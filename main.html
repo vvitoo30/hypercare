@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hypercare Dashboard</title>
+
+    <!-- Bootstrap CSS --><link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+
+    <!-- NEW: Bootstrap Icons (for the back arrow in the modal) --><link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <!-- Google Font: Poppins --><link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS (Copied from other files + new styles) --><style>
+      /* --- BASE STYLES --- */
+      body {
+        font-family: "Poppins", sans-serif;
+        /* Use your new base color */
+        background-color: #f4f6ff;
+      }
+
+      /* --- COLORS --- */
+      .bg-dark-custom {
+        background-color: #1c1c3a;
+      }
+
+      .text-primary-custom {
+        color: #4a43d1;
+      }
+
+      /* --- BUTTON STYLES (for reusing) --- */
+      .btn-primary-custom {
+        background-color: #6a60e9;
+        border-color: #6a60e9;
+      }
+
+      /* --- NEW: Custom white button for modals --- */
+      .btn-light-custom {
+        background-color: #ffffff;
+        color: #1c1c3a; /* Dark text */
+        border-color: #ffffff;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+      }
+      .btn-light-custom:hover {
+        background-color: #f0f0f0;
+        border-color: #f0f0f0;
+        color: #1c1c3a;
+      }
+
+      /* --- NEW: 6-TILE STYLES --- */
+      .app-tile {
+        background: #ffffff;
+        border-radius: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+        /* Set a fixed size for the tile */
+        width: 120px;
+        height: 120px;
+        /* Use flexbox to center the image inside the tile */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* Center the tile itself horizontally */
+        margin: 0 auto;
+      }
+
+      .app-tile:hover {
+        /* Add a subtle hover effect */
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+
+      /* --- NEW: MEDICATION CARD STYLES --- */
+      .med-card {
+        background: #ffffff;
+        /* Use a larger border-radius to match the design */
+        border-radius: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+
+      .med-img-container {
+        /* Use the same purple as our primary button */
+        background-color: #6a60e9;
+        border-radius: 0.75rem;
+        padding: 0.5rem;
+        margin-right: 1rem;
+        /* Stop the container from shrinking */
+        flex-shrink: 0;
+      }
+
+      .med-img-container img {
+        /* Control the size of the medicine box image */
+        max-width: 60px;
+        display: block;
+      }
+
+      /* --- CUSTOM MODAL STYLES (Updated for fixed size) --- */
+      .modal-fullscreen-custom {
+        background-color: #1c1c3a;
+        color: #ffffff;
+        /* Ensure the modal content itself is flexible to push footer down */
+        display: flex;
+        flex-direction: column;
+      }
+      .modal-fullscreen-custom .modal-header {
+        border-bottom: none;
+        padding: 2rem 1.5rem; /* Adjust padding for fixed size */
+        position: relative; /* For the back button absolute positioning */
+      }
+      .modal-fullscreen-custom .modal-body {
+        /* Use flex to push button to bottom */
+        display: flex;
+        flex-direction: column;
+        padding: 1rem 1.5rem; /* Adjust padding for fixed size */
+        flex-grow: 1; /* Allow body to grow and push footer */
+      }
+      .modal-fullscreen-custom .modal-footer {
+        border-top: none;
+        padding: 1.5rem;
+        flex-shrink: 0; /* Prevent footer from shrinking */
+      }
+      /* Custom back button */
+      .btn-back {
+        color: #ffffff;
+        font-size: 2rem;
+        line-height: 1;
+        opacity: 0.8;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        position: absolute; /* Absolute positioning for the back arrow */
+        left: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .btn-back:hover {
+        color: #ffffff;
+        opacity: 1;
+      }
+
+      /* NEW: Custom modal dialog size */
+      .modal-dialog-custom-size {
+        /* Set explicit width and height */
+        width: 720px; /* As requested */
+        height: 80vh; /* Set to match your screenshot */
+        max-width: none; /* Override Bootstrap's max-width for dialogs */
+        pointer-events: all; /* Ensure clicks inside the modal work */
+      }
+
+      /* NEW: Styles for the modal "Success" view */
+      .modal-success-view {
+        /* Center the checkmark and text */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        /* Take up all available space */
+        flex-grow: 1;
+      }
+
+      /* Adjust for smaller screens if the custom size is too big */
+      @media (max-width: 768px) {
+        .modal-dialog-custom-size {
+          width: 95%; /* Make it responsive on smaller screens */
+          height: 80vh; /* Use viewport height */
+        }
+        .modal-fullscreen-custom .modal-body {
+          font-size: 0.9rem; /* Smaller font for small screens */
+        }
+        .modal-fullscreen-custom h1 {
+          font-size: 2rem !important; /* Adjust heading size */
+        }
+        .modal-fullscreen-custom h2 {
+          font-size: 1.75rem !important; /* Adjust heading size */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ===== HEADER (Dark) ===== --><header class="bg-dark-custom p-3 shadow-sm text-light">
+      <div class="container">
+        <div class="d-flex align-items-center">
+          <!-- Profile Picture Placeholder --><div
+            class="rounded-circle bg-light me-3"
+            style="width: 50px; height: 50px"
+          >
+            <!-- You can replace this div with an <img> tag for a real profile pic --></div>
+          <!-- Welcome Text --><div>
+            <div class="small">Welcome!</div>
+            <div class="fw-bold fs-5">John Doe</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT (White) ===== --><main class="container my-4">
+      <!-- --- 6-TILE GRID --- --><div class="row g-4 text-center mb-4">
+        <!-- Tile 1: Daily Monitoring --><div class="col-4 text-center">
+          <a
+            href="#"
+            class="text-decoration-none app-tile"
+            data-bs-toggle="modal"
+            data-bs-target="#dailyMonitoringModal"
+          >
+            <img
+              src="assets/daily_monitoring.png"
+              alt="Daily Monitoring"
+              class="img-fluid"
+              style="max-width: 80px"
+            />
+          </a>
+          <p class="fw-bold text-dark mt-2" style="font-size: 0.8rem">
+            Daily Monitoring
+          </p>
+        </div>
+        <!-- Tile 2: Blood Pressure --><div class="col-4 text-center">
+          <a
+            href="#"
+            class="text-decoration-none app-tile"
+            data-bs-toggle="modal"
+            data-bs-target="#bpmModal"
+          >
+            <img
+              src="assets/bpm.png"
+              alt="Blood Pressure"
+              class="img-fluid"
+              style="max-width: 80px"
+            />
+          </a>
+          <p class="fw-bold text-dark mt-2" style="font-size: 0.8rem">
+            Blood Pressure
+          </p>
+        </div>
+        <!-- Tile 3: Medication Interaction --><div class="col-4 text-center">
+          <a
+            href="#"
+            class="text-decoration-none app-tile"
+            data-bs-toggle="modal"
+            data-bs-target="#medInteractionModal"
+          >
+            <img
+              src="assets/medication_interaction.png"
+              alt="Medication Interaction"
+              class="img-fluid"
+              style="max-width: 80px"
+            />
+          </a>
+          <p class="fw-bold text-dark mt-2" style="font-size: 0.8rem">
+            Medication Interaction
+          </p>
+        </div>
+        <!-- Tile 4: Pharmacy Notes --><div class="col-4 text-center">
+          <a
+            href="#"
+            class="text-decoration-none app-tile"
+            data-bs-toggle="modal"
+            data-bs-target="#pharmacyNotesModal"
+          >
+            <img
+              src="assets/pharmacy_notes.png"
+              alt="Pharmacy Notes"
+              class="img-fluid"
+              style="max-width: 80px"
+            />
+          </a>
+          <p class="fw-bold text-dark mt-2" style="font-size: 0.8rem">
+            Pharmacy Notes
+          </p>
+        </div>
+        <!-- Tile 5: Edupharma --><div class="col-4 text-center">
+          <a
+            href="#"
+            class="text-decoration-none app-tile"
+            data-bs-toggle="modal"
+            data-bs-target="#edupharmaModal"
+          >
+            <img
+              src="assets/edupharma.png"
+              alt="Edupharma"
+              class="img-fluid"
+              style="max-width: 80px"
+            />
+          </a>
+          <p class="fw-bold text-dark mt-2" style="font-size: 0.8rem">
+            Edupharma
+          </p>
+        </div>
+        <!-- Tile 6: Health Dashboard --><div class="col-4 text-center">
+          <a
+            href="#"
+            class="text-decoration-none app-tile"
+            data-bs-toggle="modal"
+            data-bs-target="#healthDashboardModal"
+          >
+            <img
+              src="assets/health_dashboard.png"
+              alt="Health Dashboard"
+              class="img-fluid"
+              style="max-width: 80px"
+            />
+          </a>
+          <p class="fw-bold text-dark mt-2" style="font-size: 0.8rem">
+            Health Dashboard
+          </p>
+        </div>
+      </div>
+
+      <!-- --- MEDICATION LIST --- --><h2 class="my-4 fw-bold" style="color: #1c1c3a">Your Medication</h2>
+
+      <!-- Medication Card 1 --><div class="med-card">
+        <div class="med-img-container">
+          <img src="assets/amlodipine.png" alt="Amlodipine" />
+        </div>
+        <div>
+          <h5 class="fw-bold mb-0" style="color: #1c1c3a">
+            Amlodipine 10 Mg
+          </h5>
+          <p class="text-muted mb-0" style="font-size: 0.9rem">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          </p>
+        </div>
+      </div>
+
+      <!-- Medication Card 2 --><div class="med-card">
+        <div class="med-img-container">
+          <img src="assets/amlodipine.png" alt="Amlodipine" />
+        </div>
+        <div>
+          <h5 class="fw-bold mb-0" style="color: #1c1c3a">
+            Amlodipine 10 Mg
+          </h5>
+          <p class="text-muted mb-0" style="font-size: 0.9rem">
+            Vestibulum porttitor ultrices elementum.
+          </p>
+        </div>
+      </div>
+
+      <!-- Medication Card 3 --><div class="med-card">
+        <div class="med-img-container">
+          <img src="assets/amlodipine.png" alt="Amlodipine" />
+        </div>
+        <div>
+          <h5 class="fw-bold mb-0" style="color: #1c1c3a">
+            Amlodipine 10 Mg
+          </h5>
+          <p class="text-muted mb-0" style="font-size: 0.9rem">
+            Proin in felis non erat blandit.
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <!--
+    ==================================================================
+    MODALS (Pop-ups)
+    ==================================================================
+    --><!-- MODAL 1: Daily Monitoring (Styled like your example) --><div
+      class="modal fade"
+      id="dailyMonitoringModal"
+      tabindex="-1"
+      aria-labelledby="dailyMonitoringModalLabel"
+      aria-hidden="true"
+    >
+      <!-- ADDED custom size class --><div class="modal-dialog modal-dialog-centered modal-dialog-custom-size">
+        <div class="modal-content modal-fullscreen-custom">
+          <!-- Modal Header (Back Button) --><div class="modal-header">
+            <button
+              type="button"
+              class="btn-back"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="bi bi-arrow-left fw-bold"></i>
+            </button>
+          </div>
+
+          <!-- Modal Body (Content) --><div class="modal-body d-flex flex-column h-100">
+            <!--
+              NEW: View #1 (Initial Schedule)
+              This view is shown by default.
+            -->
+            <!-- NEW: Added flexbox classes to make this a column that fills the height -->
+            <div
+              id="dailyMonitoring_initialView"
+              class="d-flex flex-column h-100"
+            >
+              <!-- NEW: Centered text -->
+              <h1 class="fw-bold display-5 mb-4 text-center">
+                Medication Schedule
+              </h1>
+              <!-- NEW: Centered text -->
+              <h2 class="fw-bold display-6 text-center">
+                10:15 A.M Every Day
+              </h2>
+
+              <!-- REMOVED: Side-by-side layout -->
+
+              <!-- NEW: Top-left text (default alignment is left) -->
+              <p class="fs-5 mt-5 pt-3">
+                Each medication helps<br />maintain your blood pressure!
+              </p>
+
+              <!-- NEW: Bottom-right text -->
+              <!-- mt-auto pushes this to the bottom -->
+              <!-- text-end aligns it to the right -->
+              <p class="fs-5 text-white-50 mt-auto text-end">
+                Don't forget to take the<br />medication at the same<br />time
+                everyday!
+              </p>
+
+              <!-- REMOVED: The old mt-auto div, as it's now on the <p> tag -->
+            </div>
+            <!-- End View #1 -->
+
+            <!--
+              NEW: View #2 (Success)
+              This view is hidden by default.
+            -->
+            <div
+              id="dailyMonitoring_successView"
+              class="modal-success-view"
+              style="display: none"
+            >
+              <img
+                src="assets/check.png"
+                alt="Checkmark"
+                style="max-width: 150px"
+              />
+              <h2 class="fw-bold display-6 mt-4">
+                Keep it up, don't forget to take the medication consistently!
+              </h2>
+            </div>
+            <!-- End View #2 -->
+          </div>
+
+          <!-- Modal Footer (Button) --><div class="modal-footer">
+            <!--
+              NEW: This button triggers the JavaScript
+              It will be hidden when the success view is shown.
+            -->
+            <button
+              type="button"
+              id="dailyMonitoring_mainButton"
+              class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
+              onclick="showSuccess('dailyMonitoring')"
+            >
+              I Have Taken The Medicine
+            </button>
+            <!--
+              NEW: This button is for the success view.
+              It just closes the modal and is hidden by default.
+            -->
+            <button
+              type.button
+              id="dailyMonitoring_closeButton"
+              class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
+              data-bs-dismiss="modal"
+              style="display: none"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal 1 --><!-- MODAL 2: Blood Pressure --><div
+      class="modal fade"
+      id="bpmModal"
+      tabindex="-1"
+      aria-labelledby="bpmModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-custom-size">
+        <div class="modal-content modal-fullscreen-custom">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="btn-back"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="bi bi-arrow-left fw-bold"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h1 class="fw-bold display-5 mb-4">Blood Pressure</h1>
+            <p class="fs-5">Placeholder content for Blood Pressure.</p>
+            <div class="mt-auto"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal 2 --><!-- MODAL 3: Medication Interaction --><div
+      class="modal fade"
+      id="medInteractionModal"
+      tabindex="-1"
+      aria-labelledby="medInteractionModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-custom-size">
+        <div class="modal-content modal-fullscreen-custom">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="btn-back"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="bi bi-arrow-left fw-bold"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h1 class="fw-bold display-5 mb-4">Medication Interaction</h1>
+            <p class="fs-5">Placeholder content for Medication Interaction.</p>
+            <div class="mt-auto"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal 3 --><!-- MODAL 4: Pharmacy Notes --><div
+      class="modal fade"
+      id="pharmacyNotesModal"
+      tabindex="-1"
+      aria-labelledby="pharmacyNotesModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-custom-size">
+        <div class="modal-content modal-fullscreen-custom">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="btn-back"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="bi bi-arrow-left fw-bold"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h1 class="fw-bold display-5 mb-4">Pharmacy Notes</h1>
+            <p class="fs-5">Placeholder content for Pharmacy Notes.</p>
+            <div class="mt-auto"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal 4 --><!-- MODAL 5: Edupharma --><div
+      class="modal fade"
+      id="edupharmaModal"
+      tabindex="-1"
+      aria-labelledby="edupharmaModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-custom-size">
+        <div class="modal-content modal-fullscreen-custom">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="btn-back"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="bi bi-arrow-left fw-bold"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h1 class="fw-bold display-5 mb-4">Edupharma</h1>
+            <p class="fs-5">Placeholder content for Edupharma.</p>
+            <div class="mt-auto"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal 5 --><!-- MODAL 6: Health Dashboard --><div
+      class="modal fade"
+      id="healthDashboardModal"
+      tabindex="-1"
+      aria-labelledby="healthDashboardModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-custom-size">
+        <div class="modal-content modal-fullscreen-custom">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="btn-back"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+              <i class="bi bi-arrow-left fw-bold"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <h1 class="fw-bold display-5 mb-4">Health Dashboard</h1>
+            <p class="fs-5">Placeholder content for Health Dashboard.</p>
+            <div class="mt-auto"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal 6 --><!-- Bootstrap JS Bundle --><script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- NEW: JavaScript for the modal views -->
+    <script>
+      // This function swaps the views
+      function showSuccess(modalPrefix) {
+        // Hide the initial view and main button
+        document.getElementById(modalPrefix + "_initialView").style.display =
+          "none";
+        document.getElementById(modalPrefix + "_mainButton").style.display =
+          "none";
+
+        // Show the success view and the "Done" button
+        document.getElementById(modalPrefix + "_successView").style.display =
+          "flex"; // Use "flex" to enable centering
+        document.getElementById(modalPrefix + "_closeButton").style.display =
+          "block";
+      }
+
+      // --- This part resets the modal when it's closed ---
+      const dailyModal = document.getElementById("dailyMonitoringModal");
+
+      // We listen for the modal to be hidden
+      dailyModal.addEventListener("hidden.bs.modal", function (event) {
+        // Show the initial view and main button
+        document.getElementById(
+          "dailyMonitoring_initialView"
+        ).style.display = "flex"; // "flex" to match its new display type
+        document.getElementById("dailyMonitoring_mainButton").style.display =
+          "block";
+
+        // Hide the success view and the "Done" button
+        document.getElementById(
+          "dailyMonitoring_successView"
+        ).style.display = "none";
+        document.getElementById("dailyMonitoring_closeButton").style.display =
+          "none";
+      });
+
+      // You can copy this "addEventListener" block for all other modals
+      // when you add the success state to them.
+    </script>
+  </body>
+</html>
