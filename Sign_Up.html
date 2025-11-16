@@ -108,7 +108,7 @@
     >
       <!-- Back Button -->
       <a
-        href="Login_Screen.html"
+        href="index.html"
         class="text-primary-custom"
         aria-label="Back to Login"
         style="
@@ -136,7 +136,12 @@
     <main class="flex-grow-1 d-flex align-items-center">
       <div class="container">
         <!-- Form -->
-        <form class="w-100" style="max-width: 400px; margin: 0 auto">
+        <!-- NEW: Added an ID to the form -->
+        <form
+          class="w-100"
+          style="max-width: 400px; margin: 0 auto"
+          id="signUpForm"
+        >
           <!-- Name Field -->
           <div class="mb-3">
             <label for="name" class="form-label text-light fw-bold"
@@ -186,7 +191,7 @@
 
           <!-- "Already have account" Link -->
           <p class="text-center mt-4">
-            <a href="Login.html" class="text-white-50 text-decoration-none"
+            <a href="index.html" class="text-white-50 text-decoration-none"
               >Already Have an Account?</a
             >
           </p>
@@ -194,11 +199,57 @@
       </div>
     </main>
 
+    <!-- NEW: Success Modal -->
+    <div
+      class="modal fade"
+      id="successModal"
+      tabindex="-1"
+      aria-labelledby="successModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark-custom text-white">
+          <div class="modal-header border-0">
+            <h5 class="modal-title" id="successModalLabel">Success!</h5>
+          </div>
+          <div class="modal-body">
+            <p>
+              Your account has been created. You will now be redirected to the
+              Login page.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Bootstrap JS Bundle -->
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+
+    <!-- NEW: JavaScript for redirect -->
+    <script>
+      // Get the modal and the form
+      const successModal = new bootstrap.Modal(
+        document.getElementById("successModal")
+      );
+      const signUpForm = document.getElementById("signUpForm");
+
+      // Listen for the form to be submitted
+      signUpForm.addEventListener("submit", function (event) {
+        // Stop the form from submitting normally
+        event.preventDefault();
+
+        // Show the success pop-up
+        successModal.show();
+
+        // Wait 2 seconds, then redirect to Login.html
+        setTimeout(function () {
+          window.location.href = "Login.html";
+        }, 2000); // 2000 milliseconds = 2 seconds
+      });
+    </script>
   </body>
 </html>
