@@ -31,20 +31,33 @@
         /* Use your new base color */
         background-color: #f4f6ff;
       }
-
-      /* --- COLORS --- */
-      .bg-dark-custom {
-        background-color: #1c1c3a;
+      .btn-primary-custom:hover {
+        /* A slightly darker hover state */
+        background-color: #584fc9;
+        border-color: #584fc9;
       }
 
-      .text-primary-custom {
-        color: #4a43d1;
+      /* NEW: Added this style from our other files for the "Undone" button */
+      .btn-outline-primary-custom {
+        border-color: #6a60e9;
+        color: #6a60e9;
       }
-
-      /* --- BUTTON STYLES (for reusing) --- */
-      .btn-primary-custom {
+      .btn-outline-primary-custom:hover {
         background-color: #6a60e9;
         border-color: #6a60e9;
+        color: #ffffff;
+      }
+
+      /* --- NEW: Custom white input fields for modals --- */
+      .form-control-light-custom {
+        background-color: #ffffff;
+        border: none;
+        color: #1c1c3a; /* Dark text */
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+      }
+      .form-control-light-custom::placeholder {
+        color: #a0a0b0;
       }
 
       /* --- NEW: Custom white button for modals --- */
@@ -59,6 +72,21 @@
         background-color: #f0f0f0;
         border-color: #f0f0f0;
         color: #1c1c3a;
+      }
+
+      /* --- NEW: Uniform width for activity buttons --- */
+      .btn-activity {
+        min-width: 110px; /* This makes all buttons the same width */
+      }
+
+      /* --- NEW: Style for the activity checklist items --- */
+      .activity-bar {
+        background-color: #ffffff;
+        color: #1c1c3a; /* Dark text */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0.6rem; /* Padding for the white bar */
       }
 
       /* --- NEW: 6-TILE STYLES --- */
@@ -175,6 +203,14 @@
         text-align: center;
         /* Take up all available space */
         flex-grow: 1;
+      }
+      
+      /* --- NEW: Blurred Modal Background --- */
+      .modal-backdrop {
+        /* Add the blur effect */
+        backdrop-filter: blur(4px);
+        /* Dim the background slightly */
+        background-color: rgba(244, 246, 255, 0.1);
       }
 
       /* Adjust for smaller screens if the custom size is too big */
@@ -382,7 +418,9 @@
     >
       <!-- ADDED custom size class --><div class="modal-dialog modal-dialog-centered modal-dialog-custom-size">
         <div class="modal-content modal-fullscreen-custom">
-          <!-- Modal Header (Back Button) --><div class="modal-header">
+          <!-- Modal Header (Back Button) -->
+          <!-- NEW: Added an ID here -->
+          <div class="modal-header" id="dailyMonitoring_header">
             <button
               type="button"
               class="btn-back"
@@ -437,15 +475,16 @@
             -->
             <div
               id="dailyMonitoring_successView"
-              class="modal-success-view"
-              style="display: none"
+              class="modal-success-view d-none"
             >
               <img
                 src="assets/check.png"
                 alt="Checkmark"
                 style="max-width: 150px"
+                class="mb-4"
               />
-              <h2 class="fw-bold display-6 mt-4">
+              <!-- FIXED: Added this text back to match your image -->
+              <h2 class="fw-bold display-6">
                 Keep it up, don't forget to take the medication consistently!
               </h2>
             </div>
@@ -472,9 +511,8 @@
             <button
               type.button
               id="dailyMonitoring_closeButton"
-              class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
+              class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow d-none"
               data-bs-dismiss="modal"
-              style="display: none"
             >
               Done
             </button>
@@ -501,10 +539,53 @@
               <i class="bi bi-arrow-left fw-bold"></i>
             </button>
           </div>
-          <div class="modal-body">
-            <h1 class="fw-bold display-5 mb-4">Blood Pressure</h1>
-            <p class="fs-5">Placeholder content for Blood Pressure.</p>
-            <div class="mt-auto"></div>
+          <div class="modal-body d-flex flex-column">
+            <!-- NEW CONTENT for Blood Pressure Modal -->
+            <h1 class="fw-bold display-5 mb-4">
+              Your Blood
+              <br />
+              Pressure
+            </h1>
+
+            <form>
+              <!-- Sistolic Field -->
+              <div class="mb-4">
+                <label class="form-label fw-bold"
+                  >Sistolic (mmHg)</label
+                >
+                <div
+                  id="sistolic"
+                  class="form-control form-control-lg form-control-light-custom rounded-3"
+                >
+                  120
+                </div>
+              </div>
+
+              <!-- Diastolic Field -->
+              <div class="mb-4">
+                <label class="form-label fw-bold"
+                  >Diastolic (mmHg)</label
+                >
+                <div
+                  id="diastolic"
+                  class="form-control form-control-lg form-control-light-custom rounded-3"
+                >
+                  80
+                </div>
+              </div>
+            </form>
+
+            <!-- Notes Section -->
+            <div class="mt-auto">
+              <p class="fs-5 fw-bold">
+                Notes:
+                <span class="fw-normal"
+                  >Your blood pressure is high today, try to rest and reduce
+                  your daily salt consumption</span
+                >
+              </p>
+            </div>
+            <!-- END NEW CONTENT -->
           </div>
           <div class="modal-footer">
             <button
@@ -512,7 +593,7 @@
               class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
               data-bs-dismiss="modal"
             >
-              Close
+              Save & Close
             </button>
           </div>
         </div>
@@ -646,19 +727,85 @@
             </button>
           </div>
           <div class="modal-body">
-            <h1 class="fw-bold display-5 mb-4">Health Dashboard</h1>
-            <p class="fs-5">Placeholder content for Health Dashboard.</p>
-            <div class="mt-auto"></div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
-              data-bs-dismiss="modal"
+            <!-- NEW: Daily Activity Check Content -->
+            <h1 class="fw-bold display-5 mb-4">
+              Daily Activity
+              <br />
+              Check
+            </h1>
+
+            <div
+              class="activity-bar rounded-pill fw-bold mb-3"
+              style="font-size: 0.9rem"
             >
-              Close
-            </button>
+              <span class="ps-4">Take Medicine</span>
+              <button
+                class="btn btn-primary-custom rounded-pill fw-bold btn-activity"
+                style="padding: 0.5rem 1.25rem; font-size: 0.9rem"
+                onclick="toggleActivity(this)"
+              >
+                Done
+              </button>
+            </div>
+
+            <div
+              class="activity-bar rounded-pill fw-bold mb-3"
+              style="font-size: 0.9rem"
+            >
+              <span class="ps-4">Exercise</span>
+              <button
+                class="btn btn-primary-custom rounded-pill fw-bold btn-activity"
+                style="padding: 0.5rem 1.25rem; font-size: 0.9rem"
+                onclick="toggleActivity(this)"
+              >
+                Done
+              </button>
+            </div>
+
+            <div
+              class="activity-bar rounded-pill fw-bold mb-3"
+              style="font-size: 0.9rem"
+            >
+              <span class="ps-4">Reduce Salt</span>
+              <button
+                class="btn btn-primary-custom rounded-pill fw-bold btn-activity"
+                style="padding: 0.5rem 1.25rem; font-size: 0.9rem"
+                onclick="toggleActivity(this)"
+              >
+                Done
+              </button>
+            </div>
+
+            <div
+              class="activity-bar rounded-pill fw-bold mb-3"
+              style="font-size: 0.9rem"
+            >
+              <span class="ps-4">Sleep Enough</span>
+              <button
+                class="btn btn-outline-primary-custom rounded-pill fw-bold btn-activity"
+                style="padding: 0.5rem 1.25rem; font-size: 0.9rem"
+                onclick="toggleActivity(this)"
+              >
+                Undone
+              </button>
+            </div>
+
+            <div
+              class="activity-bar rounded-pill fw-bold mb-3"
+              style="font-size: 0.9rem"
+            >
+              <span class="ps-4">No Smoking</span>
+              <button
+                class="btn btn-outline-primary-custom rounded-pill fw-bold btn-activity"
+                style="padding: 0.5rem 1.25rem; font-size: 0.9rem"
+                onclick="toggleActivity(this)"
+              >
+                Undone
+              </button>
+            </div>
+            <!-- END: Daily Activity Check Content -->
           </div>
+          <!-- REMOVED: Modal footer, as it's not in the new design -->
         </div>
       </div>
     </div>
@@ -670,19 +817,31 @@
 
     <!-- NEW: JavaScript for the modal views -->
     <script>
+      // Helper function to find elements
+      function $(id) {
+        return document.getElementById(id);
+      }
+
       // This function swaps the views
       function showSuccess(modalPrefix) {
-        // Hide the initial view and main button
-        document.getElementById(modalPrefix + "_initialView").style.display =
-          "none";
-        document.getElementById(modalPrefix + "_mainButton").style.display =
-          "none";
+        // Hide the initial view, main button, and header
+        $(modalPrefix + "_initialView").classList.toggle("d-none");
+        $(modalPrefix + "_closeButton").classList.toggle("d-none");
+      }
 
-        // Show the success view and the "Done" button
-        document.getElementById(modalPrefix + "_successView").style.display =
-          "flex"; // Use "flex" to enable centering
-        document.getElementById(modalPrefix + "_closeButton").style.display =
-          "block";
+      // NEW: Function to toggle the activity buttons
+      function toggleActivity(button) {
+        if (button.classList.contains("btn-outline-primary-custom")) {
+          // It's "Undone" -> Make it "Done"
+          button.classList.remove("btn-outline-primary-custom");
+          button.classList.add("btn-primary-custom");
+          button.textContent = "Done";
+        } else {
+          // It's "Done" -> Make it "Undone"
+          button.classList.remove("btn-primary-custom");
+          button.classList.add("btn-outline-primary-custom");
+          button.textContent = "Undone";
+        }
       }
 
       // --- This part resets the modal when it's closed ---
@@ -690,19 +849,22 @@
 
       // We listen for the modal to be hidden
       dailyModal.addEventListener("hidden.bs.modal", function (event) {
-        // Show the initial view and main button
-        document.getElementById(
+        // Show the initial view, main button, and header
+        $(
           "dailyMonitoring_initialView"
-        ).style.display = "flex"; // "flex" to match its new display type
-        document.getElementById("dailyMonitoring_mainButton").style.display =
-          "block";
+        ).classList.remove("d-none");
+        $("dailyMonitoring_initialView").classList.add("d-flex");
+        $("dailyMonitoring_mainButton").classList.remove("d-none");
+        $("dailyMonitoring_header").classList.remove("d-none");
 
         // Hide the success view and the "Done" button
-        document.getElementById(
+        $(
           "dailyMonitoring_successView"
-        ).style.display = "none";
-        document.getElementById("dailyMonitoring_closeButton").style.display =
-          "none";
+        ).classList.add("d-none");
+        $(
+          "dailyMonitoring_successView"
+        ).classList.remove("d-flex");
+        $("dailyMonitoring_closeButton").classList.add("d-none");
       });
 
       // You can copy this "addEventListener" block for all other modals
