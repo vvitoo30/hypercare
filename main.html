@@ -91,6 +91,20 @@
         color: #1c1c3a;
       }
 
+      /* --- NEW: Custom Red Logout Button --- */
+      .btn-danger-custom {
+        background-color: #dc3545; /* Bootstrap's standard red */
+        border-color: #dc3545;
+        color: #000000; /* Black text */
+        font-weight: bold;
+      }
+      .btn-danger-custom:hover {
+        background-color: #bb2d3b; /* A darker red */
+        border-color: #b02a37;
+        color: #000000;
+        font-weight: bold;
+      }
+
       /* --- NEW: 6-TILE STYLES --- */
       .app-tile {
         background: #ffffff;
@@ -161,7 +175,9 @@
         flex-direction: column;
         padding: 1rem 1.5rem; /* Adjust padding for fixed size */
         flex-grow: 1; /* Allow body to grow and push footer */
-        overflow-y: auto; /* Allow content to scroll if it's too long */
+        /* IMPORTANT: Remove overflow from here */
+        /* overflow-y: auto; */
+        min-height: 0; /* Fix for flexbox overflow */
       }
       .modal-fullscreen-custom .modal-footer {
         border-top: none;
@@ -252,26 +268,125 @@
         padding: 1.25rem;
         margin-bottom: 1rem;
       }
+      .fact-card h5 {
+        /* Add a style for the headings in the new card */
+        font-weight: bold;
+        color: #4a43d1; /* Purple heading */
+        margin-bottom: 0.5rem;
+      }
       .fact-card p {
         margin: 0;
         font-weight: bold;
+        color: #1c1c3a;
+      }
+
+      /* NEW: Edupharma Search Bar Styles */
+      .search-input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .search-input-group .form-control {
+        border-radius: 1rem; /* Rounded corners for the input */
+        padding: 1rem 1.5rem;
+        padding-right: 3rem; /* Space for the magnifying glass */
+        background-color: #ffffff;
+        border: none;
+        color: #1c1c3a;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+      .search-input-group .form-control::placeholder {
+        color: #a0a0b0;
+      }
+      .search-input-group .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(106, 96, 233, 0.5);
+      }
+
+      .search-input-group .search-icon {
+        position: absolute;
+        right: 1.5rem;
+        color: #6a60e9; /* Purple icon */
+        font-size: 1.5rem;
+      }
+
+      /* NEW: Scrollable card list for Edupharma results */
+      .scrollable-card-list {
+        overflow-y: auto; /* Add scroll only to this div */
+        flex-grow: 1; /* Allow it to fill the space */
+        padding-right: 0.5rem; /* Space for the scrollbar */
+        margin-top: 1rem;
+      }
+
+      /* --- NEW: Nutrition Label Styles --- */
+      .nutrition-label {
+        background-color: #ffffff;
+        border: 4px solid #1c1c3a; /* Thick dark border */
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        color: #1c1c3a; /* Dark text */
+        font-weight: bold;
+      }
+      .nutrition-header {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+      .nutrition-item {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+      .nutrition-label p {
+        margin: 0;
+        font-size: 0.9rem;
+      }
+      hr.nutrition-line {
+        border-top: 3px solid #1c1c3a;
+        opacity: 1;
+        margin: 0.75rem 0;
       }
     </style>
   </head>
   <body>
-    <!-- ===== HEADER (Dark) ===== --><header class="bg-dark-custom p-3 shadow-sm text-light">
+    <!-- ===== HEADER (Dark) - UPDATED WITH DROPDOWN ===== --><header class="bg-dark-custom p-3 shadow-sm text-light">
       <div class="container">
-        <div class="d-flex align-items-center">
-          <!-- Profile Picture Placeholder --><div
-            class="rounded-circle bg-light me-3"
-            style="width: 50px; height: 50px"
-          >
-            <!-- You can replace this div with an <img> tag for a real profile pic --></div>
-          <!-- Welcome Text --><div>
-            <div class="small">Welcome!</div>
-            <div class="fw-bold fs-5">John Doe</div>
+        <!-- Use d-flex to align items --><div class="d-flex align-items-center">
+          <!-- App Title (pushes dropdown to the right) --><div class="me-auto">
+            <span class="fs-4 fw-bold">Hypercare</span>
           </div>
-        </div>
+
+          <!-- NEW: Dropdown Menu --><div class="dropdown">
+            <!-- This is the trigger for the dropdown --><a
+              href="#"
+              class="d-flex align-itemsD-center text-white text-decoration-none dropdown-toggle"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <!-- Profile Picture Placeholder --><div
+                class="rounded-circle bg-light me-2"
+                style="width: 40px; height: 40px"
+              >
+                <!-- You can replace this div with an <img> tag for a real profile pic --></div>
+              <!-- Welcome Text --><div>
+                <div class="small">Welcome!</div>
+                <div class="fw-bold">John Doe</div>
+              </div>
+            </a>
+
+            <!-- Dropdown Menu Items --><ul
+              class="dropdown-menu dropdown-menu-dark text-small shadow"
+              data-bs-theme="dark"
+            >
+              <li>
+                <!-- UPDATED: Added ID and changed href --><a class="dropdown-item" href="#" id="logoutButton">Log Out</a>
+              </li>
+            </ul>
+          </div>
+          <!-- End Dropdown Menu --></div>
       </div>
     </header>
 
@@ -285,7 +400,7 @@
             data-bs-target="#dailyMonitoringModal"
           >
             <img
-              src="Assets/daily_monitoring.png"
+              src="assets/daily_monitoring.png"
               alt="Daily Monitoring"
               class="img-fluid"
               style="max-width: 80px"
@@ -303,7 +418,7 @@
             data-bs-target="#bpmModal"
           >
             <img
-              src="Assets/bpm.png"
+              src="assets/bpm.png"
               alt="Blood Pressure"
               class="img-fluid"
               style="max-width: 80px"
@@ -321,7 +436,7 @@
             data-bs-target="#medInteractionModal"
           >
             <img
-              src="Assets/medication_interaction.png"
+              src="assets/medication_interaction.png"
               alt="Medication Interaction"
               class="img-fluid"
               style="max-width: 80px"
@@ -339,7 +454,7 @@
             data-bs-target="#pharmacyNotesModal"
           >
             <img
-              src="Assets/pharmacy_notes.png"
+              src="assets/pharmacy_notes.png"
               alt="Pharmacy Notes"
               class="img-fluid"
               style="max-width: 80px"
@@ -357,7 +472,7 @@
             data-bs-target="#edupharmaModal"
           >
             <img
-              src="Assets/edupharma.png"
+              src="assets/edupharma.png"
               alt="Edupharma"
               class="img-fluid"
               style="max-width: 80px"
@@ -375,7 +490,7 @@
             data-bs-target="#healthDashboardModal"
           >
             <img
-              src="Assets/health_dashboard.png"
+              src="assets/health_dashboard.png"
               alt="Health Dashboard"
               class="img-fluid"
               style="max-width: 80px"
@@ -391,7 +506,7 @@
 
       <!-- Medication Card 1 --><div class="med-card">
         <div class="med-img-container">
-          <img src="Assets/amlodipine.png" alt="Amlodipine" />
+          <img src="assets/amlodipine.png" alt="Amlodipine" />
         </div>
         <div>
           <h5 class="fw-bold mb-0" style="color: #1c1c3a">
@@ -405,7 +520,7 @@
 
       <!-- Medication Card 2 --><div class="med-card">
         <div class="med-img-container">
-          <img src="Assets/amlodipine.png" alt="Amlodipine" />
+          <img src="assets/amlodipine.png" alt="Amlodipine" />
         </div>
         <div>
           <h5 class="fw-bold mb-0" style="color: #1c1c3a">
@@ -419,7 +534,7 @@
 
       <!-- Medication Card 3 --><div class="med-card">
         <div class="med-img-container">
-          <img src="Assets/amlodipine.png" alt="Amlodipine" />
+          <img src="assets/amlodipine.png" alt="Amlodipine" />
         </div>
         <div>
           <h5 class="fw-bold mb-0" style="color: #1c1c3a">
@@ -458,42 +573,35 @@
           </div>
 
           <!-- Modal Body (Content) --><div class="modal-body">
-            <!-- Wrapper for all initial content -->
-            <div id="dailyMonitoring_initialView">
-              <!-- Flex container for layout -->
-              <div class="d-flex flex-column h-100">
-                <!-- Centered Text -->
-                <div class="text-center">
+            <!-- Wrapper for all initial content --><div id="dailyMonitoring_initialView">
+              <!-- Flex container for layout --><div class="d-flex flex-column h-100">
+                <!-- Centered Text --><div class="text-center">
                   <h1 class="fw-bold display-5 mb-4">
                     Medication Schedule
                   </h1>
                   <h2 class="fw-bold display-6">10:15 A.M Every Day</h2>
                 </div>
 
-                <!-- Top Left Text -->
-                <p class="fs-5 mt-5 pt-3">
+                <!-- Top Left Text --><p class="fs-5 mt-5 pt-3">
                   Each medication helps<br />maintain your blood pressure!
                 </p>
 
-                <!-- Bottom Right Text -->
-                <p class="fs-5 mt-auto text-end text-white-50">
+                <!-- Bottom Right Text --><p class="fs-5 mt-auto text-end text-white-50">
                   Don't forget to take the<br />medication at the same<br />time
                   everyday!
                 </p>
               </div>
             </div>
 
-            <!-- Success View (Hidden by default) -->
-            <div
+            <!-- Success View (Hidden by default) --><div
               class="d-none text-center"
               id="dailyMonitoring_successView"
             >
-              <!-- This helper div vertically centers the content -->
-              <div
+              <!-- This helper div vertically centers the content --><div
                 class="d-flex flex-column justify-content-center align-items-center h-100"
               >
                 <img
-                  src="Assets/check.png"
+                  src="assets/check.png"
                   alt="Success"
                   class="img-fluid mb-4"
                   style="max-width: 100px"
@@ -507,8 +615,7 @@
           </div>
 
           <!-- Modal Footer (Buttons) --><div class="modal-footer">
-            <!-- Initial Button -->
-            <button
+            <!-- Initial Button --><button
               type="button"
               class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
               id="dailyMonitoring_initialButton"
@@ -516,8 +623,7 @@
             >
               I Have Taken The Medicine
             </button>
-            <!-- Close Button (Hidden by default) -->
-            <button
+            <!-- Close Button (Hidden by default) --><button
               type="button"
               class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow d-none"
               id="dailyMonitoring_closeButton"
@@ -552,31 +658,25 @@
           <div class="modal-body">
             <h1 class="fw-bold display-5 mb-4">Your Blood Pressure</h1>
 
-            <!-- Sistolic -->
-            <div class="mb-3">
+            <!-- Sistolic --><div class="mb-3">
               <label class="form-label fw-bold mb-2"
                 >Sistolic (mmHg)</label
               >
-              <!-- Data will come from DB, '120' is a placeholder -->
-              <div class="form-control-light-custom" id="bpm_sistolic_display">
+              <!-- Data will come from DB, '120' is a placeholder --><div class="form-control-light-custom" id="bpm_sistolic_display">
                 120
               </div>
             </div>
 
-            <!-- Diastolic -->
-            <div class="mb-4">
+            <!-- Diastolic --><div class="mb-4">
               <label class="form-label fw-bold mb-2"
                 >Diastolic (mmHg)</label
               >
-              <!-- Data will come from DB, '80' is a placeholder -->
-              <div class="form-control-light-custom" id="bpm_diastolic_display">
+              <!-- Data will come from DB, '80' is a placeholder --><div class="form-control-light-custom" id="bpm_diastolic_display">
                 80
               </div>
             </div>
 
-            <!-- Notes -->
-            <!-- This text will be set by JavaScript -->
-            <p class="fs-5 mt-4" id="bpm_notes">
+            <!-- Notes --><!-- This text will be set by JavaScript --><p class="fs-5 mt-4" id="bpm_notes">
               Notes: Calculating...
             </p>
 
@@ -651,12 +751,10 @@
               <i class="bi bi-arrow-left fw-bold"></i>
             </button>
           </div>
-          <!-- UPDATED: Modal Body -->
-          <div class="modal-body">
+          <!-- UPDATED: Modal Body --><div class="modal-body">
             <h1 class="fw-bold display-5 mb-4">Did you know?</h1>
 
-            <!-- Fact Card List -->
-            <div class="fact-card">
+            <!-- Fact Card List --><div class="fact-card">
               <p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
                 condimentum et tortor at fringilla.
@@ -686,12 +784,9 @@
                 condimentum et tortor at fringilla.
               </p>
             </div>
-            <!-- End Fact Card List -->
-
-            <div class="mt-auto"></div>
+            <!-- End Fact Card List --><div class="mt-auto"></div>
           </div>
-          <!-- UPDATED: Modal Footer -->
-          <div class="modal-footer">
+          <!-- UPDATED: Modal Footer --><div class="modal-footer">
             <button
               type="button"
               class="btn btn-light-custom rounded-pill fw-bold btn-lg w-100 shadow"
@@ -723,10 +818,87 @@
               <i class="bi bi-arrow-left fw-bold"></i>
             </button>
           </div>
-          <div class="modal-body">
-            <h1 class="fw-bold display-5 mb-4">Edupharma</h1>
-            <p class="fs-5">Placeholder content for Edupharma.</p>
-            <div class="mt-auto"></div>
+          <!-- UPDATED: Modal Body for Edupharma --><div class="modal-body">
+            <!-- Search View (Initial) --><div id="edupharma_searchView">
+              <h1 class="fw-bold display-5 mb-4">
+                Search up your medication here
+              </h1>
+
+              <div class="search-input-group mb-3">
+                <input
+                  type="text"
+                  class="form-control form-control-lg"
+                  placeholder="Search..."
+                  aria-label="Search medication"
+                />
+                <span class="search-icon"><i class="bi bi-search"></i></span>
+              </div>
+
+              <button
+                type="button"
+                class="btn btn-primary-custom rounded-pill fw-bold text-white px-5 shadow ms-auto"
+                id="edupharma_enterButton"
+              >
+                Enter
+              </button>
+            </div>
+            <!-- End Search View -->
+
+            <!-- Results View (Hidden) --><div class="d-none" id="edupharma_resultsView">
+              <h1 class="fw-bold display-5">Search Results</h1>
+              <h2 class="fw-bold fs-4 text-white-50 mb-3">
+                Showing results for "Amlodipine"
+              </h2>
+
+              <!-- FIXED: This div will scroll, not the whole modal body --><div class="scrollable-card-list">
+                <!-- NEW: Nutrition Label 1 -->
+                <div class="nutrition-label">
+                  <h2 class="nutrition-header">Description and Benefits</h2>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                    condimentum et tortor at fringilla. Donec eu dui sed nibh
+                    pellentesque posuere. Aenean ipsum lacus, sagittis eu
+                    vulputate et, malesuada dictum mauris.
+                  </p>
+                  <hr class="nutrition-line" />
+                  <h3 class="nutrition-item">Dosage</h3>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                    condimentum et tortor at fringilla. Donec eu dui sed nibh
+                    pellentesque posuere.
+                  </p>
+                  <hr class="nutrition-line" />
+                  <h3 class="nutrition-item">Usage Instruction</h3>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                    condimentum et tortor at fringilla.
+                  </p>
+                </div>
+                <!-- END: Nutrition Label 1 -->
+
+                <!-- NEW: Nutrition Label 2 -->
+                <div class="nutrition-label">
+                  <h2 class="nutrition-header">
+                    Safety Information & Contraindications
+                  </h2>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                    condimentum et tortor at fringilla. Donec eu dui sed nibh
+                    pellentesque posuere. Aenean ipsum lacus, sagittis eu
+                    vulputate et, malesuada dictum mauris.
+                  </p>
+                  <hr class="nutrition-line" />
+                  <h3 class="nutrition-item">Contraindication</h3>
+                  <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                    condimentum et tortor at fringilla.
+                  </p>
+                </div>
+                <!-- END: Nutrition Label 2 -->
+              </div>
+              <!-- End Scrollable Div -->
+            </div>
+            <!-- End Results View --><div class="mt-auto"></div>
           </div>
           <div class="modal-footer">
             <button
@@ -763,8 +935,7 @@
           <div class="modal-body">
             <h1 class="fw-bold display-5 mb-4">Daily Activity Check</h1>
 
-            <!-- Activity List -->
-            <div class="activity-row">
+            <!-- Activity List --><div class="activity-row">
               <p>Take Medicine</p>
               <button
                 class="btn btn-primary-custom rounded-pill fw-bold"
@@ -824,14 +995,77 @@
         </div>
       </div>
     </div>
-    <!-- End Modal 6 --><!-- Bootstrap JS Bundle --><script
+    <!-- End Modal 6 --><!-- UPDATED: MODAL 7: Log Out SPINNER (was logoutModal) --><div
+      class="modal fade"
+      id="logoutSpinnerModal"
+      tabindex="-1"
+      aria-labelledby="logoutSpinnerModalLabel"
+      aria-hidden="true"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark-custom text-white">
+          <div class="modal-body text-center p-4">
+            <h2 class="fw-bold mb-3">Logging Out...</h2>
+            <p>You will be redirected shortly.</p>
+            <div class="spinner-border text-light mt-2" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal 7 --><!-- NEW: MODAL 8: Log Out CONFIRMATION --><div
+      class="modal fade"
+      id="logoutConfirmModal"
+      tabindex="-1"
+      aria-labelledby="logoutConfirmModalLabel"
+      aria-hidden="true"
+      data-bs-backdrop-class="modal-backdrop-blur"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark-custom text-white">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold fs-4" id="logoutConfirmModalLabel">
+              Log Out?
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to log out?</p>
+          </div>
+          <div class="modal-footer border-0">
+            <button
+              type="button"
+              class="btn btn-secondary rounded-pill"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger-custom rounded-pill"
+              id="confirmLogoutButton"
+            >
+              Log Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal 8 --><!-- Bootstrap JS Bundle --><script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
 
-    <!-- NEW: JavaScript for Modals -->
-    <script>
+    <!-- NEW: JavaScript for Modals --><script>
       // This function swaps the views
       function showSuccess(modalPrefix) {
         // Get the elements
@@ -931,7 +1165,65 @@
         // 3. Set the notes text
         notesEl.textContent = note;
       });
+
+      // --- UPDATED: This part handles the Log Out flow ---
+      const logoutButton = document.getElementById("logoutButton");
+      const logoutConfirmModal = new bootstrap.Modal(
+        document.getElementById("logoutConfirmModal")
+      );
+      const logoutSpinnerModal = new bootstrap.Modal(
+        document.getElementById("logoutSpinnerModal")
+      );
+      const confirmLogoutButton = document.getElementById(
+        "confirmLogoutButton"
+      );
+
+      logoutButton.addEventListener("click", function (event) {
+        // Stop the link from doing anything
+        event.preventDefault();
+        // Show the confirmation modal
+        logoutConfirmModal.show();
+      });
+
+      confirmLogoutButton.addEventListener("click", function () {
+        // Hide the confirmation modal
+        logoutConfirmModal.hide();
+
+        // Show the "Logging Out..." spinner modal
+        logoutSpinnerModal.show();
+
+        // Wait 3 seconds, then redirect to index.html
+        setTimeout(function () {
+          window.location.href = "index.html";
+        }, 3000); // 3000 milliseconds = 3 seconds
+      });
+
+      // --- NEW: This part handles the Edupharma search ---
+      const edupharmaEnterButton = document.getElementById(
+        "edupharma_enterButton"
+      );
+      const edupharmaModal = document.getElementById("edupharmaModal");
+      const edupharmaSearchView = document.getElementById(
+        "edupharma_searchView"
+      );
+      const edupharmaResultsView = document.getElementById(
+        "edupharma_resultsView"
+      );
+
+      edupharmaEnterButton.addEventListener("click", function () {
+        // Hide the search view
+        edupharmaSearchView.classList.add("d-none");
+        // Show the results view
+        edupharmaResultsView.classList.remove("d-none");
+      });
+
+      // Reset Edupharma modal on close
+      edupharmaModal.addEventListener("hidden.bs.modal", function (event) {
+        // Show the search view
+        edupharmaSearchView.classList.remove("d-none");
+        // Hide the results view
+        edupharmaResultsView.classList.add("d-none");
+      });
     </script>
   </body>
 </html>
-
