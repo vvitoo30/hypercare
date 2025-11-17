@@ -96,7 +96,7 @@
     >
       <!-- Back Button -->
       <a
-        href="index.html"
+        href="welcome.html"
         class="text-primary-custom"
         aria-label="Back to Home"
         style="
@@ -129,6 +129,7 @@
           class="w-100"
           style="max-width: 400px; margin: 0 auto"
           action="main.html"
+          id="loginForm"
         >
           <!-- Username Field -->
           <div class="mb-3">
@@ -160,6 +161,7 @@
           <button
             type="submit"
             class="btn btn-primary-custom rounded-pill fw-bold text-white btn-lg w-100 shadow mt-3"
+            id="loginButton"
           >
             Login
           </button>
@@ -187,6 +189,28 @@
       xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+
+    <!-- NEW: JavaScript for login delay -->
+    <script>
+      // Get the form and the button
+      const loginForm = document.getElementById("loginForm");
+      const loginButton = document.getElementById("loginButton");
+
+      // Listen for the form to be submitted
+      loginForm.addEventListener("submit", function (event) {
+        // Stop the form from submitting immediately
+        event.preventDefault();
+
+        // Update button text and disable it
+        loginButton.textContent = "Logging in, please wait...";
+        loginButton.disabled = true;
+
+        // Wait 3 seconds, then redirect to Main_App.html
+        setTimeout(function () {
+          // Redirect to the page
+          window.location.href = "main.html";
+        }, 3000); // 3000 milliseconds = 3 seconds
+      });
+    </script>
   </body>
 </html>
-
