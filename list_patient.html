@@ -46,21 +46,31 @@
         color: #4a43d1;
       }
 
-      /* --- NEW: SEARCH PATIENT BUTTON --- */
-      .btn-search-patient {
+      /* --- NEW: ACTION BUTTONS CONTAINER --- */
+      .action-buttons-container {
+        display: flex;
+        gap: 1rem; /* Space between buttons */
+        margin-bottom: 2rem;
+        padding: 0 0.5rem;
+      }
+
+      /* --- NEW: ACTION BUTTON STYLE --- */
+      .btn-action-white {
         background-color: #ffffff;
         color: #4a43d1;
         font-weight: bold;
-        font-size: 1.5rem;
-        border-radius: 1rem; /* Rounded corners */
+        font-size: 1.1rem; /* Adjusted to fit text */
+        border-radius: 1rem;
         padding: 0.75rem 0;
-        width: 100%;
+        width: 100%; /* Take up available space in flex item */
         border: none;
-        text-decoration: none; /* Remove underline from link */
-        display: block;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
       }
-      .btn-search-patient:hover {
+      .btn-action-white:hover {
         background-color: #f0f0f0;
         color: #4a43d1;
       }
@@ -135,11 +145,15 @@
         <p>searching up the patient's name</p>
       </div>
 
-      <!-- UPDATED: Search Button Section -->
-      <div class="mb-5 px-3">
-        <!-- This button links directly to patient_search.html -->
-        <a href="patient_search.html" class="btn-search-patient">
+      <!-- UPDATED: Two Buttons Section -->
+      <div class="action-buttons-container">
+        <!-- Search Button -->
+        <a href="patient_search.html" class="btn-action-white">
           Search Patient
+        </a>
+        <!-- Register Button -->
+        <a href="register_patient.html" class="btn-action-white">
+          Register Patient
         </a>
       </div>
 
