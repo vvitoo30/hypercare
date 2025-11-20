@@ -46,6 +46,25 @@
         color: #4a43d1;
       }
 
+      /* --- NEW: SEARCH PATIENT BUTTON --- */
+      .btn-search-patient {
+        background-color: #ffffff;
+        color: #4a43d1;
+        font-weight: bold;
+        font-size: 1.5rem;
+        border-radius: 1rem; /* Rounded corners */
+        padding: 0.75rem 0;
+        width: 100%;
+        border: none;
+        text-decoration: none; /* Remove underline from link */
+        display: block;
+        text-align: center;
+      }
+      .btn-search-patient:hover {
+        background-color: #f0f0f0;
+        color: #4a43d1;
+      }
+
       /* --- NEW: ACTION BUTTONS CONTAINER --- */
       .action-buttons-container {
         display: flex;
@@ -83,6 +102,14 @@
         margin-bottom: 1rem;
         display: flex;
         align-items: center;
+        cursor: pointer; /* Make it look clickable */
+        transition: transform 0.1s; /* Add a subtle press effect */
+        text-decoration: none; /* Ensure no underline if using <a> tag wrapper */
+        color: inherit; /* Inherit text color */
+      }
+      
+      .patient-card:active {
+        transform: scale(0.98);
       }
       
       .patient-avatar {
@@ -160,8 +187,8 @@
       <!-- Patient List -->
       <div class="patient-list">
         
-        <!-- Patient Card 1 -->
-        <div class="patient-card">
+        <!-- Patient Card 1 - WRAPPED IN ANCHOR TAG -->
+        <a href="patient_detail.html" class="patient-card">
           <div class="patient-avatar"></div>
           <div class="patient-info">
             <div class="patient-name">Wayan Antonio</div>
@@ -170,10 +197,10 @@
               Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </div>
           </div>
-        </div>
+        </a>
 
         <!-- Patient Card 2 -->
-        <div class="patient-card">
+        <a href="patient_detail.html" class="patient-card">
           <div class="patient-avatar"></div>
           <div class="patient-info">
             <div class="patient-name">Wayan Antonio</div>
@@ -182,10 +209,10 @@
               Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </div>
           </div>
-        </div>
+        </a>
 
         <!-- Patient Card 3 -->
-        <div class="patient-card">
+        <a href="patient_detail.html" class="patient-card">
           <div class="patient-avatar"></div>
           <div class="patient-info">
             <div class="patient-name">Wayan Antonio</div>
@@ -194,10 +221,10 @@
               Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </div>
           </div>
-        </div>
+        </a>
 
         <!-- Patient Card 4 -->
-        <div class="patient-card">
+        <a href="patient_detail.html" class="patient-card">
           <div class="patient-avatar"></div>
           <div class="patient-info">
             <div class="patient-name">Wayan Antonio</div>
@@ -206,10 +233,10 @@
               Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </div>
           </div>
-        </div>
+        </a>
 
         <!-- Patient Card 5 -->
-        <div class="patient-card">
+        <a href="patient_detail.html" class="patient-card">
           <div class="patient-avatar"></div>
           <div class="patient-info">
             <div class="patient-name">Wayan Antonio</div>
@@ -218,10 +245,10 @@
               Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </div>
           </div>
-        </div>
+        </a>
 
         <!-- Patient Card 6 -->
-        <div class="patient-card">
+        <a href="patient_detail.html" class="patient-card">
           <div class="patient-avatar"></div>
           <div class="patient-info">
             <div class="patient-name">Wayan Antonio</div>
@@ -230,10 +257,10 @@
               Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </div>
           </div>
-        </div>
+        </a>
 
         <!-- Patient Card 7 -->
-        <div class="patient-card">
+        <a href="patient_detail.html" class="patient-card">
           <div class="patient-avatar"></div>
           <div class="patient-info">
             <div class="patient-name">Wayan Antonio</div>
@@ -242,7 +269,7 @@
               Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
             </div>
           </div>
-        </div>
+        </a>
 
       </div>
     </main>
