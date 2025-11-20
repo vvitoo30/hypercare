@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register Patient - Hypercare Admin</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <!-- Google Font: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <style>
+      /* --- BASE STYLES --- */
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #1c1c3a; /* Dark background */
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        color: white;
+      }
+
+      /* --- COLORS --- */
+      .bg-dark-custom {
+        background-color: #1c1c3a;
+      }
+
+      /* --- BACK ARROW --- */
+      .back-arrow {
+        color: #ffffff;
+        font-size: 2rem;
+        text-decoration: none;
+      }
+      .back-arrow:hover {
+        color: #cccccc;
+      }
+
+      /* --- FORM INPUT STYLES --- */
+      .form-label {
+        font-weight: bold;
+        font-size: 1.25rem; /* Larger labels */
+        margin-bottom: 0.5rem;
+      }
+      .form-control-custom {
+        background-color: #ffffff;
+        border-radius: 1.5rem; /* More rounded */
+        border: none;
+        padding: 1.5rem 1rem; /* Taller input fields */
+        color: #4a43d1; /* Purple text inside */
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+      .form-control-custom::placeholder {
+        color: #4a43d1;
+        opacity: 0.7;
+      }
+      /* Remove Bootstrap's default focus ring, use shadow */
+      .form-control-custom:focus {
+        box-shadow: 0 0 0 0.25rem rgba(74, 67, 209, 0.25);
+        border-color: transparent; /* Ensure no border appears */
+      }
+
+      /* --- REGISTER BUTTON --- */
+      .btn-register-custom {
+        background-color: #ffffff;
+        color: #4a43d1;
+        font-weight: bold;
+        font-size: 1.5rem;
+        border-radius: 1.5rem;
+        padding: 1rem 0;
+        width: 100%;
+        border: none;
+        margin-top: 2rem;
+      }
+      .btn-register-custom:hover {
+        background-color: #f0f0f0;
+        color: #4a43d1;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header / Top Bar -->
+    <div class="container pt-4 pb-2">
+      <!-- Back to List -->
+      <a href="admin_dashboard.html" class="back-arrow">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container mt-3">
+      <h1 class="fw-bold mb-3">Register Patient</h1>
+      <p class="mb-5">
+        Register new patient to the system by following this simple procedure
+      </p>
+
+      <!-- Added ID for JS access -->
+      <form id="registerForm">
+        <!-- Patient Name Field -->
+        <div class="mb-4">
+          <label for="patientName" class="form-label">Patient Name</label>
+          <!-- Added 'required' attribute -->
+          <input
+            type="text"
+            class="form-control form-control-custom"
+            id="patientName"
+            placeholder="Enter patient's full name"
+            required
+          />
+        </div>
+
+        <!-- Medical Report Field -->
+        <div class="mb-4">
+          <label for="medicalReport" class="form-label">Medical Report</label>
+          <!-- Added 'required' attribute -->
+          <textarea
+            class="form-control form-control-custom"
+            id="medicalReport"
+            rows="3"
+            placeholder="Enter detailed medical report"
+            required
+          ></textarea>
+        </div>
+
+        <!-- Medication Field -->
+        <div class="mb-5">
+          <label for="medication" class="form-label">Medication</label>
+          <!-- Added 'required' attribute -->
+          <input
+            type="text"
+            class="form-control form-control-custom"
+            id="medication"
+            placeholder="Enter current medications"
+            required
+          />
+        </div>
+
+        <!-- Register Button -->
+        <div>
+          <button type="submit" class="btn-register-custom">
+            Register Patient
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <!-- NEW: Success Modal with Loading Spinner -->
+    <div
+      class="modal fade"
+      id="successModal"
+      tabindex="-1"
+      aria-labelledby="successModalLabel"
+      aria-hidden="true"
+      data-bs-backdrop="static"
+      data-bs-keyboard="false"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark-custom text-white border-0">
+          <div class="modal-body text-center p-5">
+            <h2 class="fw-bold mb-3">Patient Registered!</h2>
+            <p class="fs-5 mb-4">
+              Redirecting to list of patients...
+            </p>
+            <!-- Bootstrap Spinner -->
+            <div class="spinner-border text-light" style="width: 3rem; height: 3rem;" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Registration Logic Script -->
+    <script>
+      const registerForm = document.getElementById("registerForm");
+      const successModal = new bootstrap.Modal(
+        document.getElementById("successModal")
+      );
+
+      registerForm.addEventListener("submit", function (event) {
+        // Prevent default form submission so we can handle the logic
+        event.preventDefault();
+
+        // Check if form is valid (browser handles 'required' automatically,
+        // but this is a safe check)
+        if (registerForm.checkValidity()) {
+          // Show the success modal with spinner
+          successModal.show();
+
+          // Wait 3 seconds, then redirect
+          setTimeout(function () {
+            window.location.href = "list_patient.html";
+          }, 3000);
+        } else {
+          // If not valid, let the browser show validation errors
+          registerForm.reportValidity();
+        }
+      });
+    </script>
+  </body>
+</html>
