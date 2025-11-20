@@ -87,6 +87,7 @@
       }
 
       /* --- PATIENT CARD --- */
+      /* UPDATED: Added pointer cursor and transition for hover effect */
       .patient-card {
         background-color: #ffffff;
         border-radius: 1.5rem;
@@ -95,9 +96,27 @@
         display: flex;
         align-items: center;
         /* Text inside card is dark */
-        color: #000; 
+        color: #000;
+        text-decoration: none; /* Remove underline from anchor tag */
+        cursor: pointer; /* Show pointer cursor on hover */
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth transition */
+        display: block; /* Make anchor behave like a block */
+      }
+
+      /* UPDATED: Hover effect */
+      .patient-card:hover {
+        transform: translateY(-2px); /* Slight lift on hover */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow on hover */
+        background-color: #f8f9fa; /* Slight background change on hover */
       }
       
+      /* Use flex inside the anchor tag for layout */
+      .patient-card-content {
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
       .patient-avatar {
         width: 80px;
         height: 80px;
@@ -184,65 +203,75 @@
       <!-- Patient List -->
       <div class="patient-list" id="patientListContainer">
         
-        <!-- Patient Card 1 -->
-        <div class="patient-card patient-item">
-          <div class="patient-avatar"></div>
-          <div class="patient-info">
-            <div class="patient-name">Wayan Antonio</div>
-            <div class="patient-divider"></div>
-            <div class="patient-details">
-              Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        <!-- Patient Card 1 - Updated to be a clickable link -->
+        <a href="patient_detail.html" class="patient-card patient-item">
+          <div class="patient-card-content">
+            <div class="patient-avatar"></div>
+            <div class="patient-info">
+              <div class="patient-name">Wayan Antonio</div>
+              <div class="patient-divider"></div>
+              <div class="patient-details">
+                Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              </div>
             </div>
           </div>
-        </div>
+        </a>
 
         <!-- Patient Card 2 -->
-        <div class="patient-card patient-item">
-          <div class="patient-avatar"></div>
-          <div class="patient-info">
-            <div class="patient-name">Budi Santoso</div>
-            <div class="patient-divider"></div>
-            <div class="patient-details">
-              Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        <a href="patient_detail.html" class="patient-card patient-item">
+          <div class="patient-card-content">
+            <div class="patient-avatar"></div>
+            <div class="patient-info">
+              <div class="patient-name">Budi Santoso</div>
+              <div class="patient-divider"></div>
+              <div class="patient-details">
+                Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              </div>
             </div>
           </div>
-        </div>
+        </a>
 
         <!-- Patient Card 3 -->
-        <div class="patient-card patient-item">
-          <div class="patient-avatar"></div>
-          <div class="patient-info">
-            <div class="patient-name">Siti Aminah</div>
-            <div class="patient-divider"></div>
-            <div class="patient-details">
-              Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        <a href="patient_detail.html" class="patient-card patient-item">
+          <div class="patient-card-content">
+            <div class="patient-avatar"></div>
+            <div class="patient-info">
+              <div class="patient-name">Siti Aminah</div>
+              <div class="patient-divider"></div>
+              <div class="patient-details">
+                Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              </div>
             </div>
           </div>
-        </div>
+        </a>
 
         <!-- Patient Card 4 -->
-        <div class="patient-card patient-item">
-          <div class="patient-avatar"></div>
-          <div class="patient-info">
-            <div class="patient-name">Wayan Antonio</div>
-            <div class="patient-divider"></div>
-            <div class="patient-details">
-              Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        <a href="patient_detail.html" class="patient-card patient-item">
+          <div class="patient-card-content">
+            <div class="patient-avatar"></div>
+            <div class="patient-info">
+              <div class="patient-name">Wayan Antonio</div>
+              <div class="patient-divider"></div>
+              <div class="patient-details">
+                Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              </div>
             </div>
           </div>
-        </div>
+        </a>
 
         <!-- Patient Card 5 -->
-        <div class="patient-card patient-item">
-          <div class="patient-avatar"></div>
-          <div class="patient-info">
-            <div class="patient-name">Joko Widodo</div>
-            <div class="patient-divider"></div>
-            <div class="patient-details">
-              Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        <a href="patient_detail.html" class="patient-card patient-item">
+          <div class="patient-card-content">
+            <div class="patient-avatar"></div>
+            <div class="patient-info">
+              <div class="patient-name">Joko Widodo</div>
+              <div class="patient-divider"></div>
+              <div class="patient-details">
+                Medical Report: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+              </div>
             </div>
           </div>
-        </div>
+        </a>
         
         <!-- No Results Message (Hidden by default) -->
         <div id="noResultsMessage" class="text-center text-white mt-5 d-none">
@@ -304,7 +333,7 @@
       searchButton.addEventListener('click', performSearch);
       clearButton.addEventListener('click', resetSearch); // Icon resets search
 
-      // Allow pressing "Enter" key
+      // Allow pressing "Enter" key in the input box
       searchInput.addEventListener('keyup', function(event) {
         if (event.key === 'Enter') {
           performSearch();
@@ -313,6 +342,16 @@
 
       // Real-time search (updates as you type)
       searchInput.addEventListener('input', performSearch);
+
+      // NEW: Check for incoming search query from Admin Dashboard
+      window.addEventListener('load', function() {
+        const incomingQuery = localStorage.getItem("patientSearchQuery");
+        if (incomingQuery) {
+          searchInput.value = incomingQuery;
+          performSearch(); // Run search immediately
+          localStorage.removeItem("patientSearchQuery"); // Clear it so it doesn't persist forever
+        }
+      });
     </script>
   </body>
 </html>
