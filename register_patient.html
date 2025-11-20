@@ -57,43 +57,41 @@
       /* --- FORM INPUT STYLES --- */
       .form-label {
         font-weight: bold;
-        font-size: 1.25rem; /* Larger labels */
+        font-size: 1.1rem; /* Bold labels */
         margin-bottom: 0.5rem;
       }
       .form-control-custom {
-        background-color: #ffffff;
-        border-radius: 1.5rem; /* More rounded */
+        background-color: #f4f6ff; /* Very light blue/white */
+        border-radius: 1rem; /* Rounded corners */
         border: none;
-        padding: 1.5rem 1rem; /* Taller input fields */
-        color: #4a43d1; /* Purple text inside */
-        font-weight: bold;
-        font-size: 1.2rem;
+        padding: 1rem; /* Taller input fields */
+        color: #1c1c3a; /* Dark text inside */
+        font-weight: normal;
+        font-size: 1rem;
       }
-      .form-control-custom::placeholder {
-        color: #4a43d1;
-        opacity: 0.7;
-      }
-      /* Remove Bootstrap's default focus ring, use shadow */
       .form-control-custom:focus {
+        background-color: #ffffff;
         box-shadow: 0 0 0 0.25rem rgba(74, 67, 209, 0.25);
-        border-color: transparent; /* Ensure no border appears */
+        border-color: transparent;
+        color: #1c1c3a;
       }
 
       /* --- REGISTER BUTTON --- */
       .btn-register-custom {
         background-color: #ffffff;
-        color: #4a43d1;
+        color: #4a43d1; /* Purple text */
         font-weight: bold;
         font-size: 1.5rem;
-        border-radius: 1.5rem;
-        padding: 1rem 0;
+        border-radius: 2rem; /* Pill shape */
+        padding: 0.75rem 0;
         width: 100%;
         border: none;
-        margin-top: 2rem;
+        margin-top: 1.5rem;
+        margin-bottom: 3rem;
       }
       .btn-register-custom:hover {
         background-color: #f0f0f0;
-        color: #4a43d1;
+        color: #3832a0;
       }
     </style>
   </head>
@@ -101,55 +99,83 @@
     <!-- Header / Top Bar -->
     <div class="container pt-4 pb-2">
       <!-- Back to List -->
-      <a href="admin_dashboard.html" class="back-arrow">
+      <a href="list_patient.html" class="back-arrow">
         <i class="bi bi-arrow-left"></i>
       </a>
     </div>
 
     <!-- Main Content -->
     <main class="container mt-3">
-      <h1 class="fw-bold mb-3">Register Patient</h1>
-      <p class="mb-5">
+      <h1 class="fw-bold mb-2">Register Patient</h1>
+      <p class="mb-4 text-white-50" style="font-size: 0.9rem;">
         Register new patient to the system by following this simple procedure
       </p>
 
-      <!-- Added ID for JS access -->
+      <!-- Form -->
       <form id="registerForm">
-        <!-- Patient Name Field -->
-        <div class="mb-4">
+        
+        <!-- 1. Patient Name -->
+        <div class="mb-3">
           <label for="patientName" class="form-label">Patient Name</label>
-          <!-- Added 'required' attribute -->
           <input
             type="text"
             class="form-control form-control-custom"
             id="patientName"
-            placeholder="Enter patient's full name"
             required
           />
         </div>
 
-        <!-- Medical Report Field -->
-        <div class="mb-4">
-          <label for="medicalReport" class="form-label">Medical Report</label>
-          <!-- Added 'required' attribute -->
-          <textarea
+        <!-- 2. Age -->
+        <div class="mb-3">
+          <label for="age" class="form-label">Age</label>
+          <input
+            type="number"
             class="form-control form-control-custom"
-            id="medicalReport"
-            rows="3"
-            placeholder="Enter detailed medical report"
+            id="age"
             required
-          ></textarea>
+          />
         </div>
 
-        <!-- Medication Field -->
-        <div class="mb-5">
+        <!-- 3. Location, Birth Date -->
+        <div class="mb-3">
+          <label for="locationBirthDate" class="form-label">Location, Birth Date</label>
+          <input
+            type="text"
+            class="form-control form-control-custom"
+            id="locationBirthDate"
+            required
+          />
+        </div>
+
+        <!-- 4. Medical Report -->
+        <div class="mb-3">
+          <label for="medicalReport" class="form-label">Medical Report</label>
+          <input
+            type="text"
+            class="form-control form-control-custom"
+            id="medicalReport"
+            required
+          />
+        </div>
+
+        <!-- 5. History of drug allergies -->
+        <div class="mb-3">
+          <label for="drugAllergies" class="form-label">history of drug allergies</label>
+          <input
+            type="text"
+            class="form-control form-control-custom"
+            id="drugAllergies"
+            required
+          />
+        </div>
+
+        <!-- 6. Medication -->
+        <div class="mb-4">
           <label for="medication" class="form-label">Medication</label>
-          <!-- Added 'required' attribute -->
           <input
             type="text"
             class="form-control form-control-custom"
             id="medication"
-            placeholder="Enter current medications"
             required
           />
         </div>
@@ -163,7 +189,7 @@
       </form>
     </main>
 
-    <!-- NEW: Success Modal with Loading Spinner -->
+    <!-- Success Modal with Loading Spinner -->
     <div
       class="modal fade"
       id="successModal"
@@ -207,8 +233,7 @@
         // Prevent default form submission so we can handle the logic
         event.preventDefault();
 
-        // Check if form is valid (browser handles 'required' automatically,
-        // but this is a safe check)
+        // Check if form is valid
         if (registerForm.checkValidity()) {
           // Show the success modal with spinner
           successModal.show();
