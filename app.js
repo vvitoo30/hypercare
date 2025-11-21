@@ -145,7 +145,7 @@ const displayUserData = (user) => {
 
                 // --- Chart.js Logic ---
                 const chartDocs = snapshot.docs.reverse(); // oldest to newest
-                const labels = chartDocs.map(doc => doc.data().timestamp ? doc.data().timestamp.toDate().toLocaleDateString() : '');
+                const labels = chartDocs.map(doc => doc.data().timestamp ? doc.data().timestamp.toDate().toLocaleDateString('id-ID', { weekday: 'long' }) : '');
                 const systolicData = chartDocs.map(doc => doc.data().systolic);
                 const diastolicData = chartDocs.map(doc => doc.data().diastolic);
 
@@ -156,7 +156,7 @@ const displayUserData = (user) => {
                 }
 
                 bpChartInstance = new Chart(ctx, {
-                    type: 'line',
+                    type: 'bar', // Changed to 'bar'
                     data: {
                         labels: labels,
                         datasets: [
@@ -164,17 +164,15 @@ const displayUserData = (user) => {
                                 label: 'Systolic (mmHg)',
                                 data: systolicData,
                                 borderColor: 'rgba(255, 99, 132, 1)',
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                fill: false,
-                                tension: 0.1
+                                backgroundColor: 'rgba(255, 99, 132, 0.5)', // Adjusted for bar chart
+                                borderWidth: 1
                             },
                             {
                                 label: 'Diastolic (mmHg)',
                                 data: diastolicData,
                                 borderColor: 'rgba(54, 162, 235, 1)',
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                fill: false,
-                                tension: 0.1
+                                backgroundColor: 'rgba(54, 162, 235, 0.5)', // Adjusted for bar chart
+                                borderWidth: 1
                             }
                         ]
                     },
@@ -183,7 +181,7 @@ const displayUserData = (user) => {
                         plugins: {
                             title: {
                                 display: true,
-                                text: 'Weekly Blood Pressure Trend'
+                                text: 'Blood Pressure by Day of Week' // Updated title
                             }
                         },
                         scales: {
