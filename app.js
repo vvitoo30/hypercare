@@ -609,6 +609,65 @@ const displayHealthyDashboard = () => {
     };
 };
 
+// --- Medication Interaction Functions (for medication_interaction.html) ---
+const displayMedicationInteraction = () => {
+    const med1Select = document.getElementById('medication1-select');
+    const med2Select = document.getElementById('medication2-select');
+    const compareBtn = document.getElementById('compare-btn');
+    const resultsDiv = document.getElementById('interaction-results');
+
+    if (!med1Select || !med2Select || !compareBtn || !resultsDiv) return;
+
+    let allMedications = []; // To store all fetched medications
+
+    // Populate dropdowns
+    db.collection('medications').orderBy('name').get().then(snapshot => {
+        allMedications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        let optionsHtml = '<option value="">Select a medication</option>';
+        allMedications.forEach(med => {
+            optionsHtml += `<option value="${med.id}">${med.name}</option>`;
+        });
+        med1Select.innerHTML = optionsHtml;
+        med2Select.innerHTML = optionsHtml;
+    }).catch(error => {
+        console.error("Error fetching medications for interaction check:", error);
+        resultsDiv.innerHTML = '<div class="alert alert-danger">Error loading medications for comparison.</div>';
+    });
+
+    compareBtn.addEventListener('click', () => {
+        const med1Id = med1Select.value;
+        const med2Id = med2Select.value;
+
+        if (!med1Id || !med2Id) {
+            resultsDiv.innerHTML = '<div class="alert alert-warning">Please select two medications to compare.</div>';
+            return;
+        }
+        if (med1Id === med2Id) {
+            resultsDiv.innerHTML = '<div class="alert alert-warning">Please select two *different* medications to compare.</div>';
+            return;
+        }
+
+        const med1 = allMedications.find(med => med.id === med1Id);
+        const med2 = allMedications.find(med => med.id === med2Id);
+
+        let interactionText = '';
+
+        // Simplified interaction logic: Check if interaction field exists and if either medication lists the other
+        const interactionFound = (med1 && med1.interactions && med1.interactions.some(i => i.withMedicationId === med2Id)) ||
+                                 (med2 && med2.interactions && med2.interactions.some(i => i.withMedicationId === med1Id));
+        
+        if (interactionFound) {
+            // This is a placeholder for more sophisticated interaction logic
+            interactionText = `<div class="alert alert-danger"><strong>Potential Interaction!</strong> Please consult with your doctor or pharmacist.</div>`;
+        } else {
+            interactionText = `<div class="alert alert-success">No known interactions found between ${med1.name} and ${med2.name} in our database.</div>`;
+        }
+
+        resultsDiv.innerHTML = interactionText;
+    });
+};
+
 // --- Medication Management Functions (for medication_management.html) ---
 const resetMedicationForm = () => {
     const form = document.getElementById('add-medication-form');
@@ -929,6 +988,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isBPHistoryPage = onPage('blood_pressure_history');
         const isEdupharmaPage = onPage('edupharma');
         const isHealthyDashboardPage = onPage('healthy_dashboard');
+        const isMedicationInteractionPage = onPage('medication_interaction');
 
         if (user) {
             try {
@@ -956,6 +1016,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (isMedicationPage && role === 'doctor') displayMedicationManagement();
                 else if (isEdupharmaPage) displayMedicationLibrary();
                 else if (isHealthyDashboardPage) displayHealthyDashboard();
+                else if (isMedicationInteractionPage) displayMedicationInteraction();
                 else if ((isMainPage || isMyPrescriptionsPage || isBPHistoryPage) && (role === 'user' || role === 'patient')) displayUserData(user);
 
             } catch (error) {
