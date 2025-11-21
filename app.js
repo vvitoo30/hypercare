@@ -122,12 +122,17 @@ const displayUserData = (user) => {
 
     // Display Blood Pressure History
     if (bloodPressureHistory) {
-        userDocRef.collection('blood_pressure').orderBy('timestamp', 'desc').limit(10).onSnapshot(snapshot => {
+        let bpChartInstance; // To hold the chart object
+
+        userDocRef.collection('blood_pressure').orderBy('timestamp', 'desc').limit(7).onSnapshot(snapshot => {
             let html = '<ul class="list-group">';
             if (snapshot.empty) {
                 html = '<p>No blood pressure readings found.</p>';
+                if (bpChartInstance) {
+                    bpChartInstance.destroy(); // Clear chart if no data
+                }
             } else {
-                snapshot.forEach(doc => {
+                 snapshot.forEach(doc => {
                     const data = doc.data();
                     html += `
                         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -137,6 +142,61 @@ const displayUserData = (user) => {
                     `;
                 });
                 html += '</ul>';
+
+                // --- Chart.js Logic ---
+                const chartDocs = snapshot.docs.reverse(); // oldest to newest
+                const labels = chartDocs.map(doc => doc.data().timestamp ? doc.data().timestamp.toDate().toLocaleDateString() : '');
+                const systolicData = chartDocs.map(doc => doc.data().systolic);
+                const diastolicData = chartDocs.map(doc => doc.data().diastolic);
+
+                const ctx = document.getElementById('bpChart').getContext('2d');
+
+                if (bpChartInstance) {
+                    bpChartInstance.destroy(); // Destroy old chart before drawing new one
+                }
+
+                bpChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Systolic (mmHg)',
+                                data: systolicData,
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                fill: false,
+                                tension: 0.1
+                            },
+                            {
+                                label: 'Diastolic (mmHg)',
+                                data: diastolicData,
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                fill: false,
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Weekly Blood Pressure Trend'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: {
+                                    display: true,
+                                    text: 'mmHg'
+                                }
+                            }
+                        }
+                    }
+                });
             }
             bloodPressureHistory.innerHTML = html;
         }, error => {
