@@ -502,6 +502,38 @@ const handlePatientEditPage = () => {
     });
 };
 
+// --- Edupharma Page Functions (for edupharma.html) ---
+const displayMedicationLibrary = () => {
+    const container = document.getElementById('medication-list-container');
+    if (!container) return;
+
+    db.collection('medications').orderBy('name').onSnapshot(snapshot => {
+        let html = '';
+        if (snapshot.empty) {
+            html = '<p class="text-center">No medications found in the library.</p>';
+        } else {
+            snapshot.forEach(doc => {
+                const med = doc.data();
+                html += `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">${med.name}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">${med.type || 'N/A'} - ${med.dosage || 'N/A'}</h6>
+                                <p class="card-text">${med.description || 'No description available.'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        container.innerHTML = html;
+    }, error => {
+        console.error("Error fetching medication library:", error);
+        container.innerHTML = '<p class="text-danger text-center">Could not load medication library.</p>';
+    });
+};
+
 // --- Medication Management Functions (for medication_management.html) ---
 const resetMedicationForm = () => {
     const form = document.getElementById('add-medication-form');
@@ -820,6 +852,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isMedicationPage = onPage('medication_management');
         const isMyPrescriptionsPage = onPage('my_prescriptions');
         const isBPHistoryPage = onPage('blood_pressure_history');
+        const isEdupharmaPage = onPage('edupharma');
 
         if (user) {
             try {
@@ -845,6 +878,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (isPatientListPage && role === 'doctor') displayPatientList();
                 else if (isPatientEditPage && role === 'doctor') handlePatientEditPage();
                 else if (isMedicationPage && role === 'doctor') displayMedicationManagement();
+                else if (isEdupharmaPage) displayMedicationLibrary();
                 else if ((isMainPage || isMyPrescriptionsPage || isBPHistoryPage) && (role === 'user' || role === 'patient')) displayUserData(user);
 
             } catch (error) {
