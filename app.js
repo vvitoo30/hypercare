@@ -604,14 +604,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Patient List Page Modal Logic ---
     const editPatientModal = document.getElementById('editPatientModal');
     if (editPatientModal) {
-        let bpFormSubmitHandler, prescriptionFormSubmitHandler, frequencyChangeHandler;
+        let bpFormSubmitHandler, prescriptionFormSubmitHandler, frequencyChangeHandler, savePrescriptionsHandler, removeTempPrescriptionHandler;
         let bpSnapshotUnsubscribe, prescriptionSnapshotUnsubscribe;
+        let tempPrescriptions = [];
+
+        const renderTempPrescriptions = () => {
+            const container = editPatientModal.querySelector('#modal-temp-prescriptions-list');
+            if (!container) return;
+            if (tempPrescriptions.length === 0) {
+                container.innerHTML = '<p class="text-muted">No prescriptions added yet.</p>';
+            } else {
+                let html = '<ul class="list-group">';
+                tempPrescriptions.forEach((p, index) => {
+                    html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                ${p.name} (${p.dosage})
+                                <button type="button" class="btn btn-danger btn-sm remove-temp-prescription-btn" data-index="${index}">Remove</button>
+                             </li>`;
+                });
+                html += '</ul>';
+                container.innerHTML = html;
+            }
+        };
 
         editPatientModal.addEventListener('show.bs.modal', (e) => {
             const button = e.relatedTarget;
             const patientUid = button.getAttribute('data-uid');
             const patientUsername = button.getAttribute('data-username');
             const patientRef = db.collection('users').doc(patientUid);
+
+            tempPrescriptions = []; // Reset the temporary list every time the modal is opened
 
             // --- Get Modal Elements ---
             const modalTitle = editPatientModal.querySelector('#modal-patient-name');
@@ -622,24 +643,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const frequencyInput = editPatientModal.querySelector('#modal-prescription-frequency');
             const timeInputsContainer = editPatientModal.querySelector('#modal-time-inputs-container');
             const medicationDatalist = editPatientModal.querySelector('#modal-medication-options');
+            const savePrescriptionsBtn = editPatientModal.querySelector('#modal-save-prescriptions-btn');
+            const tempPrescriptionsContainer = editPatientModal.querySelector('#modal-temp-prescriptions-list');
 
             // --- Reset UI ---
             modalTitle.textContent = patientUsername;
             bpHistoryContainer.innerHTML = '<p>Loading history...</p>';
             prescriptionsHistoryContainer.innerHTML = '<p>Loading history...</p>';
+            renderTempPrescriptions();
             
             // --- Blood Pressure Logic ---
             bpSnapshotUnsubscribe = patientRef.collection('blood_pressure').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
                 let html = '<ul class="list-group list-group-flush">';
-                if (snapshot.empty) {
-                    html = '<p>No blood pressure readings found.</p>';
-                } else {
+                if (snapshot.empty) html = '<p>No blood pressure readings found.</p>';
+                else {
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        html += `<li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span><strong>${data.systolic}/${data.diastolic}</strong> mmHg</span>
-                                    <small>${data.timestamp ? data.timestamp.toDate().toLocaleString() : 'N/A'}</small>
-                                 </li>`;
+                        html += `<li class="list-group-item d-flex justify-content-between align-items-center"><span><strong>${data.systolic}/${data.diastolic}</strong> mmHg</span><small>${data.timestamp ? data.timestamp.toDate().toLocaleString() : 'N/A'}</small></li>`;
                     });
                     html += '</ul>';
                 }
@@ -650,15 +670,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitEvent.preventDefault();
                 const systolic = Number(document.getElementById('modal-bp-systolic').value);
                 const diastolic = Number(document.getElementById('modal-bp-diastolic').value);
-                if (isNaN(systolic) || isNaN(diastolic) || systolic <= 0 || diastolic <= 0) {
-                    return alert('Please enter valid blood pressure values.');
-                }
+                if (isNaN(systolic) || isNaN(diastolic) || systolic <= 0 || diastolic <= 0) return alert('Please enter valid blood pressure values.');
                 try {
-                    await patientRef.collection('blood_pressure').add({
-                        systolic,
-                        diastolic,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                    await patientRef.collection('blood_pressure').add({ systolic, diastolic, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
                     const bpSnapshot = await patientRef.collection('blood_pressure').orderBy('timestamp', 'asc').get();
                     if (bpSnapshot.docs.length > 7) {
                         const recordsToDelete = bpSnapshot.docs.slice(0, bpSnapshot.docs.length - 7);
@@ -667,25 +681,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     bpForm.reset();
                 } catch (error) { console.error("Error adding modal BP record:", error); }
             };
-            bpForm.addEventListener('submit', bpFormSubmitHandler);
 
             // --- Prescription Logic ---
             prescriptionSnapshotUnsubscribe = patientRef.collection('prescriptions').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
                 let html = '';
-                if (snapshot.empty) {
-                    html = '<p>No prescriptions found.</p>';
-                } else {
+                if (snapshot.empty) html = '<p>No prescriptions found.</p>';
+                else {
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         const reminderTimes = data.times && data.times.length > 0 ? data.times.join(', ') : 'No specific times';
-                        html += `<div class="card mb-2">
-                                    <div class="card-body">
-                                        <h5 class="card-title">${data.name} (${data.dosage})</h5>
-                                        <p class="card-text">Reminder: ${data.frequency || 'N/A'} times a day. ${data.times && data.times.length > 0 ? `At ${reminderTimes}`: ''}</p>
-                                        <p class="card-text"><small>${data.notes || ''}</small></p>
-                                        <small class="text-muted">Prescribed on ${data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'N/A'}</small>
-                                    </div>
-                                 </div>`;
+                        html += `<div class="card mb-2"><div class="card-body">
+                                    <h5 class="card-title">${data.name} (${data.dosage})</h5>
+                                    <p class="card-text">Reminder: ${data.frequency || 'N/A'} times a day. ${data.times && data.times.length > 0 ? `At ${reminderTimes}`: ''}</p>
+                                    <p class="card-text"><small>${data.notes || ''}</small></p>
+                                    <small class="text-muted">Prescribed on ${data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'N/A'}</small>
+                                 </div></div>`;
                     });
                 }
                 prescriptionsHistoryContainer.innerHTML = html;
@@ -693,18 +703,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             db.collection('medications').orderBy('name').get().then(querySnapshot => {
                 let optionsHtml = '';
-                querySnapshot.forEach(doc => {
-                    optionsHtml += `<option value="${doc.data().name}">`;
-                });
+                querySnapshot.forEach(doc => { optionsHtml += `<option value="${doc.data().name}">`; });
                 medicationDatalist.innerHTML = optionsHtml;
             });
 
-            let tempPrescriptions = [];
-
-            const savePrescriptionsBtn = editPatientModal.querySelector('#modal-save-prescriptions-btn');
-            const tempPrescriptionsContainer = editPatientModal.querySelector('#modal-temp-prescriptions-list');
-
-            // --- Event Handlers ---
             frequencyChangeHandler = () => {
                 const count = parseInt(frequencyInput.value, 10);
                 timeInputsContainer.innerHTML = '';
@@ -729,12 +731,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     notes: document.getElementById('modal-prescription-notes').value,
                 };
 
-                if (!newPrescription.name || !newPrescription.dosage) {
-                    return alert('Please fill out Medication Name and Dosage.');
-                }
+                if (!newPrescription.name || !newPrescription.dosage) return alert('Please fill out Medication Name and Dosage.');
+                
                 tempPrescriptions.push(newPrescription);
                 renderTempPrescriptions();
-                alert(`"${newPrescription.name}" added to pending list.`); // Added alert
+                alert(`"${newPrescription.name}" added to pending list.`);
                 prescriptionForm.reset();
                 timeInputsContainer.innerHTML = '';
             };
@@ -748,9 +749,8 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             savePrescriptionsHandler = () => {
-                if (tempPrescriptions.length === 0) {
-                    return alert('No pending prescriptions to save.');
-                }
+                if (tempPrescriptions.length === 0) return alert('No pending prescriptions to save.');
+                
                 const batch = db.batch();
                 tempPrescriptions.forEach(prescription => {
                     const newPrescriptionRef = patientRef.collection('prescriptions').doc();
@@ -767,6 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             // --- Attach Event Listeners ---
+            bpForm.addEventListener('submit', bpFormSubmitHandler);
             frequencyInput.addEventListener('input', frequencyChangeHandler);
             prescriptionForm.addEventListener('submit', prescriptionFormSubmitHandler);
             tempPrescriptionsContainer.addEventListener('click', removeTempPrescriptionHandler);
@@ -774,11 +775,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         editPatientModal.addEventListener('hide.bs.modal', () => {
-            // Detach snapshot listeners
             if (bpSnapshotUnsubscribe) bpSnapshotUnsubscribe();
             if (prescriptionSnapshotUnsubscribe) prescriptionSnapshotUnsubscribe();
             
-            // Detach form handlers
             const bpForm = editPatientModal.querySelector('#modal-add-bp-form');
             if (bpForm && bpFormSubmitHandler) bpForm.removeEventListener('submit', bpFormSubmitHandler);
             
