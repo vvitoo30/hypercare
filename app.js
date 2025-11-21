@@ -699,6 +699,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 medicationDatalist.innerHTML = optionsHtml;
             });
 
+            let tempPrescriptions = [];
+
+            const savePrescriptionsBtn = editPatientModal.querySelector('#modal-save-prescriptions-btn');
+            const tempPrescriptionsContainer = editPatientModal.querySelector('#modal-temp-prescriptions-list');
+
+            // --- Event Handlers ---
             frequencyChangeHandler = () => {
                 const count = parseInt(frequencyInput.value, 10);
                 timeInputsContainer.innerHTML = '';
@@ -712,37 +718,66 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             };
-            frequencyInput.addEventListener('input', frequencyChangeHandler);
 
             prescriptionFormSubmitHandler = (e) => {
                 e.preventDefault();
-                const frequency = parseInt(frequencyInput.value, 10);
-                const times = [];
-                if (frequency > 0) {
-                    for (let i = 1; i <= frequency; i++) {
-                        const timeInput = timeInputsContainer.querySelector(`#modal-prescription-time-${i}`);
-                        if (timeInput && timeInput.value) times.push(timeInput.value);
-                    }
-                }
-                patientRef.collection('prescriptions').add({
+                const newPrescription = {
                     name: document.getElementById('modal-prescription-name').value,
                     dosage: document.getElementById('modal-prescription-dosage').value,
-                    frequency: frequency,
-                    times: times,
+                    frequency: parseInt(frequencyInput.value, 10) || 0,
+                    times: Array.from(timeInputsContainer.querySelectorAll('input')).map(input => input.value).filter(Boolean),
                     notes: document.getElementById('modal-prescription-notes').value,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(() => {
-                    prescriptionForm.reset();
-                    timeInputsContainer.innerHTML = '';
+                };
+
+                if (!newPrescription.name || !newPrescription.dosage) {
+                    return alert('Please fill out Medication Name and Dosage.');
+                }
+                tempPrescriptions.push(newPrescription);
+                renderTempPrescriptions();
+                prescriptionForm.reset();
+                timeInputsContainer.innerHTML = '';
+            };
+            
+            removeTempPrescriptionHandler = (e) => {
+                if (e.target.classList.contains('remove-temp-prescription-btn')) {
+                    const index = parseInt(e.target.getAttribute('data-index'), 10);
+                    tempPrescriptions.splice(index, 1);
+                    renderTempPrescriptions();
+                }
+            };
+
+            savePrescriptionsHandler = () => {
+                if (tempPrescriptions.length === 0) {
+                    return alert('No pending prescriptions to save.');
+                }
+                const batch = db.batch();
+                tempPrescriptions.forEach(prescription => {
+                    const newPrescriptionRef = patientRef.collection('prescriptions').doc();
+                    batch.set(newPrescriptionRef, { ...prescription, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                });
+                batch.commit().then(() => {
+                    alert('All prescriptions saved successfully!');
+                    tempPrescriptions = [];
+                    renderTempPrescriptions();
+                }).catch(error => {
+                    console.error('Error saving prescriptions in batch:', error);
+                    alert('Failed to save prescriptions.');
                 });
             };
+
+            // --- Attach Event Listeners ---
+            frequencyInput.addEventListener('input', frequencyChangeHandler);
             prescriptionForm.addEventListener('submit', prescriptionFormSubmitHandler);
+            tempPrescriptionsContainer.addEventListener('click', removeTempPrescriptionHandler);
+            savePrescriptionsBtn.addEventListener('click', savePrescriptionsHandler);
         });
 
         editPatientModal.addEventListener('hide.bs.modal', () => {
+            // Detach snapshot listeners
             if (bpSnapshotUnsubscribe) bpSnapshotUnsubscribe();
             if (prescriptionSnapshotUnsubscribe) prescriptionSnapshotUnsubscribe();
             
+            // Detach form handlers
             const bpForm = editPatientModal.querySelector('#modal-add-bp-form');
             if (bpForm && bpFormSubmitHandler) bpForm.removeEventListener('submit', bpFormSubmitHandler);
             
@@ -751,6 +786,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const frequencyInput = editPatientModal.querySelector('#modal-prescription-frequency');
             if (frequencyInput && frequencyChangeHandler) frequencyInput.removeEventListener('input', frequencyChangeHandler);
+
+            const tempPrescriptionsContainer = editPatientModal.querySelector('#modal-temp-prescriptions-list');
+            if (tempPrescriptionsContainer && removeTempPrescriptionHandler) tempPrescriptionsContainer.removeEventListener('click', removeTempPrescriptionHandler);
+
+            const savePrescriptionsBtn = editPatientModal.querySelector('#modal-save-prescriptions-btn');
+            if (savePrescriptionsBtn && savePrescriptionsHandler) savePrescriptionsBtn.removeEventListener('click', savePrescriptionsHandler);
         });
     }
 

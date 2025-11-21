@@ -154,12 +154,22 @@
                             <label for="modal-prescription-notes" class="form-label">Notes</label>
                             <textarea class="form-control" id="modal-prescription-notes" rows="2"></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary">Add Prescription</button>
+                        <button type="submit" class="btn btn-secondary">Add to List</button>
                       </form>
                     </div>
                   </div>
+
+                  <div id="pending-prescriptions-section" class="mt-4">
+                    <h5 class="fw-bold">Pending Prescriptions</h5>
+                    <div id="modal-temp-prescriptions-list">
+                      <p class="text-muted">No prescriptions added yet.</p>
+                    </div>
+                    <button id="modal-save-prescriptions-btn" class="btn btn-primary mt-3 w-100">Save All Prescriptions to Patient Record</button>
+                  </div>
                   
-                  <h4 class="fw-bold mt-4 mb-3">Prescription History</h4>
+                  <hr class="my-4">
+
+                  <h4 class="fw-bold mt-4 mb-3">Saved Prescription History</h4>
                   <div id="modal-prescriptions-history"><!-- History will be loaded here --></div>
                 </div>
               </div>
