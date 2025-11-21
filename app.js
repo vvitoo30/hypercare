@@ -734,6 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 tempPrescriptions.push(newPrescription);
                 renderTempPrescriptions();
+                alert(`"${newPrescription.name}" added to pending list.`); // Added alert
                 prescriptionForm.reset();
                 timeInputsContainer.innerHTML = '';
             };
