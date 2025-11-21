@@ -9,7 +9,7 @@
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
 
@@ -27,34 +27,25 @@
       rel="stylesheet"
     />
 
-    <!-- Custom CSS (Copied from index.html + new form styles) -->
+    <!-- Custom CSS -->
     <style>
-      /* Make sure HTML and Body are full height */
       html,
       body {
         height: 100%;
         margin: 0;
       }
-
-      /* Create the 2-part flex container AND apply Poppins font */
       body {
         display: flex;
         flex-direction: column;
         font-family: "Poppins", sans-serif;
-        /* Set the dark background as the default */
         background-color: #1c1c3a;
       }
-
-      /* --- COLORS --- */
       .bg-dark-custom {
         background-color: #1c1c3a;
       }
-
       .text-primary-custom {
         color: #4a43d1;
       }
-
-      /* --- BUTTON STYLES (from index.html) --- */
       .btn-primary-custom {
         background-color: #6a60e9;
         border-color: #6a60e9;
@@ -63,27 +54,10 @@
         background-color: #584fc9;
         border-color: #584fc9;
       }
-      .btn-outline-primary-custom {
-        border-color: #6a60e9;
-        color: #6a60e9;
-      }
-      .btn-outline-primary-custom:hover {
-        background-color: #6a60e9;
-        border-color: #6a60e9;
-        color: #ffffff;
-      }
-      .btn-custom-width {
-        width: 75%;
-        padding-top: 0.75rem;
-        padding-bottom: 0.75rem;
-      }
-
-      /* --- NEW FORM STYLES --- */
       .form-control-custom {
-        /* Custom dark input field */
         background-color: #3a3a5c;
         border: none;
-        color: #ffffff; /* This is for the text you type */
+        color: #ffffff;
       }
       .form-control-custom::placeholder {
         color: #a0a0b0;
@@ -93,7 +67,6 @@
         color: #ffffff;
         border: none;
         outline: 0;
-        /* Purple glow on focus */
         box-shadow: 0 0 0 0.25rem rgba(106, 96, 233, 0.5);
       }
     </style>
@@ -104,31 +77,29 @@
       class="bg-light p-4 shadow-sm"
       style="
         position: relative;
+        padding-bottom: 3rem !important;
       "
     >
-      <!-- Back Button -->
       <a
         href="welcome.html"
         class="text-primary-custom"
-        aria-label="Back to Login"
+        aria-label="Back to Home"
         style="
           position: absolute;
           top: 50%;
           left: 1.75rem;
-          transform: translateY(-50%);
+          transform: translateY(-80%);
         "
       >
         <i class="bi bi-arrow-left fs-2 fw-bold"></i>
       </a>
-
-      <!-- Title -->
-      <div class="container text-center">
-        <h1
-          class="fw-bold text-primary-custom"
-          style="font-size: 50px; line-height: 1.2"
-        >
-          Create Your<br />New Account
-        </h1>
+      <div class="text-center">
+        <img
+          src="Assets/logo.png"
+          alt="Hypercare Logo"
+          class="img-fluid"
+          style="max-width: 250px"
+        />
       </div>
     </header>
 
@@ -136,120 +107,99 @@
     <main class="flex-grow-1 d-flex align-items-center">
       <div class="container">
         <!-- Form -->
-        <!-- NEW: Added an ID to the form -->
         <form
+          id="register-form"
           class="w-100"
           style="max-width: 400px; margin: 0 auto"
-          id="signUpForm"
         >
-          <!-- Name Field -->
+          <!-- Username Field -->
           <div class="mb-3">
-            <label for="name" class="form-label text-light fw-bold"
-              >Name</label
+            <label for="register-username" class="form-label text-light fw-bold"
+              >Username</label
             >
             <input
               type="text"
               class="form-control form-control-lg form-control-custom rounded-3"
-              id="name"
-              placeholder="Enter your name"
+              id="register-username"
+              placeholder="Choose a username"
+              required
             />
           </div>
-
           <!-- Email Field -->
           <div class="mb-3">
-            <label for="email" class="form-label text-light fw-bold"
+            <label for="register-email" class="form-label text-light fw-bold"
               >Email</label
             >
             <input
               type="email"
               class="form-control form-control-lg form-control-custom rounded-3"
-              id="email"
+              id="register-email"
               placeholder="Enter your email"
+              required
             />
           </div>
-
+          <!-- Phone Number Field -->
+          <div class="mb-3">
+            <label for="register-phone" class="form-label text-light fw-bold"
+              >Phone Number</label
+            >
+            <input
+              type="tel"
+              class="form-control form-control-lg form-control-custom rounded-3"
+              id="register-phone"
+              placeholder="Enter your phone number"
+              required
+            />
+          </div>
           <!-- Password Field -->
           <div class="mb-4">
-            <label for="password" class="form-label text-light fw-bold"
+            <label for="register-password" class="form-label text-light fw-bold"
               >Password</label
             >
             <input
               type="password"
               class="form-control form-control-lg form-control-custom rounded-3"
-              id="password"
-              placeholder="Enter your password"
+              id="register-password"
+              placeholder="Create a password"
+              required
             />
           </div>
-
-          <!-- Sign Up Button -->
+          
+          <!-- Register Button -->
           <button
             type="submit"
-            class="btn btn-primary-custom rounded-pill fw-bold text-white btn-lg w-100 shadow mt-3"
+            class="btn btn-primary-custom rounded-pill fw-bold text-white btn-lg w-100 shadow"
           >
-            Sign Up
+            Register
           </button>
-
-          <!-- "Already have account" Link -->
-          <p class="text-center mt-4">
-            <a href="Login.html" class="text-white-50 text-decoration-none"
-              >Already Have an Account?</a
+          
+          <!-- Links -->
+          <div class="text-center mt-4">
+            <span class="text-white-50">Already have an account? </span>
+            <a
+              href="Login.html"
+              class="text-white text-decoration-none"
+              >Login</a
             >
-          </p>
+          </div>
         </form>
       </div>
     </main>
 
-    <!-- NEW: Success Modal -->
-    <div
-      class="modal fade"
-      id="successModal"
-      tabindex="-1"
-      aria-labelledby="successModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark-custom text-white">
-          <div class="modal-header border-0">
-            <h5 class="modal-title" id="successModalLabel">Success!</h5>
-          </div>
-          <div class="modal-body">
-            <p>
-              Your account has been created. You will now be redirected to the
-              Login page.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Bootstrap JS Bundle -->
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
 
-    <!-- NEW: JavaScript for redirect -->
-    <script>
-      // Get the modal and the form
-      const successModal = new bootstrap.Modal(
-        document.getElementById("successModal")
-      );
-      const signUpForm = document.getElementById("signUpForm");
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
-      // Listen for the form to be submitted
-      signUpForm.addEventListener("submit", function (event) {
-        // Stop the form from submitting normally
-        event.preventDefault();
-
-        // Show the success pop-up
-        successModal.show();
-
-        // Wait 2 seconds, then redirect to Login.html
-        setTimeout(function () {
-          window.location.href = "Login.html";
-        }, 2000); // 2000 milliseconds = 2 seconds
-      });
-    </script>
+    <!-- Your Scripts -->
+    <script src="firebase-config.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>

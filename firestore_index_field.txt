@@ -1,0 +1,7 @@
+The Firestore index field you need to specify is:
+
+role
+
+This field is used to query users based on their assigned role (e.g., 'user', 'admin', 'doctor').
+
+When creating the index, ensure you specify 'role' as the field path.

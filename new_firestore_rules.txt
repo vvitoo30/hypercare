@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check the role of the requesting user.
+    function isRequestingUserRole(role) {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+    }
+
+    // Rules for the 'users' collection
+    match /users/{userId} {
+      // READ: Allow a user to read their own document. Admins can read any user document.
+      // Doctors can also list users for their dashboard.
+      allow read, list: if request.auth != null && (
+            request.auth.uid == userId || 
+            isRequestingUserRole('admin') || 
+            isRequestingUserRole('doctor')
+      );
+      
+      // CREATE: Allow a user to create their own user document.
+      allow create: if request.auth.uid == userId;
+
+      // UPDATE: Allow user to update their own doc (but not their role), or allow an admin to update anything.
+      allow update: if request.auth != null && (
+        (request.auth.uid == userId && request.resource.data.role == resource.data.role) ||
+        isRequestingUserRole('admin')
+      );
+
+      // DELETE: Not allowing deletes for now.
+      allow delete: if false;
+
+      // Rules for patient data subcollections
+      match /{subcollection}/{docId} {
+        // Allow doctors and admins to read and write to any subcollection (prescriptions, blood_pressure).
+        allow read, write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
+      }
+    }
+
+    // Rules for the 'medications' collection
+    match /medications/{medId} {
+        // READ: Any authenticated user can read the medication list.
+        allow read: if request.auth != null;
+        // WRITE (create, update, delete): Only admins or doctors can manage medications.
+        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
+    }
+  }
+}

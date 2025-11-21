@@ -1,0 +1,119 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.form-container, #dashboard-container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #1c1e21;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 1rem;
+    border: 1px solid #dddfe2;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #1877f2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+button:hover {
+    background-color: #166fe5;
+}
+
+p {
+    color: #606770;
+    font-size: 0.9rem;
+}
+
+a {
+    color: #1877f2;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#dashboard-container p {
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+#dashboard-container span {
+    font-weight: bold;
+}
+
+#logout-button {
+    background-color: #e4e6eb;
+    color: #4b4f56;
+}
+
+#logout-button:hover {
+    background-color: #dadde1;
+}
+
+.google-btn {
+    background-color: #ffffff;
+    color: #444;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.google-btn:hover {
+    background-color: #f8f8f8;
+}
+
+.google-btn img {
+    margin-right: 10px;
+    height: 18px;
+    width: 18px;
+}
+
+#edit-profile-container label {
+    display: block;
+    text-align: left;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #606770;
+}

@@ -1,0 +1,41 @@
+Oke, masalahnya hampir pasti ada pada data di database Firestore Anda. Aturan keamanan yang kita buat mengharuskan setiap dokter memiliki dokumen di koleksi 'users' dengan bidang 'role' yang diatur dengan benar.
+
+Mari kita periksa dan perbaiki bersama. Ikuti langkah-langkah ini di Konsol Firebase Anda:
+
+**Langkah 1: Dapatkan UID Dokter**
+1.  Pergi ke bagian **Authentication** di Firebase.
+2.  Temukan akun pengguna yang seharusnya menjadi dokter (misalnya, doctor@example.com).
+3.  Salin **User UID** dari akun tersebut. Ini adalah ID unik untuk pengguna itu.
+
+**Langkah 2: Verifikasi Dokumen di Firestore**
+1.  Sekarang, pergi ke bagian **Firestore Database**.
+2.  Di bawah data, pastikan Anda melihat koleksi (collection) bernama **'users'**.
+3.  Cari dokumen yang ID-nya **sama persis** dengan UID yang Anda salin dari Langkah 1.
+
+**Langkah 3: Periksa dan Perbaiki Bidang 'role'**
+1.  Klik pada dokumen dokter tersebut untuk melihat isinya.
+2.  Di dalam dokumen, **Anda harus melihat sebuah bidang (field) bernama 'role'**.
+3.  Nilai (value) dari bidang 'role' tersebut harus berupa string: **'doctor'** (semua huruf kecil).
+
+**Contoh yang Benar:**
+Jika dokumen dokter Anda terlihat seperti ini, maka itu **SALAH** (atau tidak lengkap):
+```
+users / (UID_DOKTER_ANDA)
+  email: "doctor@example.com"
+  username: "Dokter Keren"
+  // --> TIDAK ADA BIDANG 'ROLE' <--
+```
+
+Dokumen tersebut **HARUS** terlihat seperti ini:
+```
+users / (UID_DOKTER_ANDA)"
+  email: "doctor@example.com"
+  username: "Dokter Keren"
+  role: "doctor"  <-- INI YANG PENTING
+```
+
+**Cara Memperbaiki:**
+-   Jika bidang 'role' **tidak ada**, klik **'Add field'**, beri nama 'role', atur tipenya ke 'string', dan masukkan nilainya sebagai 'doctor'.
+-   Jika bidang 'role' ada tetapi nilainya salah (misalnya, 'Doctor' dengan huruf besar), klik ikon pensil untuk mengeditnya menjadi 'doctor' (huruf kecil).
+
+Setelah Anda memastikan dokumen pengguna dokter di Firestore memiliki `role: "doctor"`, coba logout dan login kembali sebagai dokter. Masalahnya seharusnya sudah teratasi.

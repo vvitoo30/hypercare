@@ -1,0 +1,3 @@
+aduhh buat ulang aja deh fiturnya yang manage patient list.
+
+jadi intinya di manage patient itu dokter bisa memberikan data berupa blood pressure ke pasien yang dipilih. kalo dokter mengetik lagi, itu bakal jadi ke replace. tapi datanya bakal kesimpan sama data data sebelumnya, ada 7 maksimal (karena nanti bakal dibuat rata rata mingguan)

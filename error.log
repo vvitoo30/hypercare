@@ -1,0 +1,36 @@
+XHRGET
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=fL3BxjelOq-MO3M76NMJoB_Sb8WeD-oyh3v3wTugsQ0&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=U3e7LW7_wnIVtDmq1tjeOA&AID=12&CI=1&TYPE=xmlhttp&zx=eds7lb2uul0t&t=1
+[HTTP/2 200  nullms]
+
+GET
+http://localhost:3000/favicon.ico
+[HTTP/1.1 404 Not Found 0ms]
+
+XHRPOST
+https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyB3QFi6xHwzu6RigJmUmtXzv1TyNocrR5w
+[HTTP/2 200  304ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=95818&CVER=22&X-HTTP-Session-Id=gsessionid&zx=8ycc14edwxjh&t=1
+[HTTP/2 200  291ms]
+
+XHRGET
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=iXnXQjy-zVRuz5vvRT6zAFl3E2kKwVnXbIDENYFElpY&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=QLcDg2IG7tDpQ_V6PLRg0A&AID=0&CI=0&TYPE=xmlhttp&zx=hg32r9qccst8&t=1
+[HTTP/2 200  1332ms]
+
+XHRGET
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=iXnXQjy-zVRuz5vvRT6zAFl3E2kKwVnXbIDENYFElpY&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=QLcDg2IG7tDpQ_V6PLRg0A&AID=0&CI=1&TYPE=xmlhttp&zx=qfpgxyqaw9p0&t=1
+[HTTP/2 200  616ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/hypercare-66d6a/databases/(default)&gsessionid=iXnXQjy-zVRuz5vvRT6zAFl3E2kKwVnXbIDENYFElpY&SID=QLcDg2IG7tDpQ_V6PLRg0A&RID=95819&AID=6&zx=pwsgys569ut2&t=1
+[HTTP/2 200  316ms]
+
+XHRGET
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=iXnXQjy-zVRuz5vvRT6zAFl3E2kKwVnXbIDENYFElpY&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=QLcDg2IG7tDpQ_V6PLRg0A&AID=6&CI=1&TYPE=xmlhttp&zx=rosif9rz5pba&t=1
+[HTTP/2 200  316ms]
+
+XHRGET
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=iXnXQjy-zVRuz5vvRT6zAFl3E2kKwVnXbIDENYFElpY&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=QLcDg2IG7tDpQ_V6PLRg0A&AID=7&CI=1&TYPE=xmlhttp&zx=z0vadu6syzu3&t=1
+[HTTP/2 200  nullms]
+

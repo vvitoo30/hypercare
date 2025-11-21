@@ -1,0 +1,7 @@
+The Firestore Collection ID for the index you need to create is:
+
+users
+
+This collection ID refers to the 'users' collection in your Firestore database, which is where user roles are stored.
+
+When creating the index, ensure the Collection ID is set to 'users'.

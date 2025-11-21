@@ -1,0 +1,20 @@
+Here are the complete details for creating the Firestore index manually:
+
+1.  **Collection ID**: 
+    users
+
+2.  **Fields to Index**:
+    - Field Path: role
+    - Order / Index Type: Ascending
+
+3.  **Query Scope**:
+    Collection
+
+---
+**Summary of steps in Firebase Console:**
+1. Go to Firestore Database > Indexes > Composite Indexes.
+2. Click "Create Index".
+3. For "Collection ID", enter: users
+4. Under "Fields to Index", enter "role" for the Field Path and select "Ascending".
+5. For "Query Scope", ensure "Collection" is selected.
+6. Click "Create Index".
