@@ -87,50 +87,83 @@
             ></button>
           </div>
           <div class="modal-body">
-            <!-- Blood Pressure Section -->
-            <div id="blood-pressure-section">
-              <h4 class="fw-bold mb-3">Blood Pressure Data</h4>
-              <div class="card">
-                <div class="card-body">
-                  <form id="modal-add-bp-form" class="mb-4">
-                    <div class="row g-3 align-items-end">
-                      <div class="col-md">
-                        <label for="modal-bp-systolic" class="form-label"
-                          >Systolic (mmHg)</label
-                        >
-                        <input
-                          type="number"
-                          class="form-control"
-                          id="modal-bp-systolic"
-                          required
-                        />
-                      </div>
-                      <div class="col-md">
-                        <label for="modal-bp-diastolic" class="form-label"
-                          >Diastolic (mmHg)</label
-                        >
-                        <input
-                          type="number"
-                          class="form-control"
-                          id="modal-bp-diastolic"
-                          required
-                        />
-                      </div>
-                      <div class="col-md-auto">
-                        <button type="submit" class="btn btn-primary w-100">
-                          Add Reading
-                        </button>
-                      </div>
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs nav-fill mb-3" id="patientEditTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="modal-bp-tab" data-bs-toggle="tab" data-bs-target="#modal-bp-pane" type="button" role="tab" aria-controls="modal-bp-pane" aria-selected="true">Blood Pressure</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="modal-prescriptions-tab" data-bs-toggle="tab" data-bs-target="#modal-prescriptions-pane" type="button" role="tab" aria-controls="modal-prescriptions-pane" aria-selected="false">Prescriptions</button>
+              </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="patientEditTabContent">
+              <!-- Blood Pressure Pane -->
+              <div class="tab-pane fade show active" id="modal-bp-pane" role="tabpanel" aria-labelledby="modal-bp-tab">
+                <div id="blood-pressure-section">
+                  <h4 class="fw-bold mb-3">Blood Pressure Data</h4>
+                  <div class="card">
+                    <div class="card-body">
+                      <form id="modal-add-bp-form" class="mb-4">
+                        <div class="row g-3 align-items-end">
+                          <div class="col-md">
+                            <label for="modal-bp-systolic" class="form-label">Systolic (mmHg)</label>
+                            <input type="number" class="form-control" id="modal-bp-systolic" required />
+                          </div>
+                          <div class="col-md">
+                            <label for="modal-bp-diastolic" class="form-label">Diastolic (mmHg)</label>
+                            <input type="number" class="form-control" id="modal-bp-diastolic" required />
+                          </div>
+                          <div class="col-md-auto">
+                            <button type="submit" class="btn btn-primary w-100">Add Reading</button>
+                          </div>
+                        </div>
+                      </form>
+                      <h5 class="fw-bold mb-3">Blood Pressure History</h5>
+                      <div id="modal-bp-history"><!-- History will be loaded here --></div>
                     </div>
-                  </form>
-                  <h5 class="fw-bold mb-3">Blood Pressure History</h5>
-                  <div id="modal-bp-history">
-                    <!-- History will be loaded here -->
                   </div>
                 </div>
               </div>
+              
+              <!-- Prescriptions Pane -->
+              <div class="tab-pane fade" id="modal-prescriptions-pane" role="tabpanel" aria-labelledby="modal-prescriptions-tab">
+                <div id="prescriptions-section">
+                  <h4 class="fw-bold mb-3">Add New Prescription</h4>
+                  <div class="card">
+                    <div class="card-body">
+                      <form id="modal-add-prescription-form" class="mb-4">
+                        <div class="mb-3">
+                            <label for="modal-prescription-name" class="form-label">Medication</label>
+                            <input class="form-control" list="modal-medication-options" id="modal-prescription-name" placeholder="Type to search..." required>
+                            <datalist id="modal-medication-options"><!-- Options populated by app.js --></datalist>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modal-prescription-dosage" class="form-label">Dosage</label>
+                            <input type="text" class="form-control" id="modal-prescription-dosage" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="modal-prescription-frequency" class="form-label">Frequency (times per day)</label>
+                                <input type="number" class="form-control" id="modal-prescription-frequency" min="1" max="10" placeholder="e.g., 3">
+                            </div>
+                        </div>
+                        <div id="modal-time-inputs-container" class="mb-3"><!-- Time inputs generated here --></div>
+                        <div class="mb-3">
+                            <label for="modal-prescription-notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="modal-prescription-notes" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Prescription</button>
+                      </form>
+                    </div>
+                  </div>
+                  
+                  <h4 class="fw-bold mt-4 mb-3">Prescription History</h4>
+                  <div id="modal-prescriptions-history"><!-- History will be loaded here --></div>
+                </div>
+              </div>
             </div>
-            <!-- Other edit sections like prescriptions can be added here later -->
           </div>
           <div class="modal-footer">
             <button

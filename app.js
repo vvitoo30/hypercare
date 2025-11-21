@@ -604,94 +604,153 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Patient List Page Modal Logic ---
     const editPatientModal = document.getElementById('editPatientModal');
     if (editPatientModal) {
-        let bpFormSubmitHandler; // To hold the event handler function
-        let bpSnapshotUnsubscribe; // To hold the snapshot listener unsubscribe function
+        let bpFormSubmitHandler, prescriptionFormSubmitHandler, frequencyChangeHandler;
+        let bpSnapshotUnsubscribe, prescriptionSnapshotUnsubscribe;
 
         editPatientModal.addEventListener('show.bs.modal', (e) => {
             const button = e.relatedTarget;
             const patientUid = button.getAttribute('data-uid');
             const patientUsername = button.getAttribute('data-username');
-
-            const modalTitle = editPatientModal.querySelector('#modal-patient-name');
-            const bpHistoryContainer = editPatientModal.querySelector('#modal-bp-history');
-            const bpForm = editPatientModal.querySelector('#modal-add-bp-form');
-
-            modalTitle.textContent = patientUsername;
-            bpHistoryContainer.innerHTML = '<p>Loading history...</p>'; // Reset on open
-
             const patientRef = db.collection('users').doc(patientUid);
 
-            // Fetch and display blood pressure history
+            // --- Get Modal Elements ---
+            const modalTitle = editPatientModal.querySelector('#modal-patient-name');
+            const bpHistoryContainer = editPatientModal.querySelector('#modal-bp-history');
+            const prescriptionsHistoryContainer = editPatientModal.querySelector('#modal-prescriptions-history');
+            const bpForm = editPatientModal.querySelector('#modal-add-bp-form');
+            const prescriptionForm = editPatientModal.querySelector('#modal-add-prescription-form');
+            const frequencyInput = editPatientModal.querySelector('#modal-prescription-frequency');
+            const timeInputsContainer = editPatientModal.querySelector('#modal-time-inputs-container');
+            const medicationDatalist = editPatientModal.querySelector('#modal-medication-options');
+
+            // --- Reset UI ---
+            modalTitle.textContent = patientUsername;
+            bpHistoryContainer.innerHTML = '<p>Loading history...</p>';
+            prescriptionsHistoryContainer.innerHTML = '<p>Loading history...</p>';
+            
+            // --- Blood Pressure Logic ---
             bpSnapshotUnsubscribe = patientRef.collection('blood_pressure').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-                let html = '<ul class="list-group">';
+                let html = '<ul class="list-group list-group-flush">';
                 if (snapshot.empty) {
                     html = '<p>No blood pressure readings found.</p>';
                 } else {
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        html += `
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span><strong>${data.systolic}/${data.diastolic}</strong> mmHg</span>
-                                <small>${data.timestamp ? data.timestamp.toDate().toLocaleString() : 'N/A'}</small>
-                            </li>
-                        `;
+                        html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><strong>${data.systolic}/${data.diastolic}</strong> mmHg</span>
+                                    <small>${data.timestamp ? data.timestamp.toDate().toLocaleString() : 'N/A'}</small>
+                                 </li>`;
                     });
-                     html += '</ul>';
+                    html += '</ul>';
                 }
                 bpHistoryContainer.innerHTML = html;
-            }, error => {
-                console.error("Error fetching modal BP history:", error);
-                bpHistoryContainer.innerHTML = '<p class="text-danger">Could not load history.</p>';
             });
 
-            // Define the form submission handler
             bpFormSubmitHandler = async (submitEvent) => {
                 submitEvent.preventDefault();
                 const systolic = Number(document.getElementById('modal-bp-systolic').value);
                 const diastolic = Number(document.getElementById('modal-bp-diastolic').value);
-
                 if (isNaN(systolic) || isNaN(diastolic) || systolic <= 0 || diastolic <= 0) {
-                    alert('Please enter valid systolic and diastolic blood pressure values.');
-                    return;
+                    return alert('Please enter valid blood pressure values.');
                 }
-
                 try {
-                    // 1. Add the new blood pressure record
                     await patientRef.collection('blood_pressure').add({
-                        systolic: systolic,
-                        diastolic: diastolic,
+                        systolic,
+                        diastolic,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
-
-                    // 2. Query to enforce max 7 records
-                    const snapshot = await patientRef.collection('blood_pressure').orderBy('timestamp', 'asc').get();
-                    if (snapshot.docs.length > 7) {
-                        const recordsToDelete = snapshot.docs.slice(0, snapshot.docs.length - 7);
-                        const deletePromises = recordsToDelete.map(doc => doc.ref.delete());
-                        await Promise.all(deletePromises);
+                    const bpSnapshot = await patientRef.collection('blood_pressure').orderBy('timestamp', 'asc').get();
+                    if (bpSnapshot.docs.length > 7) {
+                        const recordsToDelete = bpSnapshot.docs.slice(0, bpSnapshot.docs.length - 7);
+                        await Promise.all(recordsToDelete.map(doc => doc.ref.delete()));
                     }
-
                     bpForm.reset();
-                } catch (error) {
-                    console.error("Error adding modal BP record:", error);
-                    alert("Failed to add blood pressure record.");
+                } catch (error) { console.error("Error adding modal BP record:", error); }
+            };
+            bpForm.addEventListener('submit', bpFormSubmitHandler);
+
+            // --- Prescription Logic ---
+            prescriptionSnapshotUnsubscribe = patientRef.collection('prescriptions').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+                let html = '';
+                if (snapshot.empty) {
+                    html = '<p>No prescriptions found.</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const reminderTimes = data.times && data.times.length > 0 ? data.times.join(', ') : 'No specific times';
+                        html += `<div class="card mb-2">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${data.name} (${data.dosage})</h5>
+                                        <p class="card-text">Reminder: ${data.frequency || 'N/A'} times a day. ${data.times && data.times.length > 0 ? `At ${reminderTimes}`: ''}</p>
+                                        <p class="card-text"><small>${data.notes || ''}</small></p>
+                                        <small class="text-muted">Prescribed on ${data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'N/A'}</small>
+                                    </div>
+                                 </div>`;
+                    });
+                }
+                prescriptionsHistoryContainer.innerHTML = html;
+            });
+
+            db.collection('medications').orderBy('name').get().then(querySnapshot => {
+                let optionsHtml = '';
+                querySnapshot.forEach(doc => {
+                    optionsHtml += `<option value="${doc.data().name}">`;
+                });
+                medicationDatalist.innerHTML = optionsHtml;
+            });
+
+            frequencyChangeHandler = () => {
+                const count = parseInt(frequencyInput.value, 10);
+                timeInputsContainer.innerHTML = '';
+                if (count > 0 && count <= 10) {
+                    for (let i = 1; i <= count; i++) {
+                        const timeInputDiv = document.createElement('div');
+                        timeInputDiv.classList.add('mb-2', 'row', 'align-items-center');
+                        timeInputDiv.innerHTML = `<label for="modal-prescription-time-${i}" class="col-sm-3 col-form-label">Time ${i}</label>
+                                                 <div class="col-sm-9"><input type="time" class="form-control" id="modal-prescription-time-${i}"></div>`;
+                        timeInputsContainer.appendChild(timeInputDiv);
+                    }
                 }
             };
-            
-            // Add the event listener for the form
-            bpForm.addEventListener('submit', bpFormSubmitHandler);
+            frequencyInput.addEventListener('input', frequencyChangeHandler);
+
+            prescriptionFormSubmitHandler = (e) => {
+                e.preventDefault();
+                const frequency = parseInt(frequencyInput.value, 10);
+                const times = [];
+                if (frequency > 0) {
+                    for (let i = 1; i <= frequency; i++) {
+                        const timeInput = timeInputsContainer.querySelector(`#modal-prescription-time-${i}`);
+                        if (timeInput && timeInput.value) times.push(timeInput.value);
+                    }
+                }
+                patientRef.collection('prescriptions').add({
+                    name: document.getElementById('modal-prescription-name').value,
+                    dosage: document.getElementById('modal-prescription-dosage').value,
+                    frequency: frequency,
+                    times: times,
+                    notes: document.getElementById('modal-prescription-notes').value,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    prescriptionForm.reset();
+                    timeInputsContainer.innerHTML = '';
+                });
+            };
+            prescriptionForm.addEventListener('submit', prescriptionFormSubmitHandler);
         });
 
         editPatientModal.addEventListener('hide.bs.modal', () => {
-             // Detach the snapshot listener when the modal is closed
-            if (bpSnapshotUnsubscribe) {
-                bpSnapshotUnsubscribe();
-            }
-            // Remove the form submit handler to prevent multiple listeners
+            if (bpSnapshotUnsubscribe) bpSnapshotUnsubscribe();
+            if (prescriptionSnapshotUnsubscribe) prescriptionSnapshotUnsubscribe();
+            
             const bpForm = editPatientModal.querySelector('#modal-add-bp-form');
-            if (bpForm && bpFormSubmitHandler) {
-                bpForm.removeEventListener('submit', bpFormSubmitHandler);
-            }
+            if (bpForm && bpFormSubmitHandler) bpForm.removeEventListener('submit', bpFormSubmitHandler);
+            
+            const prescriptionForm = editPatientModal.querySelector('#modal-add-prescription-form');
+            if (prescriptionForm && prescriptionFormSubmitHandler) prescriptionForm.removeEventListener('submit', prescriptionFormSubmitHandler);
+            
+            const frequencyInput = editPatientModal.querySelector('#modal-prescription-frequency');
+            if (frequencyInput && frequencyChangeHandler) frequencyInput.removeEventListener('input', frequencyChangeHandler);
         });
     }
 
