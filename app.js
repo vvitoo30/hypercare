@@ -845,8 +845,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userDisplayName = document.getElementById('user-display-name');
     const userEmail = document.getElementById('user-email');
     const editProfileForm = document.getElementById('edit-profile-form');
-    const addMedicationForm = document.getElementById('add-medication-form');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
 
     // --- Patient List Page Modal Logic ---
     const editPatientModal = document.getElementById('editPatientModal');
