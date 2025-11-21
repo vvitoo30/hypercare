@@ -47,10 +47,13 @@
       <!-- Bootstrap Nav Tabs -->
       <ul class="nav nav-tabs mb-4" id="medicationTab" role="tablist">
         <li class="nav-item" role="presentation">
-          <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list-pane" type="button" role="tab" aria-controls="list-pane" aria-selected="true">Medication List</button>
+          <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list-pane" type="button" role="tab" aria-controls="list-pane" aria-selected="true">All Medications</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="add-tab" data-bs-toggle="tab" data-bs-target="#add-pane" type="button" role="tab" aria-controls="add-pane" aria-selected="false">Add Medication</button>
+          <button class="nav-link" id="add-tab" data-bs-toggle="tab" data-bs-target="#add-pane" type="button" role="tab" aria-controls="add-pane" aria-selected="false">Add New Medication</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="reaction-tab" data-bs-toggle="tab" data-bs-target="#reaction-pane" type="button" role="tab" aria-controls="reaction-pane" aria-selected="false">Reactions</button>
         </li>
       </ul>
 
@@ -115,6 +118,32 @@
               </form>
             </div>
           </div>
+        </div>
+
+        <!-- Reactions Pane -->
+        <div class="tab-pane fade" id="reaction-pane" role="tabpanel" aria-labelledby="reaction-tab">
+            <h2 class="fw-bold mb-3">Manage Medication Interactions</h2>
+            <div class="card shadow-sm mb-4">
+              <div class="card-body">
+                <h4 class="card-title mb-3">Add New Interaction</h4>
+                <div class="mb-3">
+                  <label for="interaction-medications-select" class="form-label">Select Medications (2 or more)</label>
+                  <select class="form-select" id="interaction-medications-select" multiple size="5">
+                    <!-- Options will be populated by app.js -->
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="interaction-description" class="form-label">Reaction Description</label>
+                  <textarea class="form-control" id="interaction-description" rows="3" placeholder="Describe the interaction, e.g., 'Increases risk of bleeding', 'Reduces effectiveness of drug X'"></textarea>
+                </div>
+                <button type="button" class="btn btn-primary" id="save-interaction-btn">Save Interaction</button>
+              </div>
+            </div>
+
+            <h3 class="fw-bold mb-3 mt-5">Existing Interactions</h3>
+            <div id="existing-interactions-list" class="list-group">
+              <p class="text-muted">Loading interactions...</p>
+            </div>
         </div>
       </div>
     </main>

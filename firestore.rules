@@ -55,5 +55,13 @@ service cloud.firestore {
         // WRITE (create, update, delete): Only admins or doctors can manage medications.
         allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
     }
+
+    // Rules for the 'medication_interactions' collection
+    match /medication_interactions/{interactionId} {
+        // READ: Any authenticated user can read interactions (for the patient-facing checker).
+        allow read: if request.auth != null;
+        // WRITE: Only admins or doctors can create/update/delete interactions.
+        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
+    }
   }
 }

@@ -619,14 +619,16 @@ const displayMedicationInteraction = () => {
     if (!med1Select || !med2Select || !compareBtn || !resultsDiv) return;
 
     let allMedications = []; // To store all fetched medications
+    const medicationNamesMap = new Map(); // To map medication IDs to names
 
-    // Populate dropdowns
+    // Populate dropdowns and build medicationNamesMap
     db.collection('medications').orderBy('name').get().then(snapshot => {
         allMedications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         
         let optionsHtml = '<option value="">Select a medication</option>';
         allMedications.forEach(med => {
             optionsHtml += `<option value="${med.id}">${med.name}</option>`;
+            medicationNamesMap.set(med.id, med.name);
         });
         med1Select.innerHTML = optionsHtml;
         med2Select.innerHTML = optionsHtml;
@@ -635,7 +637,7 @@ const displayMedicationInteraction = () => {
         resultsDiv.innerHTML = '<div class="alert alert-danger">Error loading medications for comparison.</div>';
     });
 
-    compareBtn.addEventListener('click', () => {
+    compareBtn.addEventListener('click', async () => {
         const med1Id = med1Select.value;
         const med2Id = med2Select.value;
 
@@ -648,23 +650,43 @@ const displayMedicationInteraction = () => {
             return;
         }
 
-        const med1 = allMedications.find(med => med.id === med1Id);
-        const med2 = allMedications.find(med => med.id === med2Id);
+        const med1Name = medicationNamesMap.get(med1Id);
+        const med2Name = medicationNamesMap.get(med2Id);
 
-        let interactionText = '';
+        resultsDiv.innerHTML = '<p class="text-info">Checking for interactions...</p>';
 
-        // Simplified interaction logic: Check if interaction field exists and if either medication lists the other
-        const interactionFound = (med1 && med1.interactions && med1.interactions.some(i => i.withMedicationId === med2Id)) ||
-                                 (med2 && med2.interactions && med2.interactions.some(i => i.withMedicationId === med1Id));
-        
-        if (interactionFound) {
-            // This is a placeholder for more sophisticated interaction logic
-            interactionText = `<div class="alert alert-danger"><strong>Potential Interaction!</strong> Please consult with your doctor or pharmacist.</div>`;
-        } else {
-            interactionText = `<div class="alert alert-success">No known interactions found between ${med1.name} and ${med2.name} in our database.</div>`;
+        try {
+            // Query for interactions where both selected medication IDs are present in the 'medicationIds' array
+            const interactionSnapshot = await db.collection('medication_interactions')
+                .where('medicationIds', 'array-contains', med1Id)
+                .get();
+
+            let foundInteraction = null;
+            interactionSnapshot.forEach(doc => {
+                const interaction = doc.data();
+                // Check if the other selected medication is also in this interaction's medicationIds array
+                if (interaction.medicationIds.includes(med2Id)) {
+                    foundInteraction = interaction;
+                    return; // Exit forEach early
+                }
+            });
+
+            if (foundInteraction) {
+                resultsDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>Potential Interaction between ${med1Name} and ${med2Name}:</strong><br>
+                        ${foundInteraction.description}
+                        <p class="mt-2 mb-0"><small>Please consult with your doctor or pharmacist.</small></p>
+                    </div>
+                `;
+            } else {
+                resultsDiv.innerHTML = `<div class="alert alert-success">No known interactions found between ${med1Name} and ${med2Name} in our database.</div>`;
+            }
+
+        } catch (error) {
+            console.error("Error checking medication interactions:", error);
+            resultsDiv.innerHTML = '<div class="alert alert-danger">An error occurred while checking interactions.</div>';
         }
-
-        resultsDiv.innerHTML = interactionText;
     });
 };
 
@@ -731,8 +753,11 @@ const displayMedicationManagement = () => {
             return;
         }
         let medicationsHtml = '';
+        let selectOptionsHtml = '<option value="" disabled>Select medications</option>'; // Default option for multi-select
+        const allMedicationsMap = new Map(); // Store all medications for easy lookup later
         querySnapshot.forEach(doc => {
             const med = doc.data();
+            allMedicationsMap.set(doc.id, med); // Store med by ID
             medicationsHtml += `
                 <tr>
                     <td>${med.name || '-'}</td>
@@ -745,11 +770,64 @@ const displayMedicationManagement = () => {
                     </td>
                 </tr>
             `;
+            // Also populate the multi-select for reactions tab
+            selectOptionsHtml += `<option value="${doc.id}">${med.name}</option>`;
         });
         medicationsTableBody.innerHTML = medicationsHtml;
+
+        const interactionSelect = document.getElementById('interaction-medications-select');
+        if (interactionSelect) {
+            interactionSelect.innerHTML = selectOptionsHtml;
+        }
     }, error => {
         console.error("Error fetching medications:", error);
         medicationsTableBody.innerHTML = `<tr><td colspan="5" class="text-danger">Error loading medications.</td></tr>`;
+    });
+};
+
+let medicationInteractionsSnapshotUnsubscribe; // Declare globally
+
+const displayMedicationInteractionsList = () => {
+    const container = document.getElementById('existing-interactions-list');
+    if (!container) return;
+
+    container.innerHTML = '<p class="text-muted">Loading interactions...</p>';
+
+    // Fetch all medications to map IDs to names
+    db.collection('medications').get().then(medsSnapshot => {
+        const medicationNamesMap = new Map();
+        medsSnapshot.forEach(doc => {
+            medicationNamesMap.set(doc.id, doc.data().name);
+        });
+
+        // Listen for medication interactions
+        medicationInteractionsSnapshotUnsubscribe = db.collection('medication_interactions').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+            let html = '';
+            if (snapshot.empty) {
+                html = '<p class="text-muted">No interactions recorded.</p>';
+            } else {
+                snapshot.forEach(doc => {
+                    const interaction = doc.data();
+                    const interactingMedNames = interaction.medicationIds.map(medId => medicationNamesMap.get(medId) || `Unknown Med (${medId})`).join(', ');
+                    html += `
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <h5 class="card-title">Interaction between: ${interactingMedNames}</h5>
+                                <p class="card-text"><strong>Reaction:</strong> ${interaction.description}</p>
+                                <small class="text-muted">Recorded on: ${interaction.timestamp ? interaction.timestamp.toDate().toLocaleString() : 'N/A'}</small>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            container.innerHTML = html;
+        }, error => {
+            console.error("Error fetching medication interactions:", error);
+            container.innerHTML = '<p class="text-danger">Could not load interactions.</p>';
+        });
+    }).catch(error => {
+        console.error("Error fetching all medications for interaction display:", error);
+        container.innerHTML = '<p class="text-danger">Could not load interactions.</p>';
     });
 };
 
@@ -1120,7 +1198,83 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    const saveInteractionBtn = document.getElementById('save-interaction-btn'); // Get reference here
+    let saveInteractionHandler; // Declare globally for cleanup
+
     if (cancelEditBtn) {
         cancelEditBtn.addEventListener('click', resetMedicationForm);
+    }
+
+    if (saveInteractionBtn) {
+        saveInteractionHandler = async () => {
+            const medicationSelect = document.getElementById('interaction-medications-select');
+            const descriptionInput = document.getElementById('interaction-description');
+
+            const selectedMedicationIds = Array.from(medicationSelect.selectedOptions).map(option => option.value);
+            const description = descriptionInput.value.trim();
+
+            if (selectedMedicationIds.length < 2) {
+                alert('Please select at least two medications for the interaction.');
+                return;
+            }
+            if (!description) {
+                alert('Please provide a description for the interaction.');
+                return;
+            }
+
+            try {
+                await db.collection('medication_interactions').add({
+                    medicationIds: selectedMedicationIds,
+                    description: description,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdBy: auth.currentUser ? auth.currentUser.uid : 'anonymous'
+                });
+                alert('Medication interaction saved successfully!');
+                Array.from(medicationSelect.options).forEach(option => option.selected = false);
+                descriptionInput.value = '';
+            } catch (error) {
+                console.error("Error saving medication interaction:", error);
+                alert("Failed to save medication interaction: " + error.message);
+            }
+        };
+        saveInteractionBtn.addEventListener('click', saveInteractionHandler);
+    }
+
+    // --- Event Listener for tab changes to trigger loading ---
+    const medicationTab = document.getElementById('medicationTab');
+    if (medicationTab) {
+        medicationTab.addEventListener('shown.bs.tab', event => {
+            const activeTabId = event.target.id;
+            // Detach previous interaction snapshot listener if moving away from reaction tab
+            if (medicationInteractionsSnapshotUnsubscribe && activeTabId !== 'reaction-tab') {
+                medicationInteractionsSnapshotUnsubscribe();
+                medicationInteractionsSnapshotUnsubscribe = null; // Clear reference
+            }
+
+            if (activeTabId === 'add-tab') {
+                resetMedicationForm();
+            } else if (activeTabId === 'list-tab') {
+                displayMedicationManagement();
+            } else if (activeTabId === 'reaction-tab') {
+                displayMedicationInteractionsList();
+            }
+        });
+        // Attach listener for 'hide.bs.tab' to ensure cleanup if active tab is changed via code or external means
+        medicationTab.addEventListener('hide.bs.tab', event => {
+            const hiddenTabId = event.target.id;
+             if (medicationInteractionsSnapshotUnsubscribe && hiddenTabId === 'reaction-tab') {
+                medicationInteractionsSnapshotUnsubscribe();
+                medicationInteractionsSnapshotUnsubscribe = null;
+            }
+        });
+
+        // Initial load for the default active tab (Medication List)
+        const activeTab = medicationTab.querySelector('.nav-link.active');
+        if (activeTab && activeTab.id === 'list-tab') {
+            displayMedicationManagement();
+        } else if (activeTab && activeTab.id === 'reaction-tab') {
+             displayMedicationInteractionsList();
+        }
     }
 });
