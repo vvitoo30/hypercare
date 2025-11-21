@@ -251,7 +251,15 @@ const displayPatientList = () => {
                     <td>${patient.email || '-'}</td>
                     <td>${patient.phoneNumber || '-'}</td>
                     <td>
-                        <a href="patient_edit.html?uid=${uid}" class="btn btn-primary btn-sm" onclick="debugLink(event)">Edit</a>
+                        <button 
+                            class="btn btn-primary btn-sm" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#editPatientModal" 
+                            data-uid="${uid}" 
+                            data-username="${patient.username || 'N/A'}"
+                        >
+                            Edit
+                        </button>
                     </td>
                 </tr>
             `;
@@ -524,6 +532,100 @@ document.addEventListener('DOMContentLoaded', () => {
     const editProfileForm = document.getElementById('edit-profile-form');
     const addMedicationForm = document.getElementById('add-medication-form');
     const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+    // --- Patient List Page Modal Logic ---
+    const editPatientModal = document.getElementById('editPatientModal');
+    if (editPatientModal) {
+        let bpFormSubmitHandler; // To hold the event handler function
+        let bpSnapshotUnsubscribe; // To hold the snapshot listener unsubscribe function
+
+        editPatientModal.addEventListener('show.bs.modal', (e) => {
+            const button = e.relatedTarget;
+            const patientUid = button.getAttribute('data-uid');
+            const patientUsername = button.getAttribute('data-username');
+
+            const modalTitle = editPatientModal.querySelector('#modal-patient-name');
+            const bpHistoryContainer = editPatientModal.querySelector('#modal-bp-history');
+            const bpForm = editPatientModal.querySelector('#modal-add-bp-form');
+
+            modalTitle.textContent = patientUsername;
+            bpHistoryContainer.innerHTML = '<p>Loading history...</p>'; // Reset on open
+
+            const patientRef = db.collection('users').doc(patientUid);
+
+            // Fetch and display blood pressure history
+            bpSnapshotUnsubscribe = patientRef.collection('blood_pressure').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+                let html = '<ul class="list-group">';
+                if (snapshot.empty) {
+                    html = '<p>No blood pressure readings found.</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        html += `
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><strong>${data.systolic}/${data.diastolic}</strong> mmHg</span>
+                                <small>${data.timestamp ? data.timestamp.toDate().toLocaleString() : 'N/A'}</small>
+                            </li>
+                        `;
+                    });
+                     html += '</ul>';
+                }
+                bpHistoryContainer.innerHTML = html;
+            }, error => {
+                console.error("Error fetching modal BP history:", error);
+                bpHistoryContainer.innerHTML = '<p class="text-danger">Could not load history.</p>';
+            });
+
+            // Define the form submission handler
+            bpFormSubmitHandler = async (submitEvent) => {
+                submitEvent.preventDefault();
+                const systolic = Number(document.getElementById('modal-bp-systolic').value);
+                const diastolic = Number(document.getElementById('modal-bp-diastolic').value);
+
+                if (isNaN(systolic) || isNaN(diastolic) || systolic <= 0 || diastolic <= 0) {
+                    alert('Please enter valid systolic and diastolic blood pressure values.');
+                    return;
+                }
+
+                try {
+                    // 1. Add the new blood pressure record
+                    await patientRef.collection('blood_pressure').add({
+                        systolic: systolic,
+                        diastolic: diastolic,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // 2. Query to enforce max 7 records
+                    const snapshot = await patientRef.collection('blood_pressure').orderBy('timestamp', 'asc').get();
+                    if (snapshot.docs.length > 7) {
+                        const recordsToDelete = snapshot.docs.slice(0, snapshot.docs.length - 7);
+                        const deletePromises = recordsToDelete.map(doc => doc.ref.delete());
+                        await Promise.all(deletePromises);
+                    }
+
+                    bpForm.reset();
+                } catch (error) {
+                    console.error("Error adding modal BP record:", error);
+                    alert("Failed to add blood pressure record.");
+                }
+            };
+            
+            // Add the event listener for the form
+            bpForm.addEventListener('submit', bpFormSubmitHandler);
+        });
+
+        editPatientModal.addEventListener('hide.bs.modal', () => {
+             // Detach the snapshot listener when the modal is closed
+            if (bpSnapshotUnsubscribe) {
+                bpSnapshotUnsubscribe();
+            }
+            // Remove the form submit handler to prevent multiple listeners
+            const bpForm = editPatientModal.querySelector('#modal-add-bp-form');
+            if (bpForm && bpFormSubmitHandler) {
+                bpForm.removeEventListener('submit', bpFormSubmitHandler);
+            }
+        });
+    }
 
     // --- Main Auth State Listener ---
     auth.onAuthStateChanged(async (user) => {
