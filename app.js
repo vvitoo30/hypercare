@@ -512,26 +512,101 @@ const displayMedicationLibrary = () => {
         if (snapshot.empty) {
             html = '<p class="text-center">No medications found in the library.</p>';
         } else {
-            snapshot.forEach(doc => {
+            html += '<div class="accordion" id="medicationAccordion">';
+            snapshot.forEach((doc, index) => {
                 const med = doc.data();
+                const medId = `med-${doc.id}`;
                 html += `
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">${med.name}</h5>
-                                <h6 class="card-subtitle mb-2 text-muted">${med.type || 'N/A'} - ${med.dosage || 'N/A'}</h6>
-                                <p class="card-text">${med.description || 'No description available.'}</p>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading-${medId}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${medId}" aria-expanded="false" aria-controls="collapse-${medId}">
+                                <strong>${med.name}</strong>&nbsp;-&nbsp;<span class="text-muted">${med.type || 'N/A'}</span>
+                            </button>
+                        </h2>
+                        <div id="collapse-${medId}" class="accordion-collapse collapse" aria-labelledby="heading-${medId}" data-bs-parent="#medicationAccordion">
+                            <div class="accordion-body">
+                                <p><strong>Dosage:</strong> ${med.dosage || 'N/A'}</p>
+                                <p><strong>Description:</strong> ${med.description || 'No description available.'}</p>
                             </div>
                         </div>
                     </div>
                 `;
             });
+            html += '</div>';
         }
         container.innerHTML = html;
     }, error => {
         console.error("Error fetching medication library:", error);
         container.innerHTML = '<p class="text-danger text-center">Could not load medication library.</p>';
     });
+};
+
+// --- Healthy Dashboard Page Functions (for healthy_dashboard.html) ---
+const displayHealthyDashboard = () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const container = document.getElementById('health-tasks-container');
+    if (!container) return;
+
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const userDailyTasksRef = db.collection('users').doc(user.uid).collection('daily_health_tasks').doc(today);
+
+    const defaultTasks = {
+        takeMedicine: false,
+        exercise: false,
+        reduceSalt: false,
+        getEnoughSleep: false,
+        dontSmoke: false
+    };
+
+    userDailyTasksRef.onSnapshot(docSnapshot => {
+        if (!docSnapshot.exists) {
+            // Document for today doesn't exist, create it
+            userDailyTasksRef.set(defaultTasks).then(() => {
+                renderTasks(defaultTasks); // Render with default
+            }).catch(error => {
+                console.error("Error creating daily tasks document:", error);
+                container.innerHTML = '<p class="text-danger">Could not load tasks.</p>';
+            });
+        } else {
+            // Document exists, render its current state
+            const tasks = docSnapshot.data();
+            renderTasks(tasks);
+        }
+    }, error => {
+        console.error("Error fetching daily tasks:", error);
+        container.innerHTML = '<p class="text-danger">Could not load tasks.</p>';
+    });
+
+    const renderTasks = (tasks) => {
+        let html = '<ul class="list-group">';
+        for (const [taskKey, taskStatus] of Object.entries(tasks)) {
+            const taskLabel = taskKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); // Convert camelCase to readable string
+            html += `
+                <li class="list-group-item d-flex justify-content-between align-items-center task-item ${taskStatus ? 'done' : ''}" data-task-key="${taskKey}">
+                    ${taskLabel}
+                    <i class="bi ${taskStatus ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted'}"></i>
+                </li>
+            `;
+        }
+        html += '</ul>';
+        container.innerHTML = html;
+
+        // Attach event listeners for toggling tasks
+        container.querySelectorAll('.task-item').forEach(item => {
+            item.onclick = () => {
+                const taskKey = item.getAttribute('data-task-key');
+                const currentStatus = tasks[taskKey];
+                userDailyTasksRef.update({
+                    [taskKey]: !currentStatus
+                }).catch(error => {
+                    console.error("Error toggling task status:", error);
+                    alert("Failed to update task status.");
+                });
+            };
+        });
+    };
 };
 
 // --- Medication Management Functions (for medication_management.html) ---
@@ -853,6 +928,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isMyPrescriptionsPage = onPage('my_prescriptions');
         const isBPHistoryPage = onPage('blood_pressure_history');
         const isEdupharmaPage = onPage('edupharma');
+        const isHealthyDashboardPage = onPage('healthy_dashboard');
 
         if (user) {
             try {
@@ -879,6 +955,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (isPatientEditPage && role === 'doctor') handlePatientEditPage();
                 else if (isMedicationPage && role === 'doctor') displayMedicationManagement();
                 else if (isEdupharmaPage) displayMedicationLibrary();
+                else if (isHealthyDashboardPage) displayHealthyDashboard();
                 else if ((isMainPage || isMyPrescriptionsPage || isBPHistoryPage) && (role === 'user' || role === 'patient')) displayUserData(user);
 
             } catch (error) {
