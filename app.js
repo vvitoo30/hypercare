@@ -818,6 +818,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const isPatientListPage = onPage('patient_list');
         const isPatientEditPage = onPage('patient_edit');
         const isMedicationPage = onPage('medication_management');
+        const isMyPrescriptionsPage = onPage('my_prescriptions');
+        const isBPHistoryPage = onPage('blood_pressure_history');
 
         if (user) {
             try {
@@ -843,7 +845,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (isPatientListPage && role === 'doctor') displayPatientList();
                 else if (isPatientEditPage && role === 'doctor') handlePatientEditPage();
                 else if (isMedicationPage && role === 'doctor') displayMedicationManagement();
-                else if (isMainPage && (role === 'user' || role === 'patient')) displayUserData(user); // Allow both for backward compatibility
+                else if ((isMainPage || isMyPrescriptionsPage || isBPHistoryPage) && (role === 'user' || role === 'patient')) displayUserData(user);
 
             } catch (error) {
                 console.error("Error during auth state change, signing out:", error);

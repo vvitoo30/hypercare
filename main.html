@@ -69,33 +69,36 @@
             Welcome back, <span id="profile-username"></span>!
           </h2>
           <p class="lead my-3">
-            This is your personal dashboard. Here you can find your prescriptions and blood pressure history as recorded by your doctor.
+            This is your personal health dashboard. Select one of the options below to view your data.
           </p>
         </div>
       </div>
 
-      <div class="row g-5">
-        <!-- Prescriptions -->
+      <div class="row g-4">
+        <!-- My Prescriptions Card -->
         <div class="col-md-6">
-          <h3 class="pb-4 mb-4 fst-italic border-bottom">
-            My Prescriptions
-          </h3>
-          <div id="prescriptions-list">
-            <!-- Prescription data will be populated by app.js -->
-            <p>Loading prescriptions...</p>
-          </div>
+          <a href="my_prescriptions.html" class="text-decoration-none">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body text-center">
+                <i class="bi bi-prescription2 card-icon mb-3"></i>
+                <h3 class="card-title">My Prescriptions</h3>
+                <p class="card-text">View your current and past prescriptions, including dosage and reminders.</p>
+              </div>
+            </div>
+          </a>
         </div>
 
-        <!-- Blood Pressure -->
+        <!-- Blood Pressure History Card -->
         <div class="col-md-6">
-          <h3 class="pb-4 mb-4 fst-italic border-bottom">
-            Blood Pressure History
-          </h3>
-          <div id="blood-pressure-history">
-            <!-- Blood pressure data will be populated by app.js -->
-            <p>Loading history...</p>
-          </div>
-          <canvas id="bpChart" class="mt-4"></canvas>
+          <a href="blood_pressure_history.html" class="text-decoration-none">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body text-center">
+                <i class="bi bi-heart-pulse card-icon mb-3"></i>
+                <h3 class="card-title">Blood Pressure History</h3>
+                <p class="card-text">Check your blood pressure readings and view your weekly progress chart.</p>
+              </div>
+            </div>
+          </a>
         </div>
       </div>
     </main>
