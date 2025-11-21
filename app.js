@@ -748,40 +748,43 @@ const displayMedicationManagement = () => {
     if (!medicationsTableBody) return;
 
     db.collection('medications').orderBy('createdAt', 'desc').onSnapshot(querySnapshot => {
+        console.log("Firestore onSnapshot triggered for medications. Snapshot size:", querySnapshot.size);
         if (querySnapshot.empty) {
+            console.log("Medications collection is empty.");
             medicationsTableBody.innerHTML = '<tr><td colspan="5" class="text-center">No medications found.</td></tr>';
-            return;
-        }
-        let medicationsHtml = '';
-        let selectOptionsHtml = '<option value="" disabled>Select medications</option>'; // Default option for multi-select
-        const allMedicationsMap = new Map(); // Store all medications for easy lookup later
-        querySnapshot.forEach(doc => {
-            const med = doc.data();
-            allMedicationsMap.set(doc.id, med); // Store med by ID
-            medicationsHtml += `
-                <tr>
-                    <td>${med.name || '-'}</td>
-                    <td>${med.description || '-'}</td>
-                    <td>${med.type || '-'}</td>
-                    <td>${med.dosage || '-'}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm me-2" onclick="editMedication('${doc.id}')">Edit</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteMedication('${doc.id}')">Delete</button>
-                    </td>
-                </tr>
-            `;
-            // Also populate the multi-select for reactions tab
-            selectOptionsHtml += `<option value="${doc.id}">${med.name}</option>`;
-        });
-        medicationsTableBody.innerHTML = medicationsHtml;
+        } else {
+            let medicationsHtml = '';
+            let selectOptionsHtml = '<option value="" disabled>Select medications</option>'; // Default option for multi-select
+            const allMedicationsMap = new Map(); // Store all medications for easy lookup later
+            querySnapshot.forEach(doc => {
+                const med = doc.data();
+                allMedicationsMap.set(doc.id, med); // Store med by ID
+                medicationsHtml += `
+                    <tr>
+                        <td>${med.name || '-'}</td>
+                        <td>${med.description || '-'}</td>
+                        <td>${med.type || '-'}</td>
+                        <td>${med.dosage || '-'}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm me-2" onclick="editMedication('${doc.id}')">Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteMedication('${doc.id}')">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                // Also populate the multi-select for reactions tab
+                selectOptionsHtml += `<option value="${doc.id}">${med.name}</option>`;
+            });
+            medicationsTableBody.innerHTML = medicationsHtml;
+            console.log("Medications rendered. Total:", querySnapshot.size);
 
-        const interactionSelect = document.getElementById('interaction-medications-select');
-        if (interactionSelect) {
-            interactionSelect.innerHTML = selectOptionsHtml;
+            const interactionSelect = document.getElementById('interaction-medications-select');
+            if (interactionSelect) {
+                interactionSelect.innerHTML = selectOptionsHtml;
+            }
         }
     }, error => {
-        console.error("Error fetching medications:", error);
-        medicationsTableBody.innerHTML = `<tr><td colspan="5" class="text-danger">Error loading medications.</td></tr>`;
+        console.error("Error fetching medications (onSnapshot error):", error);
+        medicationsTableBody.innerHTML = `<tr><td colspan="5" class="text-danger">Error loading medications: ${error.message}.</td></tr>`;
     });
 };
 
