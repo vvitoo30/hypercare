@@ -692,16 +692,11 @@ const displayMedicationInteraction = () => {
 
 // --- Medication Management Functions (for medication_management.html) ---
 const resetMedicationForm = () => {
-    const form = document.getElementById('add-medication-form');
-    if(form) form.reset();
-    const idInput = document.getElementById('medication-id-to-edit');
-    if(idInput) idInput.value = '';
-    const title = document.getElementById('add-medication-form-title');
-    if(title) title.textContent = 'Add New Medication';
-    const submitBtn = document.getElementById('add-medication-submit-btn');
-    if(submitBtn) submitBtn.textContent = 'Add Medication';
-    const cancelBtn = document.getElementById('cancel-edit-btn');
-    if(cancelBtn) cancelBtn.style.display = 'none';
+    // Select the specific fields of the "Tambah Obat" form
+    document.getElementById('medication-name').value = '';
+    document.getElementById('medication-description').value = '';
+    document.getElementById('medication-type').value = '';
+    document.getElementById('medication-dosage').value = '';
 };
 
 const editMedication = (medicationId) => {
@@ -1170,9 +1165,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (addMedicationForm) {
-        addMedicationForm.addEventListener('submit', (e) => {
+        addMedicationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const medicationId = document.getElementById('medication-id-to-edit').value;
             const medicationData = {
                 name: document.getElementById('medication-name').value,
                 description: document.getElementById('medication-description').value,
@@ -1180,23 +1174,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 dosage: document.getElementById('medication-dosage').value,
             };
 
-            let promise;
-            if (medicationId) {
-                // Update existing medication
-                promise = db.collection('medications').doc(medicationId).update(medicationData);
-            } else {
-                // Add new medication
-                promise = db.collection('medications').add({ ...medicationData, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            // Basic validation
+            if (!medicationData.name || !medicationData.description || !medicationData.type || !medicationData.dosage) {
+                alert('Please fill in all medication fields.');
+                return;
             }
 
-            promise.then(() => {
-                alert(`Medication ${medicationId ? 'updated' : 'added'} successfully!`);
-                resetMedicationForm();
-            })
-            .catch(error => {
-                console.error("Error saving medication:", error);
-                alert("Error saving medication: " + error.message);
-            });
+            try {
+                await db.collection('medications').add({ ...medicationData, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                alert(`Medication '${medicationData.name}' added successfully!`);
+                // Clear the form
+                document.getElementById('medication-name').value = '';
+                document.getElementById('medication-description').value = '';
+                document.getElementById('medication-type').value = '';
+                document.getElementById('medication-dosage').value = '';
+            } catch (error) {
+                console.error("Error saving new medication:", error);
+                alert("Failed to save new medication: " + error.message);
+            }
         });
     }
 

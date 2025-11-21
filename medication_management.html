@@ -50,7 +50,7 @@
           <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#list-pane" type="button" role="tab" aria-controls="list-pane" aria-selected="true">All Medications</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" id="add-tab" data-bs-toggle="tab" data-bs-target="#add-pane" type="button" role="tab" aria-controls="add-pane" aria-selected="false">Add New Medication</button>
+          <button class="nav-link" id="add-tab" data-bs-toggle="tab" data-bs-target="#add-pane" type="button" role="tab" aria-controls="add-pane" aria-selected="false">Tambah Obat</button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="reaction-tab" data-bs-toggle="tab" data-bs-target="#reaction-pane" type="button" role="tab" aria-controls="reaction-pane" aria-selected="false">Reactions</button>
@@ -66,15 +66,7 @@
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-striped table-hover">
-                  <thead class="table-light">
-                    <tr>
-                      <th>Name</th>
-                      <th>Description</th>
-                      <th>Type</th>
-                      <th>Dosage</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
+                  <thead class="table-light"><tr><th>Name</th><th>Description</th><th>Type</th><th>Dosage</th><th>Action</th></tr></thead>
                   <tbody id="medications-table-body">
                     <tr>
                       <td colspan="5" class="text-center py-5">
@@ -92,29 +84,27 @@
 
         <!-- Add Medication Pane -->
         <div class="tab-pane fade" id="add-pane" role="tabpanel" aria-labelledby="add-tab">
-          <h2 class="fw-bold mb-4" id="add-medication-form-title">Add New Medication</h2>
+          <h2 class="fw-bold mb-4" id="add-medication-form-title">Tambah Obat Baru</h2>
           <div class="card shadow-sm">
             <div class="card-body">
               <form id="add-medication-form">
-                <input type="hidden" id="medication-id-to-edit"> <!-- NEW: Hidden input for ID -->
                 <div class="mb-3">
-                  <label for="medication-name" class="form-label">Medication Name</label>
+                  <label for="medication-name" class="form-label">Nama Obat</label>
                   <input type="text" class="form-control" id="medication-name" required>
                 </div>
                 <div class="mb-3">
-                  <label for="medication-description" class="form-label">Description</label>
+                  <label for="medication-description" class="form-label">Deskripsi</label>
                   <textarea class="form-control" id="medication-description" rows="3" required></textarea>
                 </div>
                 <div class="mb-3">
-                  <label for="medication-type" class="form-label">Type</label>
-                  <input type="text" class="form-control" id="medication-type" required>
+                  <label for="medication-type" class="form-label">Jenis</label>
+                  <input type="text" class="form-control" id="medication-type" placeholder="e.g., Antibiotik, Analgesik" required>
                 </div>
                 <div class="mb-3">
-                  <label for="medication-dosage" class="form-label">Dosage (e.g., "500mg, twice daily")</label>
-                  <input type="text" class="form-control" id="medication-dosage" required>
+                  <label for="medication-dosage" class="form-label">Dosis</label>
+                  <input type="text" class="form-control" id="medication-dosage" placeholder="e.g., 500mg, 1 tablet sehari" required>
                 </div>
-                <button type="submit" class="btn btn-primary" id="add-medication-submit-btn">Save Medication</button> <!-- CHANGED TEXT AND ADDED ID -->
-                <button type="button" class="btn btn-secondary ms-2" id="cancel-edit-btn" style="display:none;">Cancel Edit</button>
+                <button type="submit" class="btn btn-primary" id="add-medication-submit-btn">Simpan Obat</button>
               </form>
             </div>
           </div>

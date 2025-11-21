@@ -1,36 +1,48 @@
 XHRGET
-https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=fL3BxjelOq-MO3M76NMJoB_Sb8WeD-oyh3v3wTugsQ0&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=U3e7LW7_wnIVtDmq1tjeOA&AID=12&CI=1&TYPE=xmlhttp&zx=eds7lb2uul0t&t=1
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=4RNNhdiPVcgCGUDFW7X4Kgu2ENEBLh3mS7Rz3fSAfT4&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=nhddbylqXwFaLyvdluJSzQ&AID=7&CI=1&TYPE=xmlhttp&zx=a39bnv1we0l&t=1
 [HTTP/2 200  nullms]
 
+Uncaught ReferenceError: addMedicationForm is not defined
+    <anonymous> http://localhost:3000/app.js:1172
+    EventListener.handleEvent* http://localhost:3000/app.js:838
+app.js:1172:9
 GET
 http://localhost:3000/favicon.ico
 [HTTP/1.1 404 Not Found 0ms]
 
 XHRPOST
 https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyB3QFi6xHwzu6RigJmUmtXzv1TyNocrR5w
-[HTTP/2 200  304ms]
+[HTTP/2 200  332ms]
 
 XHRPOST
-https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=95818&CVER=22&X-HTTP-Session-Id=gsessionid&zx=8ycc14edwxjh&t=1
-[HTTP/2 200  291ms]
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=54923&CVER=22&X-HTTP-Session-Id=gsessionid&zx=tsctbc8e1bn2&t=1
+[HTTP/2 200  299ms]
 
 XHRGET
-https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=iXnXQjy-zVRuz5vvRT6zAFl3E2kKwVnXbIDENYFElpY&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=QLcDg2IG7tDpQ_V6PLRg0A&AID=0&CI=0&TYPE=xmlhttp&zx=hg32r9qccst8&t=1
-[HTTP/2 200  1332ms]
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=YZVlRVHCrneqNG2TmeuEZ0B4Yh9lkjqEf1RxDQyHHHk&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=VfhmFL73vJeHExljdULRMw&AID=0&CI=0&TYPE=xmlhttp&zx=fbeyfqbb8k64&t=1
+[HTTP/2 200  1303ms]
 
 XHRGET
-https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=iXnXQjy-zVRuz5vvRT6zAFl3E2kKwVnXbIDENYFElpY&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=QLcDg2IG7tDpQ_V6PLRg0A&AID=0&CI=1&TYPE=xmlhttp&zx=qfpgxyqaw9p0&t=1
-[HTTP/2 200  616ms]
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=YZVlRVHCrneqNG2TmeuEZ0B4Yh9lkjqEf1RxDQyHHHk&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=VfhmFL73vJeHExljdULRMw&AID=0&CI=1&TYPE=xmlhttp&zx=djbugq5e9gk7&t=1
+[HTTP/2 200  300ms]
+
+XHRGET
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=YZVlRVHCrneqNG2TmeuEZ0B4Yh9lkjqEf1RxDQyHHHk&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=VfhmFL73vJeHExljdULRMw&AID=6&CI=1&TYPE=xmlhttp&zx=6f1ehak5oou7&t=1
+[HTTP/2 200  258ms]
 
 XHRPOST
-https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/hypercare-66d6a/databases/(default)&gsessionid=iXnXQjy-zVRuz5vvRT6zAFl3E2kKwVnXbIDENYFElpY&SID=QLcDg2IG7tDpQ_V6PLRg0A&RID=95819&AID=6&zx=pwsgys569ut2&t=1
-[HTTP/2 200  316ms]
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/hypercare-66d6a/databases/(default)&gsessionid=YZVlRVHCrneqNG2TmeuEZ0B4Yh9lkjqEf1RxDQyHHHk&SID=VfhmFL73vJeHExljdULRMw&RID=54924&AID=6&zx=84d51sh330v6&t=1
+[HTTP/2 200  301ms]
+
+XHRPOST
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects/hypercare-66d6a/databases/(default)&gsessionid=YZVlRVHCrneqNG2TmeuEZ0B4Yh9lkjqEf1RxDQyHHHk&SID=VfhmFL73vJeHExljdULRMw&RID=54925&AID=6&zx=p7cf9gde7sig&t=1
+[HTTP/2 200  301ms]
 
 XHRGET
-https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=iXnXQjy-zVRuz5vvRT6zAFl3E2kKwVnXbIDENYFElpY&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=QLcDg2IG7tDpQ_V6PLRg0A&AID=6&CI=1&TYPE=xmlhttp&zx=rosif9rz5pba&t=1
-[HTTP/2 200  316ms]
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=YZVlRVHCrneqNG2TmeuEZ0B4Yh9lkjqEf1RxDQyHHHk&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=VfhmFL73vJeHExljdULRMw&AID=8&CI=1&TYPE=xmlhttp&zx=bvou3uwijscp&t=1
+[HTTP/2 200  281ms]
 
 XHRGET
-https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=iXnXQjy-zVRuz5vvRT6zAFl3E2kKwVnXbIDENYFElpY&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=QLcDg2IG7tDpQ_V6PLRg0A&AID=7&CI=1&TYPE=xmlhttp&zx=z0vadu6syzu3&t=1
+https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?gsessionid=YZVlRVHCrneqNG2TmeuEZ0B4Yh9lkjqEf1RxDQyHHHk&VER=8&database=projects/hypercare-66d6a/databases/(default)&RID=rpc&SID=VfhmFL73vJeHExljdULRMw&AID=13&CI=1&TYPE=xmlhttp&zx=dfkw3obx95ka&t=1
 [HTTP/2 200  nullms]
 
