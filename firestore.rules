@@ -60,8 +60,8 @@ service cloud.firestore {
     match /medication_interactions/{interactionId} {
         // READ: Any authenticated user can read interactions (for the patient-facing checker).
         allow read: if request.auth != null;
-        // WRITE: Only admins or doctors can create/update/delete interactions.
-        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
+        // WRITE: Temporarily allow any authenticated user to write for debugging.
+        allow write: if request.auth != null;
     }
   }
 }

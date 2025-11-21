@@ -772,9 +772,13 @@ const displayMedicationManagement = () => {
             medicationsTableBody.innerHTML = medicationsHtml;
             console.log("Medications rendered. Total:", querySnapshot.size);
 
-            const interactionSelect = document.getElementById('interaction-medications-select');
-            if (interactionSelect) {
-                interactionSelect.innerHTML = selectOptionsHtml;
+            const interactionSelect1 = document.getElementById('interaction-medication1-select');
+            const interactionSelect2 = document.getElementById('interaction-medication2-select');
+            if (interactionSelect1) {
+                interactionSelect1.innerHTML = selectOptionsHtml;
+            }
+            if (interactionSelect2) {
+                interactionSelect2.innerHTML = selectOptionsHtml;
             }
         }
     }, error => {
@@ -840,6 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userDisplayName = document.getElementById('user-display-name');
     const userEmail = document.getElementById('user-email');
     const editProfileForm = document.getElementById('edit-profile-form');
+    const addMedicationForm = document.getElementById('add-medication-form');
 
 
     // --- Patient List Page Modal Logic ---
@@ -1205,14 +1210,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (saveInteractionBtn) {
         saveInteractionHandler = async () => {
-            const medicationSelect = document.getElementById('interaction-medications-select');
+            const medication1Select = document.getElementById('interaction-medication1-select');
+            const medication2Select = document.getElementById('interaction-medication2-select');
             const descriptionInput = document.getElementById('interaction-description');
 
-            const selectedMedicationIds = Array.from(medicationSelect.selectedOptions).map(option => option.value);
+            const medication1Id = medication1Select.value;
+            const medication2Id = medication2Select.value;
             const description = descriptionInput.value.trim();
 
-            if (selectedMedicationIds.length < 2) {
-                alert('Please select at least two medications for the interaction.');
+            if (!medication1Id || !medication2Id) {
+                alert('Please select two medications for the interaction.');
+                return;
+            }
+            if (medication1Id === medication2Id) {
+                alert('Please select two *different* medications for the interaction.');
                 return;
             }
             if (!description) {
@@ -1222,13 +1233,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 await db.collection('medication_interactions').add({
-                    medicationIds: selectedMedicationIds,
+                    medicationIds: [medication1Id, medication2Id], // Now an array of two specific IDs
                     description: description,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     createdBy: auth.currentUser ? auth.currentUser.uid : 'anonymous'
                 });
                 alert('Medication interaction saved successfully!');
-                Array.from(medicationSelect.options).forEach(option => option.selected = false);
+                // Reset the select elements and description input
+                medication1Select.value = '';
+                medication2Select.value = '';
                 descriptionInput.value = '';
             } catch (error) {
                 console.error("Error saving medication interaction:", error);
