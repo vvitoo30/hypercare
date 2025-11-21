@@ -604,7 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Patient List Page Modal Logic ---
     const editPatientModal = document.getElementById('editPatientModal');
     if (editPatientModal) {
-        let bpFormSubmitHandler, prescriptionFormSubmitHandler, frequencyChangeHandler, savePrescriptionsHandler, removeTempPrescriptionHandler;
+        let bpFormSubmitHandler, prescriptionFormSubmitHandler, frequencyChangeHandler, savePrescriptionsHandler, removeTempPrescriptionHandler, clearPrescriptionsHandler;
         let bpSnapshotUnsubscribe, prescriptionSnapshotUnsubscribe;
         let tempPrescriptions = [];
 
@@ -632,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const patientUsername = button.getAttribute('data-username');
             const patientRef = db.collection('users').doc(patientUid);
 
-            tempPrescriptions = []; // Reset the temporary list every time the modal is opened
+            tempPrescriptions = [];
 
             // --- Get Modal Elements ---
             const modalTitle = editPatientModal.querySelector('#modal-patient-name');
@@ -645,6 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const medicationDatalist = editPatientModal.querySelector('#modal-medication-options');
             const savePrescriptionsBtn = editPatientModal.querySelector('#modal-save-prescriptions-btn');
             const tempPrescriptionsContainer = editPatientModal.querySelector('#modal-temp-prescriptions-list');
+            const clearPrescriptionsBtn = editPatientModal.querySelector('#modal-clear-prescriptions-btn');
 
             // --- Reset UI ---
             modalTitle.textContent = patientUsername;
@@ -730,9 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     times: Array.from(timeInputsContainer.querySelectorAll('input')).map(input => input.value).filter(Boolean),
                     notes: document.getElementById('modal-prescription-notes').value,
                 };
-
                 if (!newPrescription.name || !newPrescription.dosage) return alert('Please fill out Medication Name and Dosage.');
-                
                 tempPrescriptions.push(newPrescription);
                 renderTempPrescriptions();
                 alert(`"${newPrescription.name}" added to pending list.`);
@@ -750,7 +749,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             savePrescriptionsHandler = () => {
                 if (tempPrescriptions.length === 0) return alert('No pending prescriptions to save.');
-                
                 const batch = db.batch();
                 tempPrescriptions.forEach(prescription => {
                     const newPrescriptionRef = patientRef.collection('prescriptions').doc();
@@ -760,10 +758,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('All prescriptions saved successfully!');
                     tempPrescriptions = [];
                     renderTempPrescriptions();
-                }).catch(error => {
-                    console.error('Error saving prescriptions in batch:', error);
-                    alert('Failed to save prescriptions.');
-                });
+                }).catch(error => { console.error('Error saving prescriptions in batch:', error); alert('Failed to save prescriptions.'); });
+            };
+
+            clearPrescriptionsHandler = () => {
+                if (!confirm('Are you sure you want to delete all prescription history for this patient? This action cannot be undone.')) return;
+                patientRef.collection('prescriptions').get().then(snapshot => {
+                    if (snapshot.empty) return alert('There is no history to clear.');
+                    const batch = db.batch();
+                    snapshot.docs.forEach(doc => { batch.delete(doc.ref); });
+                    return batch.commit();
+                }).then(() => {
+                    alert('Prescription history cleared successfully.');
+                }).catch(error => { console.error('Error clearing prescription history:', error); alert('Failed to clear prescription history.'); });
             };
 
             // --- Attach Event Listeners ---
@@ -772,6 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
             prescriptionForm.addEventListener('submit', prescriptionFormSubmitHandler);
             tempPrescriptionsContainer.addEventListener('click', removeTempPrescriptionHandler);
             savePrescriptionsBtn.addEventListener('click', savePrescriptionsHandler);
+            clearPrescriptionsBtn.addEventListener('click', clearPrescriptionsHandler);
         });
 
         editPatientModal.addEventListener('hide.bs.modal', () => {
@@ -792,6 +800,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const savePrescriptionsBtn = editPatientModal.querySelector('#modal-save-prescriptions-btn');
             if (savePrescriptionsBtn && savePrescriptionsHandler) savePrescriptionsBtn.removeEventListener('click', savePrescriptionsHandler);
+
+            const clearPrescriptionsBtn = editPatientModal.querySelector('#modal-clear-prescriptions-btn');
+            if (clearPrescriptionsBtn && clearPrescriptionsHandler) clearPrescriptionsBtn.removeEventListener('click', clearPrescriptionsHandler);
         });
     }
 
