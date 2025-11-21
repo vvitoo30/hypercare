@@ -144,7 +144,17 @@ const displayUserData = (user) => {
                 html += '</ul>';
 
                 // --- Chart.js Logic ---
-                const chartDocs = snapshot.docs.reverse(); // oldest to newest
+                // Filter to get only the latest reading for each day
+                const latestReadingsMap = new Map();
+                snapshot.docs.forEach(doc => {
+                    const dateStr = doc.data().timestamp.toDate().toISOString().split('T')[0];
+                    if (!latestReadingsMap.has(dateStr)) {
+                        latestReadingsMap.set(dateStr, doc);
+                    }
+                });
+
+                const chartDocs = Array.from(latestReadingsMap.values()).reverse(); // oldest to newest
+                
                 const labels = chartDocs.map(doc => doc.data().timestamp ? doc.data().timestamp.toDate().toLocaleDateString('id-ID', { weekday: 'long' }) : '');
                 const systolicData = chartDocs.map(doc => doc.data().systolic);
                 const diastolicData = chartDocs.map(doc => doc.data().diastolic);
