@@ -9,8 +9,6 @@
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
     />
 
     <!-- Bootstrap Icons -->
@@ -44,9 +42,6 @@
       }
       .bg-light-custom {
         background-color: #f4f6ff;
-      }
-      .text-primary-custom {
-        color: #4a43d1;
       }
 
       /* --- LAYOUT SECTIONS --- */
@@ -93,6 +88,19 @@
         font-size: 0.95rem;
         margin-bottom: 1rem;
         color: #333;
+      }
+      
+      /* Skeleton loading effect */
+      .skeleton {
+          background-color: #e0e0e0;
+          color: transparent;
+          border-radius: 4px;
+          animation: pulse 1.5s infinite;
+      }
+      @keyframes pulse {
+          0% { opacity: 0.6; }
+          50% { opacity: 1; }
+          100% { opacity: 0.6; }
       }
 
       .custom-hr {
@@ -165,8 +173,8 @@
         color: white;
         border-radius: 1rem;
         border: none;
-        position: relative; /* Needed for overlay positioning */
-        overflow: hidden; /* Ensure overlay stays inside rounded corners */
+        position: relative;
+        overflow: hidden;
       }
 
       /* Checkup Rows inside Modal */
@@ -230,6 +238,7 @@
       }
       .form-control-pill-white:focus {
         box-shadow: 0 0 0 0.25rem rgba(106, 96, 233, 0.5);
+        outline: none;
       }
 
       /* --- Medication Schedule Modal Styles --- */
@@ -298,10 +307,10 @@
 
       /* --- BP Save Button Style --- */
       .btn-save-bp {
-        background-color: #ffffff; /* White bg */
-        color: #4a43d1; /* Purple text */
+        background-color: #4a43d1;
+        color: #ffffff;
         font-weight: bold;
-        font-size: 1.5rem; /* Larger text */
+        font-size: 1.5rem;
         border-radius: 2rem;
         width: 100%;
         padding: 0.75rem;
@@ -309,7 +318,7 @@
         margin-top: 2rem;
       }
       .btn-save-bp:hover {
-        background-color: #f0f0f0;
+        background-color: #3a32a0;
       }
 
       /* --- Pharmacy Notes Styles --- */
@@ -317,7 +326,7 @@
         background-color: #ffffff;
         border-radius: 1rem;
         padding: 1rem;
-        color: #1c1c3a; /* Dark text */
+        color: #1c1c3a;
         font-weight: bold;
         border: none;
         width: 100%;
@@ -330,28 +339,28 @@
       }
       .btn-add-notes {
         background-color: #ffffff;
-        color: #4a43d1; /* Purple text */
+        color: #4a43d1;
         font-weight: bold;
         border-radius: 1rem;
         padding: 0.75rem;
         border: none;
-        width: 48%; /* Roughly half width */
+        width: 48%;
         font-size: 1.1rem;
       }
       .btn-save-notes {
-        background-color: #4a43d1; /* Purple bg */
+        background-color: #4a43d1;
         color: #ffffff;
         font-weight: bold;
         border-radius: 1rem;
         padding: 0.75rem;
         border: none;
-        width: 48%; /* Roughly half width */
+        width: 48%;
         font-size: 1.1rem;
       }
       
       /* --- Medical Check Up Records Button Style --- */
       .btn-save-checkup {
-        background-color: #4a43d1; /* Purple */
+        background-color: #4a43d1;
         color: white;
         font-weight: bold;
         font-size: 1.3rem;
@@ -365,19 +374,19 @@
           background-color: #3a32a0;
       }
 
-      /* --- NEW: Save Animation Overlay --- */
+      /* --- Save Animation Overlay --- */
       .save-overlay {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(28, 28, 58, 0.95); /* Dark blue, mostly opaque */
+        background-color: rgba(28, 28, 58, 0.95);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        z-index: 1050; /* Sit on top of modal content */
+        z-index: 1050;
         border-radius: 1rem;
       }
       .save-icon {
@@ -407,27 +416,28 @@
 
         <!-- Patient Info Card -->
         <div class="patient-info-card shadow-sm">
-          <div class="fw-bold fs-5">Patient Name (Age)</div>
+          <!-- Added IDs for Dynamic Data -->
+          <div class="fw-bold fs-5" id="pName">Loading Name...</div>
           <hr class="custom-hr">
           
-          <div class="fw-bold mb-3">Location, Date of Birth</div>
+          <div class="fw-bold mb-3" id="pLocDob"><span class="skeleton">Loading Location...</span></div>
           <hr class="custom-hr">
 
           <div class="info-label">Medical Report</div>
-          <div class="info-content">
-            lorem ipsum dolor sit amet
+          <div class="info-content" id="pReport">
+            <span class="skeleton">Loading report data...</span>
           </div>
           <hr class="custom-hr">
 
           <div class="info-label">History of Drugs Allergies</div>
-          <div class="info-content">
-            lorem ipsum dolor sit amet
+          <div class="info-content" id="pAllergies">
+             <span class="skeleton">Loading allergies...</span>
           </div>
           <hr class="custom-hr">
 
           <div class="info-label">Medication</div>
-          <div class="info-content mb-0">
-            lorem ipsum dolor sit amet
+          <div class="info-content mb-0" id="pMeds">
+             <span class="skeleton">Loading medication...</span>
           </div>
         </div>
 
@@ -437,6 +447,7 @@
               class="btn-show-records" 
               data-bs-toggle="modal" 
               data-bs-target="#medicalCheckupModal"
+              onclick="loadCheckupHistory()"
             >
                 Show Medical Check Up Records
             </button>
@@ -466,7 +477,6 @@
             Blood Pressure<br>Records
           </button>
 
-          <!-- Opens Pharmacy Notes Modal -->
           <button 
             class="btn-action-dark"
             data-bs-toggle="modal"
@@ -475,7 +485,6 @@
             Pharmacy<br>Notes
           </button>
           
-           <!-- Opens Medical Check Up Records Modal (NEW) -->
           <button 
             class="btn-action-dark"
             data-bs-toggle="modal"
@@ -489,13 +498,7 @@
     </div>
 
     <!-- === MODAL 1: Medical Check Up History & Details === -->
-    <div 
-      class="modal fade" 
-      id="medicalCheckupModal" 
-      tabindex="-1" 
-      aria-hidden="true"
-      data-bs-backdrop-class="modal-backdrop-blur"
-    >
+    <div class="modal fade" id="medicalCheckupModal" tabindex="-1" aria-hidden="true" data-bs-backdrop-class="modal-backdrop-blur">
       <div class="modal-dialog modal-dialog-centered modal-lg"> 
         <div class="modal-content modal-content-dark p-3">
           <div class="modal-body">
@@ -504,30 +507,18 @@
             <div id="checkupHistoryView">
               <h2 class="fw-bold mb-2">Medical Check Up History</h2>
               <p class="text-white-50 mb-4">Review your patient’s medical check up history</p>
-
-              <h5 class="fw-bold mb-3">Check Up Dates</h5>
-
-              <div class="checkup-row">
-                <p class="checkup-date">Tuesday, 20/11/2025</p>
-                <button class="btn btn-details" onclick="showCheckupDetail()">See Details</button>
-              </div>
-              <div class="checkup-row">
-                <p class="checkup-date">Tuesday, 20/11/2025</p>
-                <button class="btn btn-details" onclick="showCheckupDetail()">See Details</button>
-              </div>
-              <div class="checkup-row">
-                <p class="checkup-date">Tuesday, 20/11/2025</p>
-                <button class="btn btn-details" onclick="showCheckupDetail()">See Details</button>
-              </div>
-
-              <a href="#" class="link-show-more">Show more</a>
               
+              <div id="checkupHistoryList">
+                  <!-- Dynamic Rows will be injected here -->
+                  <div class="text-center text-white-50 py-3">Loading history...</div>
+              </div>
+
               <div class="text-center mt-4">
                 <button type="button" class="btn btn-outline-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
               </div>
             </div>
 
-            <!-- VIEW 2: Detail Form -->
+            <!-- VIEW 2: Detail Form (Read Only) -->
             <div id="checkupDetailView" class="d-none">
                <div class="mb-3">
                  <button class="btn text-white p-0" onclick="hideCheckupDetail()">
@@ -535,33 +526,23 @@
                  </button>
                </div>
 
-              <h2 class="fw-bold mb-2">Medical Check Up History</h2>
-              <p class="text-white-50 mb-4">Review your patient’s medical check up history</p>
-
+              <h2 class="fw-bold mb-2">Check Up Detail</h2>
               <form>
                 <div class="mb-3">
-                  <label class="form-label-light">Check up Dates (Day, DD/MM/YYYY)</label>
-                  <input type="text" class="form-control form-control-pill-white" value="Tuesday, 20/11/2025" readonly>
+                  <label class="form-label-light">Date</label>
+                  <input type="text" class="form-control form-control-pill-white" id="detailDate" readonly>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label-light">Sistolic (mmHg)</label>
-                  <input type="text" class="form-control form-control-pill-white">
+                  <label class="form-label-light">Blood Pressure (Sys/Dia)</label>
+                  <input type="text" class="form-control form-control-pill-white" id="detailBP" readonly>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label-light">Diastolic (mmHg)</label>
-                  <input type="text" class="form-control form-control-pill-white">
+                  <label class="form-label-light">Medication Prescribed</label>
+                  <input type="text" class="form-control form-control-pill-white" id="detailMeds" readonly>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label-light">Medication</label>
-                  <input type="text" class="form-control form-control-pill-white">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label-light">List of Drug Allergies</label>
-                  <input type="text" class="form-control form-control-pill-white">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label-light">Used Up Medicine (Strips/pills)</label>
-                  <input type="text" class="form-control form-control-pill-white">
+                  <label class="form-label-light">Notes</label>
+                  <textarea class="form-control form-control-pill-white" id="detailNotes" rows="3" readonly></textarea>
                 </div>
               </form>
             </div>
@@ -572,16 +553,9 @@
     </div>
 
     <!-- === MODAL 2: Medication Schedule === -->
-    <div 
-      class="modal fade" 
-      id="medicationScheduleModal" 
-      tabindex="-1" 
-      aria-hidden="true"
-      data-bs-backdrop-class="modal-backdrop-blur"
-    >
+    <div class="modal fade" id="medicationScheduleModal" tabindex="-1" aria-hidden="true" data-bs-backdrop-class="modal-backdrop-blur">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-content-dark p-3">
-          <!-- NEW: Save Overlay (Hidden by default) -->
           <div id="medicationSaveOverlay" class="save-overlay d-none">
             <i class="bi bi-check-circle-fill save-icon"></i>
             <div class="save-text">Saved!</div>
@@ -597,21 +571,21 @@
             <p class="text-white-50 mb-4">Add Medication Schedule to your patient</p>
 
             <div id="medicationContainer">
+              <!-- First Group -->
               <div class="medication-group">
                 <div class="mb-3">
                   <label class="form-label-light fs-4">Time</label>
                   <div class="time-input-group">
-                    <input type="text" class="time-box" maxlength="1" placeholder="0">
-                    <input type="text" class="time-box" maxlength="1" placeholder="0">
+                    <input type="text" class="time-box h1" maxlength="1" placeholder="0">
+                    <input type="text" class="time-box h2" maxlength="1" placeholder="0">
                     <span class="time-colon">:</span>
-                    <input type="text" class="time-box" maxlength="1" placeholder="0">
-                    <input type="text" class="time-box" maxlength="1" placeholder="0">
+                    <input type="text" class="time-box m1" maxlength="1" placeholder="0">
+                    <input type="text" class="time-box m2" maxlength="1" placeholder="0">
                   </div>
-                  <div class="text-white-50 mt-1 small">Notes: use 24 hours format</div>
                 </div>
                 <div class="mb-3">
                   <label class="form-label-light fs-4">Medication</label>
-                  <textarea class="form-control form-control-pill-white" rows="3" style="border-radius: 1rem;" placeholder="Lorem ipsum dolor sit amet"></textarea>
+                  <textarea class="form-control form-control-pill-white med-name" rows="2" placeholder="e.g. Paracetamol 500mg"></textarea>
                 </div>
               </div>
             </div>
@@ -622,9 +596,8 @@
                </button>
             </div>
 
-            <!-- UPDATED: Trigger save animation -->
             <div class="mt-4">
-              <button class="btn-save-schedule" onclick="saveAndClose('medicationScheduleModal', 'medicationSaveOverlay')">
+              <button class="btn-save-schedule" onclick="saveMedicationSchedule()">
                 Save Schedule
               </button>
             </div>
@@ -635,16 +608,9 @@
     </div>
 
     <!-- === MODAL 3: Blood Pressure Records === -->
-    <div 
-      class="modal fade" 
-      id="bloodPressureModal" 
-      tabindex="-1" 
-      aria-hidden="true"
-      data-bs-backdrop-class="modal-backdrop-blur"
-    >
+    <div class="modal fade" id="bloodPressureModal" tabindex="-1" aria-hidden="true" data-bs-backdrop-class="modal-backdrop-blur">
       <div class="modal-dialog modal-dialog-centered modal-lg"> 
         <div class="modal-content modal-content-dark p-3">
-          <!-- NEW: Save Overlay -->
           <div id="bpSaveOverlay" class="save-overlay d-none">
             <i class="bi bi-check-circle-fill save-icon"></i>
             <div class="save-text">Saved!</div>
@@ -663,18 +629,17 @@
 
               <form>
                 <div class="mb-4">
-                  <label class="form-label-light">Sistolic (mmHg)</label>
-                  <input type="text" class="form-control form-control-pill-white">
+                  <label class="form-label-light">Systolic (mmHg)</label>
+                  <input type="number" id="bpSystolic" class="form-control form-control-pill-white" placeholder="120">
                 </div>
 
                 <div class="mb-4">
                   <label class="form-label-light">Diastolic (mmHg)</label>
-                  <input type="text" class="form-control form-control-pill-white">
+                  <input type="number" id="bpDiastolic" class="form-control form-control-pill-white" placeholder="80">
                 </div>
 
-                <!-- UPDATED: Trigger save animation -->
                 <div class="mt-5">
-                  <button type="button" class="btn-save-bp" onclick="saveAndClose('bloodPressureModal', 'bpSaveOverlay')">
+                  <button type="button" class="btn-save-bp" onclick="saveBPRecord()">
                     Save BP Records
                   </button>
                 </div>
@@ -687,16 +652,9 @@
     </div>
 
     <!-- === MODAL 4: Pharmacy Notes === -->
-    <div 
-      class="modal fade" 
-      id="pharmacyNotesModal" 
-      tabindex="-1" 
-      aria-hidden="true"
-      data-bs-backdrop-class="modal-backdrop-blur"
-    >
+    <div class="modal fade" id="pharmacyNotesModal" tabindex="-1" aria-hidden="true" data-bs-backdrop-class="modal-backdrop-blur">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-content-dark p-3">
-          <!-- NEW: Save Overlay -->
           <div id="pharmacySaveOverlay" class="save-overlay d-none">
             <i class="bi bi-check-circle-fill save-icon"></i>
             <div class="save-text">Saved!</div>
@@ -713,19 +671,17 @@
 
             <div id="pharmacyNotesContainer">
               <textarea 
+                id="pharmacyNoteInput"
                 class="pharmacy-note-textarea" 
                 rows="6" 
-                placeholder="Lorem ipsum dolor sit amet"
+                placeholder="Enter pharmacy notes here..."
               ></textarea>
             </div>
 
             <div class="d-flex justify-content-between mt-3">
-              <button class="btn-add-notes" onclick="addPharmacyNote()">
-                Add Another<br>Notes
-              </button>
-              <!-- UPDATED: Trigger save animation -->
-              <button class="btn-save-notes" onclick="saveAndClose('pharmacyNotesModal', 'pharmacySaveOverlay')">
-                Save<br>Notes
+              <!-- Simplified: Just one main save button for the text area -->
+              <button class="btn-save-notes w-100" onclick="savePharmacyNote()">
+                Save Notes
               </button>
             </div>
 
@@ -734,17 +690,10 @@
       </div>
     </div>
 
-    <!-- === MODAL 5: Medical Check Up Records (NEW) === -->
-    <div 
-      class="modal fade" 
-      id="medicalCheckupRecordsModal" 
-      tabindex="-1" 
-      aria-hidden="true"
-      data-bs-backdrop-class="modal-backdrop-blur"
-    >
+    <!-- === MODAL 5: Add Medical Check Up Record === -->
+    <div class="modal fade" id="medicalCheckupRecordsModal" tabindex="-1" aria-hidden="true" data-bs-backdrop-class="modal-backdrop-blur">
       <div class="modal-dialog modal-dialog-centered modal-lg"> 
         <div class="modal-content modal-content-dark p-3">
-          <!-- NEW: Save Overlay -->
           <div id="checkupSaveOverlay" class="save-overlay d-none">
             <i class="bi bi-check-circle-fill save-icon"></i>
             <div class="save-text">Saved!</div>
@@ -756,38 +705,32 @@
              </button>
           </div>
           <div class="modal-body pt-2">
-            <h2 class="fw-bold mb-2">Medical Check Up Records</h2>
-            <p class="text-white-50 mb-4">Add your patient’s Medical Check Up Records</p>
+            <h2 class="fw-bold mb-2">Add Medical Record</h2>
+            <p class="text-white-50 mb-4">Add a new check-up entry</p>
 
             <form onsubmit="return false;">
-                <div class="mb-3">
-                  <label class="form-label-light">Check up Dates (Day, DD/MM/YYYY)</label>
-                  <input type="text" class="form-control form-control-pill-white">
+                <!-- Date is auto-generated by server timestamp -->
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label-light">Systolic</label>
+                        <input type="number" id="chkSys" class="form-control form-control-pill-white">
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label-light">Diastolic</label>
+                        <input type="number" id="chkDia" class="form-control form-control-pill-white">
+                    </div>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label-light">Sistolic (mmHg)</label>
-                  <input type="text" class="form-control form-control-pill-white">
+                  <label class="form-label-light">Medication Prescribed</label>
+                  <input type="text" id="chkMeds" class="form-control form-control-pill-white">
                 </div>
                 <div class="mb-3">
-                  <label class="form-label-light">Diastolic (mmHg)</label>
-                  <input type="text" class="form-control form-control-pill-white">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label-light">Medication</label>
-                  <input type="text" class="form-control form-control-pill-white">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label-light">List of Drug Allergies</label>
-                  <input type="text" class="form-control form-control-pill-white">
-                </div>
-                <div class="mb-3">
-                  <label class="form-label-light">Used Up Medicine (Strips/pills)</label>
-                  <input type="text" class="form-control form-control-pill-white">
+                  <label class="form-label-light">Notes / Allergies</label>
+                  <input type="text" id="chkNotes" class="form-control form-control-pill-white">
                 </div>
 
                 <div class="text-center">
-                  <!-- UPDATED: Trigger save animation -->
-                  <button type="button" class="btn-save-checkup" onclick="saveAndClose('medicalCheckupRecordsModal', 'checkupSaveOverlay')">
+                  <button type="button" class="btn-save-checkup" onclick="saveNewCheckup()">
                     Save Records
                   </button>
                 </div>
@@ -799,83 +742,237 @@
     </div>
 
     <!-- Bootstrap JS Bundle -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Config (Must exist in same folder) -->
+    <script src="firebase-config.js"></script>
 
     <!-- Custom JS -->
     <script>
-      // --- NEW: Save Animation Logic ---
-      function saveAndClose(modalId, overlayId) {
+      // --- 1. Initialize Firebase ---
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+      
+      // Get Patient ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const patientId = urlParams.get('id');
+
+      // --- 2. Load Patient Data on Start ---
+      auth.onAuthStateChanged((user) => {
+        if (user && patientId) {
+            loadPatientProfile(patientId);
+        } else if (!patientId) {
+            alert("No patient selected.");
+            window.location.href = "doctor_dashboard.html";
+        }
+      });
+
+      function loadPatientProfile(id) {
+        db.collection("users").doc(id).onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                
+                // Populate HTML elements with IDs
+                document.getElementById('pName').innerText = `${data.username || 'Unknown'} (${data.age || 'N/A'})`;
+                document.getElementById('pLocDob').innerText = data.location_dob || 'No Location Info';
+                document.getElementById('pReport').innerText = data.medical_report || 'No Report';
+                document.getElementById('pAllergies').innerText = data.allergies || 'None';
+                document.getElementById('pMeds').innerText = data.medication || 'None';
+            } else {
+                alert("Patient not found!");
+            }
+        });
+      }
+
+      // --- 3. Save Helpers ---
+      function showOverlayAndClose(modalId, overlayId) {
         const overlay = document.getElementById(overlayId);
         const modalEl = document.getElementById(modalId);
         const modal = bootstrap.Modal.getInstance(modalEl);
 
-        // Show the overlay
         overlay.classList.remove('d-none');
-
-        // Wait for 1.5 seconds
         setTimeout(() => {
-          // Hide overlay
           overlay.classList.add('d-none');
-          // Close modal
           modal.hide();
+          // Clear inputs
+          const inputs = modalEl.querySelectorAll('input, textarea');
+          inputs.forEach(input => input.value = '');
         }, 1500);
       }
 
-      // --- Medical Checkup Logic ---
-      function showCheckupDetail() {
-        document.getElementById('checkupHistoryView').classList.add('d-none');
-        document.getElementById('checkupDetailView').classList.remove('d-none');
-      }
-      function hideCheckupDetail() {
-        document.getElementById('checkupDetailView').classList.add('d-none');
-        document.getElementById('checkupHistoryView').classList.remove('d-none');
-      }
-      document.getElementById('medicalCheckupModal').addEventListener('hidden.bs.modal', function () {
-        hideCheckupDetail();
-      });
+      // --- 4. Logic: Save Blood Pressure ---
+      async function saveBPRecord() {
+        const sys = document.getElementById('bpSystolic').value;
+        const dia = document.getElementById('bpDiastolic').value;
 
-      // --- Medication Schedule Logic ---
+        if(!sys || !dia) return alert("Please fill in both fields");
+
+        try {
+            await db.collection("users").doc(patientId).collection("blood_pressure").add({
+                systolic: sys,
+                diastolic: dia,
+                recordedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                recordedBy: auth.currentUser.email
+            });
+            showOverlayAndClose('bloodPressureModal', 'bpSaveOverlay');
+        } catch (e) {
+            console.error(e);
+            alert("Error saving: " + e.message);
+        }
+      }
+
+      // --- 5. Logic: Save Pharmacy Notes ---
+      async function savePharmacyNote() {
+        const note = document.getElementById('pharmacyNoteInput').value;
+        if(!note) return alert("Please write a note");
+
+        try {
+            await db.collection("users").doc(patientId).collection("pharmacy_notes").add({
+                note: note,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showOverlayAndClose('pharmacyNotesModal', 'pharmacySaveOverlay');
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+      }
+
+      // --- 6. Logic: Save Medication Schedule ---
+      async function saveMedicationSchedule() {
+        // Gather all medication groups
+        const groups = document.querySelectorAll('.medication-group');
+        let schedules = [];
+        
+        groups.forEach(group => {
+            const h1 = group.querySelector('.h1').value || '0';
+            const h2 = group.querySelector('.h2').value || '0';
+            const m1 = group.querySelector('.m1').value || '0';
+            const m2 = group.querySelector('.m2').value || '0';
+            const medName = group.querySelector('.med-name').value;
+            
+            if(medName) {
+                schedules.push({
+                    time: `${h1}${h2}:${m1}${m2}`,
+                    medication: medName
+                });
+            }
+        });
+
+        if(schedules.length === 0) return alert("Please add at least one medication.");
+
+        try {
+            // We add a batch or single document depending on preference. 
+            // Here we add one document containing the array of schedules for this update.
+            await db.collection("users").doc(patientId).collection("medication_schedules").add({
+                items: schedules,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showOverlayAndClose('medicationScheduleModal', 'medicationSaveOverlay');
+            // Clear extra groups
+            document.getElementById('medicationContainer').innerHTML = ''; 
+            addMedicationGroup(); // Add one empty back
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+      }
+
       function addMedicationGroup() {
         const container = document.getElementById('medicationContainer');
-        const newGroupHTML = `
+        const html = `
           <div class="medication-group">
             <div class="mb-3">
               <label class="form-label-light fs-4">Time</label>
               <div class="time-input-group">
-                <input type="text" class="time-box" maxlength="1" placeholder="0">
-                <input type="text" class="time-box" maxlength="1" placeholder="0">
+                <input type="text" class="time-box h1" maxlength="1" placeholder="0">
+                <input type="text" class="time-box h2" maxlength="1" placeholder="0">
                 <span class="time-colon">:</span>
-                <input type="text" class="time-box" maxlength="1" placeholder="0">
-                <input type="text" class="time-box" maxlength="1" placeholder="0">
+                <input type="text" class="time-box m1" maxlength="1" placeholder="0">
+                <input type="text" class="time-box m2" maxlength="1" placeholder="0">
               </div>
-              <div class="text-white-50 mt-1 small">Notes: use 24 hours format</div>
             </div>
             <div class="mb-3">
               <label class="form-label-light fs-4">Medication</label>
-              <textarea class="form-control form-control-pill-white" rows="3" style="border-radius: 1rem;" placeholder="Lorem ipsum dolor sit amet"></textarea>
+              <textarea class="form-control form-control-pill-white med-name" rows="2"></textarea>
             </div>
-          </div>
-        `;
-        container.insertAdjacentHTML('beforeend', newGroupHTML);
+          </div>`;
+        container.insertAdjacentHTML('beforeend', html);
       }
 
-      // --- Pharmacy Notes Logic ---
-      function addPharmacyNote() {
-        const container = document.getElementById('pharmacyNotesContainer');
-        const newNoteHTML = `
-          <textarea 
-            class="pharmacy-note-textarea" 
-            rows="6" 
-            placeholder="Lorem ipsum dolor sit amet"
-          ></textarea>
-        `;
-        container.insertAdjacentHTML('beforeend', newNoteHTML);
+      // --- 7. Logic: Save New Checkup ---
+      async function saveNewCheckup() {
+        const sys = document.getElementById('chkSys').value;
+        const dia = document.getElementById('chkDia').value;
+        const meds = document.getElementById('chkMeds').value;
+        const notes = document.getElementById('chkNotes').value;
+
+        try {
+            await db.collection("users").doc(patientId).collection("checkup_records").add({
+                bp: `${sys}/${dia}`,
+                medication: meds,
+                notes: notes,
+                date: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showOverlayAndClose('medicalCheckupRecordsModal', 'checkupSaveOverlay');
+            // Refresh the history list if it's open or next time it opens
+        } catch(e) {
+            alert("Error: " + e.message);
+        }
+      }
+
+      // --- 8. Logic: Load Checkup History ---
+      function loadCheckupHistory() {
+        const list = document.getElementById('checkupHistoryList');
+        list.innerHTML = '<div class="text-center text-white-50">Loading...</div>';
+
+        db.collection("users").doc(patientId).collection("checkup_records")
+          .orderBy('date', 'desc')
+          .get()
+          .then(snapshot => {
+             if(snapshot.empty) {
+                 list.innerHTML = '<div class="text-center text-white-50">No records found.</div>';
+                 return;
+             }
+             
+             let html = '';
+             snapshot.forEach(doc => {
+                 const d = doc.data();
+                 const dateObj = d.date ? d.date.toDate() : new Date();
+                 const dateStr = dateObj.toLocaleDateString("en-GB", { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' });
+                 
+                 // Store data in data-attributes to show details easily
+                 html += `
+                  <div class="checkup-row">
+                    <p class="checkup-date">${dateStr}</p>
+                    <button class="btn btn-details" 
+                        onclick="showCheckupDetail('${dateStr}', '${d.bp}', '${d.medication}', '${d.notes}')">
+                        See Details
+                    </button>
+                  </div>
+                 `;
+             });
+             list.innerHTML = html;
+          });
+      }
+
+      function showCheckupDetail(date, bp, meds, notes) {
+        document.getElementById('checkupHistoryView').classList.add('d-none');
+        document.getElementById('checkupDetailView').classList.remove('d-none');
+        
+        document.getElementById('detailDate').value = date;
+        document.getElementById('detailBP').value = bp;
+        document.getElementById('detailMeds').value = meds;
+        document.getElementById('detailNotes').value = notes;
+      }
+
+      function hideCheckupDetail() {
+        document.getElementById('checkupDetailView').classList.add('d-none');
+        document.getElementById('checkupHistoryView').classList.remove('d-none');
       }
     </script>
   </body>
-
 </html>
