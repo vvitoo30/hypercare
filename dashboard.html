@@ -9,122 +9,500 @@
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
     />
-
     <!-- Bootstrap Icons -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
-
     <!-- Google Font: Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
     <!-- Custom CSS -->
     <style>
+      /* --- BASE THEME --- */
       body {
         font-family: "Poppins", sans-serif;
-        background-color: #f4f6ff;
+        background-color: #1c1c3a; /* Deep Dark Blue */
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
-      .bg-dark-custom {
-        background-color: #1c1c3a;
+
+      /* --- HEADER --- */
+      .navbar-custom {
+        background-color: #15152e;
+        padding: 1rem 0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
       }
-      .table {
-        border-color: #dee2e6;
-      }
-      .table th {
-        background-color: #e9ecef;
+      .brand-logo {
         font-weight: 700;
+        font-size: 1.5rem;
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
+      
+      /* --- STATS CARDS --- */
+      .stat-card {
+        background: linear-gradient(145deg, #2a2a55, #212145);
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        border: 1px solid rgba(255,255,255,0.05);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.2s;
+        cursor: pointer; /* Clickable cursor */
+        position: relative;
+        overflow: hidden;
+      }
+      .stat-card:hover {
+        transform: translateY(-5px);
+        border-color: #4a43d1;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      }
+      .stat-card.active-filter {
+        border: 2px solid #ffffff;
+        background: #343461;
+      }
+      
+      .stat-icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+      }
+      /* Specific Colors for Stats */
+      .stat-users .stat-icon-box { background-color: rgba(74, 67, 209, 0.2); color: #4a43d1; }
+      .stat-doctors .stat-icon-box { background-color: rgba(13, 202, 240, 0.2); color: #0dcaf0; }
+      .stat-patients .stat-icon-box { background-color: rgba(25, 135, 84, 0.2); color: #198754; }
+      .stat-admins .stat-icon-box { background-color: rgba(220, 53, 69, 0.2); color: #dc3545; }
+
+      /* --- TABLE SECTION --- */
+      .table-container {
+        background-color: #ffffff;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        color: #333;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      }
+      
+      .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 1rem; /* Spacing between rows */
+      }
+      
+      .custom-table thead th {
+        border: none;
+        color: #888;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        padding: 0 1rem;
+      }
+
+      .custom-table tbody tr {
+        background-color: #f8f9fa;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: transform 0.1s;
+      }
+      .custom-table tbody tr:hover {
+        transform: scale(1.01);
+        background-color: #f0f4ff; /* Light blue hover */
+      }
+
+      .custom-table td {
+        padding: 1.2rem 1rem;
+        vertical-align: middle;
+        border: none;
+      }
+      
+      /* Round corners for first and last cells */
+      .custom-table td:first-child { border-top-left-radius: 1rem; border-bottom-left-radius: 1rem; }
+      .custom-table td:last-child { border-top-right-radius: 1rem; border-bottom-right-radius: 1rem; }
+
+      /* User Avatar in Table */
+      .table-avatar {
+        width: 40px;
+        height: 40px;
+        background-color: #4a43d1;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 1rem;
+      }
+
+      /* Role Select Input */
       .role-select {
-          border-radius: 0.375rem;
-          padding: 0.375rem 0.75rem;
-          border: 1px solid #ced4da;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 2rem;
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+        color: #4a43d1;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .role-select:focus {
+        border-color: #4a43d1;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(74, 67, 209, 0.2);
+      }
+
+      /* Role Badges */
+      .badge-role {
+        padding: 0.4rem 0.8rem;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+      .badge-admin { background-color: #ffe0e3; color: #dc3545; }
+      .badge-doctor { background-color: #e0f8ff; color: #0dcaf0; }
+      .badge-patient { background-color: #d1e7dd; color: #198754; }
+      .badge-user { background-color: #e2e3e5; color: #6c757d; }
+
+      /* --- MODAL (Dark Theme) --- */
+      .modal-content-dark {
+        background-color: #252547;
+        color: white;
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
     </style>
   </head>
   <body>
-    <!-- ===== HEADER ===== -->
-    <header class="bg-dark-custom p-3 shadow-sm text-light">
-      <div class="container">
-        <div class="d-flex align-items-center">
-          <div class="me-auto">
-            <span class="fs-4 fw-bold">Hypercare Admin</span>
-          </div>
-          <div class="dropdown">
-            <a
-              href="#"
-              class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <div
-                class="rounded-circle bg-light me-2"
-                style="width: 40px; height: 40px"
-              ></div>
-              <div>
-                <div class="small">Welcome, Admin!</div>
-                <div class="fw-bold" id="user-email"></div>
+
+    <!-- Header -->
+    <nav class="navbar-custom">
+      <div class="container d-flex justify-content-between align-items-center">
+        <a href="#" class="brand-logo">
+            <i class="bi bi-shield-lock-fill text-primary"></i>
+            Hypercare Admin
+        </a>
+        
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+              <div class="rounded-circle bg-secondary me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                <i class="bi bi-person-fill"></i>
               </div>
+              <span class="d-none d-sm-block">Admin</span>
             </a>
-            <ul
-              class="dropdown-menu dropdown-menu-dark text-small shadow"
-              data-bs-theme="dark"
-            >
-              <li>
-                <a class="dropdown-item" href="#" id="logout-button">Log Out</a>
-              </li>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right me-2"></i>Log Out</a></li>
             </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mt-5 pb-5">
+      
+      <!-- Stats Section (Click to Filter) -->
+      <div class="row g-3 mb-5">
+        <!-- 1. Total Card -->
+        <div class="col-6 col-md-3">
+          <div class="stat-card stat-users active-filter" id="card-all" onclick="applyFilter('all')">
+            <div class="stat-icon-box"><i class="bi bi-people-fill"></i></div>
+            <div>
+              <h2 class="fw-bold m-0" id="totalUsersCount">0</h2>
+              <p class="text-white-50 m-0 small">Total</p>
+            </div>
+          </div>
+        </div>
+        <!-- 2. Doctors Card -->
+        <div class="col-6 col-md-3">
+          <div class="stat-card stat-doctors" id="card-doctor" onclick="applyFilter('doctor')">
+            <div class="stat-icon-box"><i class="bi bi-heart-pulse-fill"></i></div>
+            <div>
+              <h2 class="fw-bold m-0" id="totalDoctorsCount">0</h2>
+              <p class="text-white-50 m-0 small">Doctors</p>
+            </div>
+          </div>
+        </div>
+        <!-- 3. Patients Card -->
+        <div class="col-6 col-md-3">
+          <div class="stat-card stat-patients" id="card-patient" onclick="applyFilter('patient')">
+            <div class="stat-icon-box"><i class="bi bi-person-wheelchair"></i></div>
+            <div>
+              <h2 class="fw-bold m-0" id="totalPatientsCount">0</h2>
+              <p class="text-white-50 m-0 small">Patients</p>
+            </div>
+          </div>
+        </div>
+        <!-- 4. Admins Card (NEW) -->
+        <div class="col-6 col-md-3">
+          <div class="stat-card stat-admins" id="card-admin" onclick="applyFilter('admin')">
+            <div class="stat-icon-box"><i class="bi bi-shield-fill"></i></div>
+            <div>
+              <h2 class="fw-bold m-0" id="totalAdminsCount">0</h2>
+              <p class="text-white-50 m-0 small">Admins</p>
+            </div>
           </div>
         </div>
       </div>
-    </header>
 
-    <!-- ===== MAIN CONTENT ===== -->
-    <main class="container py-5">
-      <h2 class="fw-bold mb-4">Manage Users</h2>
-      <div class="card shadow-sm">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="users-table-body">
-                        <!-- User data will be populated here by app.js -->
-                    </tbody>
-                </table>
-            </div>
+      <!-- Table Section -->
+      <div class="table-container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="fw-bold m-0">Manage Users</h3>
+          <!-- Search Input -->
+          <div style="width: 250px; position: relative;">
+            <input type="text" id="searchUser" class="form-control rounded-pill ps-4" placeholder="Search users...">
+            <i class="bi bi-search position-absolute text-muted" style="right: 15px; top: 10px;"></i>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Current Role</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody">
+               <tr>
+                   <td colspan="4" class="text-center py-4">Loading users...</td>
+               </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </main>
 
-    <!-- Bootstrap JS Bundle -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous"
-    ></script>
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-dark p-4 text-center">
+          <div class="modal-body p-0">
+            
+            <!-- STATE 1: Confirmation -->
+            <div id="logoutConfirmContent">
+              <div class="mb-4">
+                <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background-color: rgba(74, 67, 209, 0.1);">
+                  <i class="bi bi-box-arrow-right" style="font-size: 2.5rem; color: #4a43d1;"></i>
+                </div>
+              </div>
+              <h3 class="fw-bold mb-2">Log Out</h3>
+              <p class="text-white-50 mb-4">Are you sure you want to log out?</p>
+              <div class="row g-3">
+                <div class="col-6">
+                  <button type="button" class="btn btn-outline-light w-100 py-2 rounded-pill fw-bold" data-bs-dismiss="modal" style="border: 1px solid rgba(255,255,255,0.2);">Cancel</button>
+                </div>
+                <div class="col-6">
+                  <button type="button" class="btn w-100 py-2 rounded-pill fw-bold" id="confirmLogoutBtn" style="background-color: #4a43d1; color: white;">Log Out</button>
+                </div>
+              </div>
+            </div>
 
-    <!-- Firebase SDK -->
+            <!-- STATE 2: Loading Animation -->
+            <div id="logoutLoadingContent" class="d-none py-3">
+               <div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;" role="status">
+                  <span class="visually-hidden">Loading...</span>
+               </div>
+               <h4 class="fw-bold">Logging you out...</h4>
+               <p class="text-white-50 m-0">Please be patient</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    
-    <!-- Your Scripts -->
     <script src="firebase-config.js"></script>
-    <script src="app.js"></script>
+
+    <script>
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+      let allUsers = [];
+      let currentFilter = 'all';
+
+      // 1. Auth Check
+      auth.onAuthStateChanged(user => {
+        if (user) {
+            loadUsers();
+        } else {
+            // window.location.href = 'index.html'; // Uncomment in prod
+            loadUsers(); // For testing
+        }
+      });
+
+      // 2. Logout Logic
+      document.getElementById('logoutBtn').addEventListener('click', (e) => {
+          e.preventDefault();
+          // Reset modal
+          document.getElementById('logoutConfirmContent').classList.remove('d-none');
+          document.getElementById('logoutLoadingContent').classList.add('d-none');
+          // Show modal
+          const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+          logoutModal.show();
+      });
+
+      document.getElementById('confirmLogoutBtn').addEventListener('click', () => {
+          // Switch to Loading State
+          document.getElementById('logoutConfirmContent').classList.add('d-none');
+          document.getElementById('logoutLoadingContent').classList.remove('d-none');
+
+          // Wait 1.5s then logout
+          setTimeout(() => {
+              auth.signOut().then(() => window.location.href = 'index.html');
+          }, 1500);
+      });
+
+
+      // 3. Load Users & Update Stats
+      function loadUsers() {
+          db.collection("users").onSnapshot(snapshot => {
+              allUsers = [];
+              let doctorCount = 0;
+              let patientCount = 0;
+              let adminCount = 0;
+
+              snapshot.forEach(doc => {
+                  const data = doc.data();
+                  const user = { id: doc.id, ...data };
+                  allUsers.push(user);
+
+                  // Stats Logic
+                  const r = (data.role || '').toLowerCase();
+                  if(r === 'doctor') doctorCount++;
+                  else if(r === 'patient') patientCount++;
+                  else if(r === 'admin') adminCount++;
+              });
+
+              // Update Stats UI
+              document.getElementById('totalUsersCount').innerText = allUsers.length;
+              document.getElementById('totalDoctorsCount').innerText = doctorCount;
+              document.getElementById('totalPatientsCount').innerText = patientCount;
+              document.getElementById('totalAdminsCount').innerText = adminCount;
+
+              // Re-apply current filter
+              applyFilter(currentFilter);
+
+          }, error => {
+              console.error("Error fetching users:", error);
+              alert("Error fetching users: " + error.message);
+          });
+      }
+
+      // 4. Filter Logic (Called by Cards)
+      function applyFilter(filterRole) {
+          currentFilter = filterRole;
+          
+          // UI Update: Highlight active card
+          document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-filter'));
+          document.getElementById(`card-${filterRole}`).classList.add('active-filter');
+
+          // Filter Data
+          const term = document.getElementById('searchUser').value.toLowerCase();
+          
+          const filtered = allUsers.filter(u => {
+              // First check role
+              const uRole = (u.role || 'user').toLowerCase();
+              const roleMatch = (filterRole === 'all') || (uRole === filterRole);
+              
+              // Then check search term
+              const nameMatch = (u.username && u.username.toLowerCase().includes(term)) || false;
+              const emailMatch = (u.email && u.email.toLowerCase().includes(term)) || false;
+              
+              return roleMatch && (nameMatch || emailMatch || term === '');
+          });
+
+          renderTable(filtered);
+      }
+
+      // 5. Render Table
+      function renderTable(users) {
+          const tbody = document.getElementById('userTableBody');
+          tbody.innerHTML = '';
+
+          if (users.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4">No users found matching this filter.</td></tr>';
+              return;
+          }
+
+          users.forEach(user => {
+              const name = user.username || 'Unknown';
+              const email = user.email || '-';
+              const role = user.role || 'user';
+              const initial = name.charAt(0).toUpperCase();
+
+              // Badge Logic
+              let badgeClass = 'badge-user';
+              if(role === 'admin') badgeClass = 'badge-admin';
+              if(role === 'doctor') badgeClass = 'badge-doctor';
+              if(role === 'patient') badgeClass = 'badge-patient';
+
+              const row = `
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="table-avatar">${initial}</div>
+                            <span class="fw-bold text-dark">${name}</span>
+                        </div>
+                    </td>
+                    <td class="text-secondary">${email}</td>
+                    <td><span class="badge-role ${badgeClass}">${role.toUpperCase()}</span></td>
+                    <td>
+                        <select class="role-select" onchange="updateRole('${user.id}', this.value)">
+                            <option value="" disabled selected>Change Role</option>
+                            <option value="patient">Patient</option>
+                            <option value="doctor">Doctor</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </td>
+                </tr>
+              `;
+              tbody.insertAdjacentHTML('beforeend', row);
+          });
+      }
+
+      // 6. Update Role Function
+      async function updateRole(userId, newRole) {
+          if(!confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
+              // If cancelled, reload list to reset dropdown
+              applyFilter(currentFilter); 
+              return;
+          }
+
+          try {
+              await db.collection("users").doc(userId).update({
+                  role: newRole
+              });
+              // No need to manual reload, onSnapshot handles it
+          } catch (error) {
+              console.error("Error updating role:", error);
+              alert("Failed to update role: " + error.message);
+          }
+      }
+
+      // 7. Search Input Listener
+      document.getElementById('searchUser').addEventListener('input', () => {
+          applyFilter(currentFilter); // Re-run filter with current role + new search term
+      });
+
+    </script>
   </body>
 </html>
