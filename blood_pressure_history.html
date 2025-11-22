@@ -4,50 +4,347 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Blood Pressure History - Hypercare</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <!-- Google Font: Poppins -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
     <style>
+      /* --- BASE THEME --- */
       body {
         font-family: "Poppins", sans-serif;
-        background-color: #f4f6ff;
+        background-color: #1c1c3a; /* Deep Dark Blue */
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
-      .bg-dark-custom {
-        background-color: #1c1c3a;
+
+      /* --- HEADER --- */
+      .navbar-custom {
+        background-color: #15152e;
+        padding: 1rem 0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      }
+      .brand-logo {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* --- CONTENT --- */
+      .page-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+      .page-subtitle {
+        color: #a0a0c0;
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+
+      /* --- CARDS --- */
+      .content-card {
+        background-color: #ffffff;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        color: #333;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      }
+      .card-header-custom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+      .card-header-custom h3 {
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #1c1c3a;
+        margin: 0;
+      }
+
+      /* --- TABLE --- */
+      .table-custom {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 0.5rem;
+      }
+      .table-custom th {
+        color: #888;
+        font-weight: 600;
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+      }
+      .table-custom td {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        vertical-align: middle;
+      }
+      .table-custom tr td:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+      .table-custom tr td:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+      
+      .bp-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 2rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+      .bp-normal { background-color: #d1e7dd; color: #198754; }
+      .bp-elevated { background-color: #fff3cd; color: #ffc107; }
+      .bp-high { background-color: #f8d7da; color: #dc3545; }
+
+      /* Back Button */
+      .btn-back {
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: color 0.2s;
+      }
+      .btn-back:hover {
+        color: #ccc;
       }
     </style>
   </head>
   <body>
-    <!-- Header -->
-    <header class="bg-dark-custom p-3 shadow-sm text-light">
-      <div class="container d-flex justify-content-between align-items-center">
-        <span class="fs-4 fw-bold">Blood Pressure History</span>
-        <a href="main.html" class="btn btn-light">Back to Dashboard</a>
-      </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="container py-5">
-      <div class="row">
-        <div class="col-md-12">
-            <div id="blood-pressure-history">
-                <div class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div>
-            <canvas id="bpChart" class="mt-4"></canvas>
+    <!-- Header -->
+    <nav class="navbar-custom">
+      <div class="container d-flex justify-content-between align-items-center">
+        <a href="main.html" class="brand-logo">
+            <i class="bi bi-heart-pulse-fill text-primary"></i>
+            Hypercare
+        </a>
+        
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+              <div class="rounded-circle bg-secondary me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                <i class="bi bi-person-fill"></i>
+              </div>
+              <span class="d-none d-sm-block fw-bold" id="nav-user-name">Patient</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+              <li><a class="dropdown-item" href="main.html">Dashboard</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="logout-button">Log Out</a></li>
+            </ul>
         </div>
       </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mt-4 pb-5">
+      
+      <a href="main.html" class="btn-back">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+      </a>
+
+      <h1 class="page-title">Blood Pressure History</h1>
+      <p class="page-subtitle">Track your blood pressure trends over time.</p>
+
+      <!-- Loading Spinner -->
+      <div id="loadingSpinner" class="text-center py-5">
+         <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+      </div>
+
+      <div id="contentContainer" style="display: none;">
+          
+          <!-- Chart Section -->
+          <div class="content-card">
+            <div class="card-header-custom">
+                <h3>Weekly Trend</h3>
+                <span class="badge bg-light text-dark border">Last 7 Entries</span>
+            </div>
+            <canvas id="bpChart" style="max-height: 300px;"></canvas>
+          </div>
+
+          <!-- Table Section -->
+          <div class="content-card">
+            <div class="card-header-custom">
+                <h3>Recent Logs</h3>
+            </div>
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Systolic (mmHg)</th>
+                            <th>Diastolic (mmHg)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bpTableBody">
+                        <!-- Rows injected here -->
+                    </tbody>
+                </table>
+                <div id="emptyState" class="text-center py-4 text-muted d-none">
+                    No blood pressure readings found.
+                </div>
+            </div>
+          </div>
+
+      </div>
+
     </main>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
-    <script src="app.js"></script>
+
+    <script>
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+      
+      // 1. Check Auth
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          document.getElementById('nav-user-name').textContent = user.displayName || "Patient";
+          loadBPData(user.uid);
+        } else {
+          window.location.href = 'index.html';
+        }
+      });
+
+      // 2. Logout
+      document.getElementById('logout-button').addEventListener('click', (e) => {
+        e.preventDefault();
+        auth.signOut().then(() => window.location.href = 'index.html');
+      });
+
+      // 3. Load Data & Render
+      async function loadBPData(userId) {
+          try {
+              // Fetch 'blood_pressure' sub-collection
+              const snapshot = await db.collection("users").doc(userId)
+                                       .collection("blood_pressure")
+                                       .orderBy("recordedAt", "desc") // Newest first
+                                       .limit(10)
+                                       .get();
+
+              if (snapshot.empty) {
+                  document.getElementById('loadingSpinner').style.display = 'none';
+                  document.getElementById('contentContainer').style.display = 'block';
+                  document.getElementById('emptyState').classList.remove('d-none');
+                  return;
+              }
+
+              const labels = [];
+              const sysData = [];
+              const diaData = [];
+              let tableHtml = '';
+
+              // Process Data (Reverse for chart so oldest is left)
+              const docs = snapshot.docs; 
+              const chartDocs = [...docs].reverse(); 
+
+              // Build Chart Data
+              chartDocs.forEach(doc => {
+                  const d = doc.data();
+                  const date = d.recordedAt ? d.recordedAt.toDate() : new Date();
+                  labels.push(date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }));
+                  sysData.push(d.systolic);
+                  diaData.push(d.diastolic);
+              });
+
+              // Build Table Rows
+              docs.forEach(doc => {
+                  const d = doc.data();
+                  const date = d.recordedAt ? d.recordedAt.toDate() : new Date();
+                  const dateStr = date.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                  
+                  let statusBadge = '<span class="bp-badge bp-normal">Normal</span>';
+                  if (d.systolic >= 140 || d.diastolic >= 90) statusBadge = '<span class="bp-badge bp-high">High</span>';
+                  else if (d.systolic >= 120 && d.systolic < 140) statusBadge = '<span class="bp-badge bp-elevated">Elevated</span>';
+
+                  tableHtml += `
+                    <tr>
+                        <td>${dateStr}</td>
+                        <td class="fw-bold">${d.systolic}</td>
+                        <td class="fw-bold">${d.diastolic}</td>
+                        <td>${statusBadge}</td>
+                    </tr>
+                  `;
+              });
+
+              document.getElementById('bpTableBody').innerHTML = tableHtml;
+              
+              // Render Chart
+              renderChart(labels, sysData, diaData);
+
+              // Show Content
+              document.getElementById('loadingSpinner').style.display = 'none';
+              document.getElementById('contentContainer').style.display = 'block';
+
+          } catch (error) {
+              console.error("Error loading BP:", error);
+              alert("Error loading data: " + error.message);
+          }
+      }
+
+      function renderChart(labels, sysData, diaData) {
+          const ctx = document.getElementById('bpChart').getContext('2d');
+          new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels: labels,
+                  datasets: [
+                      {
+                          label: 'Systolic',
+                          data: sysData,
+                          borderColor: '#dc3545', // Red
+                          backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                          tension: 0.4,
+                          fill: true
+                      },
+                      {
+                          label: 'Diastolic',
+                          data: diaData,
+                          borderColor: '#0dcaf0', // Blue
+                          backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                          tension: 0.4,
+                          fill: true
+                      }
+                  ]
+              },
+              options: {
+                  responsive: true,
+                  plugins: {
+                      legend: { position: 'top' }
+                  },
+                  scales: {
+                      y: { beginAtZero: false, suggestMin: 60, suggestMax: 160 }
+                  }
+              }
+          });
+      }
+    </script>
   </body>
 </html>
