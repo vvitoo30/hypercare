@@ -154,13 +154,25 @@
         margin-top: 0.3rem;
       }
 
-      /* --- MODAL --- */
+      /* --- MODAL COMMON STYLES --- */
       .modal-content-dark {
         background-color: #252547;
         color: white;
         border-radius: 1.5rem;
         border: 1px solid rgba(255, 255, 255, 0.1);
       }
+      .modal-content-light {
+        background-color: #f4f6ff;
+        color: #1c1c3a;
+        border-radius: 1.5rem;
+        border: none;
+      }
+      .modal-backdrop-blur {
+        backdrop-filter: blur(5px);
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      /* Form Controls */
       .form-control-custom {
         background-color: #1c1c3a;
         border: 1px solid #3f3f6b;
@@ -174,6 +186,22 @@
         color: white;
         box-shadow: none;
       }
+      .form-control-pill-white {
+        background-color: #ffffff;
+        border-radius: 2rem;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        color: #1c1c3a;
+        font-weight: bold;
+      }
+      .form-label-light {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        color: #ccc;
+        font-size: 0.9rem;
+      }
+      
+      /* Register Button */
       .btn-register-submit {
         background-color: #4a43d1;
         color: white;
@@ -186,6 +214,110 @@
       }
       .btn-register-submit:hover {
         background-color: #3b35a8;
+      }
+
+      /* --- PATIENT DETAIL MODAL SPECIFIC --- */
+      .patient-detail-card {
+        background-color: #f4f6ff;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        color: #000000;
+        margin-bottom: 1.5rem;
+      }
+      .detail-label {
+        font-weight: bold;
+        font-size: 1rem;
+        color: #4a43d1;
+        margin-bottom: 0.2rem;
+      }
+      .detail-content {
+        font-size: 0.95rem;
+        color: #333;
+        margin-bottom: 0.8rem;
+      }
+      .custom-hr {
+        border-top: 1px solid #d1d1e0;
+        margin: 0.5rem 0 1rem 0;
+      }
+      .buttons-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      .btn-action-grid {
+        background-color: #1c1c3a;
+        color: white;
+        border-radius: 1rem;
+        padding: 1rem;
+        border: none;
+        font-weight: bold;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+      .btn-action-grid:hover {
+        background-color: #2a2a55;
+        color: white;
+      }
+      .btn-show-records {
+        background-color: #6a60e9;
+        color: white;
+        font-weight: bold;
+        border-radius: 2rem;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        width: 100%;
+      }
+
+      /* Save Overlay */
+      .save-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(28, 28, 58, 0.95);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1060;
+        border-radius: 1.5rem;
+      }
+      
+      /* Checkup Rows */
+      .checkup-row {
+        background-color: #ffffff;
+        border-radius: 50rem;
+        padding: 0.5rem 0.5rem 0.5rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        color: black;
+      }
+      .btn-details-small {
+        background-color: #4a43d1;
+        color: white;
+        border-radius: 50rem;
+        padding: 0.4rem 1.2rem;
+        font-size: 0.85rem;
+        border: none;
+        font-weight: bold;
+      }
+      
+      /* Medication Group Style */
+      .medication-group {
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+      }
+      .medication-group:last-child {
+        border-bottom: none;
       }
     </style>
   </head>
@@ -241,7 +373,9 @@
 
     </main>
 
-    <!-- Register Modal -->
+    <!-- ================= MODALS ================= -->
+
+    <!-- 1. Register Modal -->
     <div class="modal fade" id="registerPatientModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-content-dark p-4">
@@ -253,28 +387,28 @@
             <form id="registerForm">
               <div class="row">
                 <div class="col-6 mb-3">
-                    <label class="text-white-50 small">Full Name</label>
+                    <label class="form-label-light">Full Name</label>
                     <input type="text" class="form-control form-control-custom" id="regName" required>
                 </div>
                 <div class="col-6 mb-3">
-                    <label class="text-white-50 small">Age</label>
+                    <label class="form-label-light">Age</label>
                     <input type="number" class="form-control form-control-custom" id="regAge" required>
                 </div>
               </div>
               <div class="mb-3">
-                <label class="text-white-50 small">Location / DOB</label>
+                <label class="form-label-light">Location / DOB</label>
                 <input type="text" class="form-control form-control-custom" id="regLocation" required>
               </div>
               <div class="mb-3">
-                <label class="text-white-50 small">Medical Report</label>
+                <label class="form-label-light">Medical Report</label>
                 <textarea class="form-control form-control-custom" id="regReport" rows="2" required></textarea>
               </div>
               <div class="mb-3">
-                <label class="text-white-50 small">Allergies</label>
+                <label class="form-label-light">Allergies</label>
                 <input type="text" class="form-control form-control-custom" id="regAllergies" required>
               </div>
               <div class="mb-3">
-                <label class="text-white-50 small">Current Medication</label>
+                <label class="form-label-light">Current Medication</label>
                 <input type="text" class="form-control form-control-custom" id="regMedication" required>
               </div>
               <button type="submit" class="btn-register-submit">Save Patient</button>
@@ -284,16 +418,14 @@
       </div>
     </div>
 
-    <!-- Logout Confirmation Modal -->
+    <!-- 2. Logout Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-content-dark p-4 text-center">
           <div class="modal-body p-0">
-            
-            <!-- STATE 1: Confirmation (Default) -->
+            <!-- Confirmation -->
             <div id="logoutConfirmContent">
               <div class="mb-4">
-                <!-- Icon Container -->
                 <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background-color: rgba(74, 67, 209, 0.1);">
                   <i class="bi bi-box-arrow-right" style="font-size: 2.5rem; color: #4a43d1;"></i>
                 </div>
@@ -309,16 +441,212 @@
                 </div>
               </div>
             </div>
-
-            <!-- STATE 2: Loading (Hidden by default) -->
+            <!-- Loading -->
             <div id="logoutLoadingContent" class="d-none py-3">
-               <div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;" role="status">
-                  <span class="visually-hidden">Loading...</span>
-               </div>
+               <div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
                <h4 class="fw-bold">Logging you out...</h4>
                <p class="text-white-50 m-0">Please be patient</p>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <!-- 3. MAIN PATIENT DETAIL MODAL (The Pop-up Card) -->
+    <div class="modal fade" id="patientDetailModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content modal-content-dark">
+          <!-- Header -->
+          <div class="modal-header border-0 p-4 pb-0">
+             <h3 class="modal-title fw-bold">Patient Detail</h3>
+             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <!-- Body -->
+          <div class="modal-body p-4">
+             <!-- Patient Info Card (Light) -->
+             <div class="patient-detail-card">
+                <div class="fw-bold fs-5 text-dark" id="modalPName">Loading...</div>
+                <hr class="custom-hr">
+                
+                <div class="detail-label">Location / DOB</div>
+                <div class="detail-content" id="modalPLocDob">...</div>
+                
+                <div class="detail-label">Medical Report</div>
+                <div class="detail-content" id="modalPReport">...</div>
+                
+                <div class="detail-label">Allergies</div>
+                <div class="detail-content" id="modalPAllergies">...</div>
+                
+                <div class="detail-label">Medication</div>
+                <div class="detail-content mb-0" id="modalPMeds">...</div>
+             </div>
+
+             <!-- History Button -->
+             <button class="btn-show-records mb-4" onclick="openCheckupHistory()">
+               Show Medical Check Up Records
+             </button>
+
+             <!-- Grid Buttons -->
+             <div class="buttons-grid">
+               <button class="btn-action-grid" data-bs-toggle="modal" data-bs-target="#medicationScheduleModal">
+                 Medication<br>Schedule
+               </button>
+               <button class="btn-action-grid" data-bs-toggle="modal" data-bs-target="#bloodPressureModal">
+                 Blood Pressure<br>Records
+               </button>
+               <button class="btn-action-grid" data-bs-toggle="modal" data-bs-target="#pharmacyNotesModal">
+                 Pharmacy<br>Notes
+               </button>
+               <button class="btn-action-grid" data-bs-toggle="modal" data-bs-target="#medicalCheckupRecordsModal">
+                 Add Medical<br>Record
+               </button>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. SUB-MODAL: Medication Schedule -->
+    <div class="modal fade" id="medicationScheduleModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-dark p-3">
+          <div id="medicationSaveOverlay" class="save-overlay d-none">
+            <i class="bi bi-check-circle-fill save-icon"></i>
+            <div class="save-text">Saved!</div>
+          </div>
+          <div class="modal-header border-0 pb-0">
+             <!-- Back button updated to toggle main modal -->
+             <button type="button" class="btn text-white p-0" data-bs-target="#patientDetailModal" data-bs-toggle="modal">
+               <i class="bi bi-arrow-left fs-2"></i>
+             </button>
+          </div>
+          <div class="modal-body pt-2">
+            <h4 class="fw-bold mb-2">Medication Schedule</h4>
+            <p class="text-white-50 mb-4">Add schedule for patient</p>
+            
+            <div id="medicationContainer">
+              <!-- Dynamic Rows will be added here -->
+              <div class="medication-group">
+                <div class="mb-3">
+                   <label class="form-label-light">Time (e.g. 08:00)</label>
+                   <input type="text" class="form-control form-control-pill-white sched-time" placeholder="HH:MM">
+                </div>
+                <div class="mb-3">
+                   <label class="form-label-light">Medication Name</label>
+                   <input type="text" class="form-control form-control-pill-white sched-name">
+                </div>
+              </div>
+            </div>
+
+            <!-- Add Another Button -->
+            <button class="btn btn-sm btn-outline-light mb-4" onclick="addMedicationGroup()">
+                <i class="bi bi-plus-circle me-1"></i> Add Another
+            </button>
+
+            <button class="btn-register-submit" onclick="saveMedicationSchedule()">Save Schedule</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. SUB-MODAL: Blood Pressure -->
+    <div class="modal fade" id="bloodPressureModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-dark p-3">
+          <div id="bpSaveOverlay" class="save-overlay d-none">
+            <i class="bi bi-check-circle-fill save-icon"></i>
+            <div class="save-text">Saved!</div>
+          </div>
+          <div class="modal-header border-0 pb-0">
+             <!-- Back button updated to toggle main modal -->
+             <button type="button" class="btn text-white p-0" data-bs-target="#patientDetailModal" data-bs-toggle="modal">
+               <i class="bi bi-arrow-left fs-2"></i>
+             </button>
+          </div>
+          <div class="modal-body pt-2">
+            <h4 class="fw-bold mb-2">BP Records</h4>
+            <p class="text-white-50 mb-4">Log blood pressure</p>
+            <div class="mb-3">
+               <label class="form-label-light">Systolic</label>
+               <input type="number" id="bpSystolic" class="form-control form-control-pill-white">
+            </div>
+            <div class="mb-3">
+               <label class="form-label-light">Diastolic</label>
+               <input type="number" id="bpDiastolic" class="form-control form-control-pill-white">
+            </div>
+            <button class="btn-register-submit" onclick="saveBPRecord()">Save BP</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. SUB-MODAL: Pharmacy Notes -->
+    <div class="modal fade" id="pharmacyNotesModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-dark p-3">
+          <div id="pharmacySaveOverlay" class="save-overlay d-none">
+            <i class="bi bi-check-circle-fill save-icon"></i>
+            <div class="save-text">Saved!</div>
+          </div>
+          <div class="modal-header border-0 pb-0">
+             <!-- Back button updated to toggle main modal -->
+             <button type="button" class="btn text-white p-0" data-bs-target="#patientDetailModal" data-bs-toggle="modal">
+               <i class="bi bi-arrow-left fs-2"></i>
+             </button>
+          </div>
+          <div class="modal-body pt-2">
+            <h4 class="fw-bold mb-2">Pharmacy Notes</h4>
+            <div class="mb-3">
+               <textarea id="pharmacyNoteInput" class="form-control form-control-pill-white" rows="5" placeholder="Enter notes..."></textarea>
+            </div>
+            <button class="btn-register-submit" onclick="savePharmacyNote()">Save Note</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. SUB-MODAL: Add Medical Checkup -->
+    <div class="modal fade" id="medicalCheckupRecordsModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-dark p-3">
+          <div id="checkupSaveOverlay" class="save-overlay d-none">
+            <i class="bi bi-check-circle-fill save-icon"></i>
+            <div class="save-text">Saved!</div>
+          </div>
+          <div class="modal-header border-0 pb-0">
+             <!-- Back button updated to toggle main modal -->
+             <button type="button" class="btn text-white p-0" data-bs-target="#patientDetailModal" data-bs-toggle="modal">
+               <i class="bi bi-arrow-left fs-2"></i>
+             </button>
+          </div>
+          <div class="modal-body pt-2">
+            <h4 class="fw-bold mb-2">Add Medical Record</h4>
+            <div class="row">
+               <div class="col-6 mb-3"><input type="number" id="chkSys" class="form-control form-control-pill-white" placeholder="Sys"></div>
+               <div class="col-6 mb-3"><input type="number" id="chkDia" class="form-control form-control-pill-white" placeholder="Dia"></div>
+            </div>
+            <div class="mb-3"><input type="text" id="chkMeds" class="form-control form-control-pill-white" placeholder="Medication"></div>
+            <div class="mb-3"><input type="text" id="chkNotes" class="form-control form-control-pill-white" placeholder="Notes"></div>
+            <button class="btn-register-submit" onclick="saveNewCheckup()">Save Record</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. SUB-MODAL: View History -->
+    <div class="modal fade" id="medicalCheckupModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content modal-content-dark p-3">
+          <div class="modal-header border-0">
+             <!-- Back button updated to toggle main modal (added back arrow here too for consistency) -->
+             <button type="button" class="btn text-white p-0 me-3" data-bs-target="#patientDetailModal" data-bs-toggle="modal">
+               <i class="bi bi-arrow-left fs-2"></i>
+             </button>
+             <h4 class="modal-title fw-bold">History</h4>
+             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+             <div id="checkupHistoryList">Loading...</div>
           </div>
         </div>
       </div>
@@ -339,6 +667,7 @@
       const patientListContainer = document.getElementById('patientListContainer');
       const loadingSpinner = document.getElementById('loadingSpinner');
       let allPatients = []; 
+      let currentPatientId = null; // Tracks which patient card was clicked
 
       // 1. Check Auth
       auth.onAuthStateChanged((user) => {
@@ -346,7 +675,6 @@
           document.getElementById('user-email').textContent = user.email;
           loadPatients();
         } else {
-          // If testing without login, this will load the LIST but writes will fail
           console.warn("User NOT logged in.");
           loadPatients(); 
         }
@@ -355,23 +683,14 @@
       // 2. Logout
       document.getElementById('logout-button').addEventListener('click', (e) => {
         e.preventDefault();
-        
-        // Reset modal state in case it was opened before
         document.getElementById('logoutConfirmContent').classList.remove('d-none');
         document.getElementById('logoutLoadingContent').classList.add('d-none');
-        
-        // Show the confirmation modal
-        const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
-        logoutModal.show();
+        new bootstrap.Modal(document.getElementById('logoutModal')).show();
       });
 
-      // Handle Confirm Button inside Modal
       document.getElementById('confirmLogoutBtn').addEventListener('click', () => {
-        // 1. Switch to Loading State
         document.getElementById('logoutConfirmContent').classList.add('d-none');
         document.getElementById('logoutLoadingContent').classList.remove('d-none');
-
-        // 2. Wait 1.5 seconds for UX, then Sign Out
         setTimeout(() => {
             auth.signOut().then(() => window.location.href = 'index.html');
         }, 1500);
@@ -402,23 +721,22 @@
         } catch (error) {
             console.error("Error: ", error);
             loadingSpinner.style.display = 'none';
-            // If permission denied on load, clarify
             if(error.code === 'permission-denied') {
                 patientListContainer.innerHTML = '<p class="text-center text-danger mt-4">Permission Denied: Check Firestore Rules.</p>';
             }
         }
       }
 
-      // 4. Render Card with Redirect Link
+      // 4. Render Card (Now opens Modal instead of Redirect)
       function renderPatientCard(patient) {
           const name = patient.username || "Unknown";
           const age = patient.age || "N/A";
           const condition = patient.medical_report || "No Data";
           const initial = name.charAt(0).toUpperCase();
 
-          // Redirects to patient_detail.html with ID
+          // CHANGED: onclick calls openPatientDetail()
           const cardHTML = `
-            <div class="patient-card" onclick="window.location.href='patient_detail.html?id=${patient.id}'">
+            <div class="patient-card" onclick="openPatientDetail('${patient.id}')">
               <div class="patient-avatar">${initial}</div>
               <div class="patient-info">
                 <div class="patient-name">${name}</div>
@@ -430,18 +748,157 @@
           patientListContainer.insertAdjacentHTML('beforeend', cardHTML);
       }
 
-      // 5. Register Logic (UPDATED WITH BETTER ERROR HANDLING)
-      const registerForm = document.getElementById('registerForm');
-      let registerModal = new bootstrap.Modal(document.getElementById('registerPatientModal'));
+      // 5. Open Patient Detail Modal
+      function openPatientDetail(id) {
+          currentPatientId = id; // Set global ID
+          const patient = allPatients.find(p => p.id === id);
+          
+          if(patient) {
+              // Populate Modal Fields
+              document.getElementById('modalPName').innerText = `${patient.username || 'Unknown'} (${patient.age || 'N/A'})`;
+              document.getElementById('modalPLocDob').innerText = patient.location_dob || 'N/A';
+              document.getElementById('modalPReport').innerText = patient.medical_report || 'N/A';
+              document.getElementById('modalPAllergies').innerText = patient.allergies || 'N/A';
+              document.getElementById('modalPMeds').innerText = patient.medication || 'N/A';
+              
+              // Show Modal
+              new bootstrap.Modal(document.getElementById('patientDetailModal')).show();
+          }
+      }
 
+      // 6. Sub-Modal Saving Logic
+      function showOverlayAndClose(modalId, overlayId) {
+        const overlay = document.getElementById(overlayId);
+        const modalEl = document.getElementById(modalId);
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        overlay.classList.remove('d-none');
+        setTimeout(() => {
+          overlay.classList.add('d-none');
+          modal.hide();
+          // Return to main
+          new bootstrap.Modal(document.getElementById('patientDetailModal')).show();
+        }, 1500);
+      }
+
+      async function saveBPRecord() {
+         if(!currentPatientId) return;
+         const sys = document.getElementById('bpSystolic').value;
+         const dia = document.getElementById('bpDiastolic').value;
+         try {
+             await db.collection("users").doc(currentPatientId).collection("blood_pressure").add({
+                 systolic: sys, diastolic: dia, recordedAt: firebase.firestore.FieldValue.serverTimestamp()
+             });
+             showOverlayAndClose('bloodPressureModal', 'bpSaveOverlay');
+         } catch(e) { alert("Error: " + e.message); }
+      }
+
+      function addMedicationGroup() {
+        const container = document.getElementById('medicationContainer');
+        const div = document.createElement('div');
+        div.className = 'medication-group';
+        div.innerHTML = `
+            <div class="mb-3">
+               <label class="form-label-light">Time (e.g. 08:00)</label>
+               <input type="text" class="form-control form-control-pill-white sched-time" placeholder="HH:MM">
+            </div>
+            <div class="mb-3">
+               <label class="form-label-light">Medication Name</label>
+               <input type="text" class="form-control form-control-pill-white sched-name">
+            </div>
+        `;
+        container.appendChild(div);
+      }
+
+      async function saveMedicationSchedule() {
+         if(!currentPatientId) return;
+         
+         // Gather all entries
+         const groups = document.querySelectorAll('.medication-group');
+         const schedules = [];
+         
+         groups.forEach(g => {
+             const time = g.querySelector('.sched-time').value;
+             const name = g.querySelector('.sched-name').value;
+             if(time && name) {
+                 schedules.push({ time, medication: name });
+             }
+         });
+
+         if(schedules.length === 0) return alert("Add at least one medication.");
+
+         try {
+             // Save as single doc with array for this set
+             await db.collection("users").doc(currentPatientId).collection("medication_schedules").add({
+                 items: schedules,
+                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
+             });
+             showOverlayAndClose('medicationScheduleModal', 'medicationSaveOverlay');
+             
+             // Reset Form
+             document.getElementById('medicationContainer').innerHTML = `
+              <div class="medication-group">
+                <div class="mb-3">
+                   <label class="form-label-light">Time (e.g. 08:00)</label>
+                   <input type="text" class="form-control form-control-pill-white sched-time" placeholder="HH:MM">
+                </div>
+                <div class="mb-3">
+                   <label class="form-label-light">Medication Name</label>
+                   <input type="text" class="form-control form-control-pill-white sched-name">
+                </div>
+              </div>
+             `;
+         } catch(e) { alert("Error: " + e.message); }
+      }
+
+      async function savePharmacyNote() {
+         if(!currentPatientId) return;
+         const note = document.getElementById('pharmacyNoteInput').value;
+         try {
+             await db.collection("users").doc(currentPatientId).collection("pharmacy_notes").add({
+                 note: note, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+             });
+             showOverlayAndClose('pharmacyNotesModal', 'pharmacySaveOverlay');
+         } catch(e) { alert("Error: " + e.message); }
+      }
+
+      async function saveNewCheckup() {
+         if(!currentPatientId) return;
+         const sys = document.getElementById('chkSys').value;
+         const dia = document.getElementById('chkDia').value;
+         const meds = document.getElementById('chkMeds').value;
+         const notes = document.getElementById('chkNotes').value;
+         try {
+             await db.collection("users").doc(currentPatientId).collection("checkup_records").add({
+                 bp: `${sys}/${dia}`, medication: meds, notes: notes, date: firebase.firestore.FieldValue.serverTimestamp()
+             });
+             showOverlayAndClose('medicalCheckupRecordsModal', 'checkupSaveOverlay');
+         } catch(e) { alert("Error: " + e.message); }
+      }
+
+      function openCheckupHistory() {
+          if(!currentPatientId) return;
+          const list = document.getElementById('checkupHistoryList');
+          list.innerHTML = 'Loading...';
+          
+          db.collection("users").doc(currentPatientId).collection("checkup_records").orderBy('date','desc').get()
+          .then(snap => {
+              if(snap.empty) { list.innerHTML = "No records found."; return; }
+              let html = '';
+              snap.forEach(doc => {
+                  const d = doc.data();
+                  const dateStr = d.date ? d.date.toDate().toLocaleDateString() : '?';
+                  html += `<div class="checkup-row"><span class="fw-bold">${dateStr}</span> <small>${d.bp}</small></div>`;
+              });
+              list.innerHTML = html;
+              new bootstrap.Modal(document.getElementById('medicalCheckupModal')).show();
+          });
+      }
+
+      // 7. Register Logic (Existing)
+      const registerForm = document.getElementById('registerForm');
       registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-
-        // SECURITY CHECK
-        if (!auth.currentUser) {
-            alert("You must be logged in to register a patient.");
-            return;
-        }
+        if (!auth.currentUser) { alert("Login required."); return; }
         
         const newPatient = {
             username: document.getElementById('regName').value,
@@ -457,31 +914,20 @@
 
         try {
             await db.collection("users").add(newPatient);
-            registerModal.hide();
+            bootstrap.Modal.getInstance(document.getElementById('registerPatientModal')).hide();
             registerForm.reset();
-            loadingSpinner.style.display = 'flex';
-            patientListContainer.innerHTML = ''; 
-            await loadPatients(); 
-            alert("Patient registered successfully!");
+            loadPatients(); 
+            alert("Registered!");
         } catch (error) {
-            console.error("Error adding patient: ", error);
-            
-            // SPECIFIC PERMISSION ERROR
-            if (error.code === 'permission-denied') {
-                alert("Permission Denied! \n\nPlease go to Firebase Console > Firestore > Rules and change 'allow write: if false' to 'allow write: if request.auth != null'");
-            } else {
-                alert("Error: " + error.message);
-            }
+            alert("Error: " + error.message);
         }
       });
 
-      // 6. Search Logic
-      const searchInput = document.getElementById('searchInput');
-      searchInput.addEventListener('input', (e) => {
+      // 8. Search Logic
+      document.getElementById('searchInput').addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         patientListContainer.innerHTML = '';
         const filtered = allPatients.filter(p => p.username && p.username.toLowerCase().includes(term));
-        
         if (filtered.length === 0) patientListContainer.innerHTML = '<p class="text-center text-white-50">No matches.</p>';
         else filtered.forEach(p => renderPatientCard(p));
       });
