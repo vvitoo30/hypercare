@@ -4,150 +4,329 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Patient Dashboard - Hypercare</title>
+
+    <!-- Bootstrap CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <!-- Bootstrap Icons -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
+    <!-- Google Font: Poppins -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
     <style>
+      /* --- BASE THEME --- */
       body {
         font-family: "Poppins", sans-serif;
-        background-color: #f4f6ff;
+        background-color: #1c1c3a; /* Deep Dark Blue */
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
-      .bg-dark-custom {
-        background-color: #1c1c3a;
+
+      /* --- HEADER --- */
+      .navbar-custom {
+        background-color: #15152e;
+        padding: 1rem 0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
       }
-      .card-icon {
-        font-size: 3rem;
-        color: #6a60e9;
+      .brand-logo {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* --- WELCOME SECTION --- */
+      .welcome-banner {
+        background: linear-gradient(135deg, #2a2a55 0%, #1c1c3a 100%);
+        border-radius: 1.5rem;
+        padding: 3rem 2rem;
+        border: 1px solid rgba(255,255,255,0.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .welcome-banner::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(74, 67, 209, 0.2) 0%, rgba(0,0,0,0) 70%);
+        border-radius: 50%;
+        z-index: 0;
+      }
+      
+      /* --- ACTION CARDS --- */
+      .action-card {
+        background-color: #ffffff;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        height: 100%;
+        text-decoration: none;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: none;
+        position: relative;
+        overflow: hidden;
+      }
+      .action-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+      }
+      
+      .card-icon-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin-bottom: 1.5rem;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      /* Specific Card Styles */
+      .card-prescriptions .card-icon-circle { background-color: #e0e0ff; color: #4a43d1; }
+      .card-bp .card-icon-circle { background-color: #ffe0e3; color: #dc3545; }
+      .card-edu .card-icon-circle { background-color: #e0f8ff; color: #0dcaf0; }
+      .card-healthy .card-icon-circle { background-color: #d1e7dd; color: #198754; }
+      .card-interaction .card-icon-circle { background-color: #fff3cd; color: #ffc107; }
+
+      .action-card h3 {
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+        color: #1c1c3a;
+      }
+      .action-card p {
+        font-size: 0.9rem;
+        color: #666;
+        line-height: 1.5;
+      }
+
+      /* --- MODAL (Dark Theme) --- */
+      .modal-content-dark {
+        background-color: #252547;
+        color: white;
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
     </style>
   </head>
   <body>
+
     <!-- Header -->
-    <header class="bg-dark-custom p-3 shadow-sm text-light">
-      <div class="container">
-        <div class="d-flex align-items-center">
-          <div class="me-auto">
-            <span class="fs-4 fw-bold">Hypercare</span>
-          </div>
-          <div class="dropdown">
-            <a
-              href="#"
-              class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <div class="fw-bold" id="user-display-name">Patient</div>
+    <nav class="navbar-custom">
+      <div class="container d-flex justify-content-between align-items-center">
+        <a href="#" class="brand-logo">
+            <i class="bi bi-heart-pulse-fill text-primary"></i>
+            Hypercare
+        </a>
+        
+        <!-- User Profile Dropdown -->
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+              <div class="rounded-circle bg-secondary me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="bi bi-person-fill"></i>
+              </div>
+              <span class="d-none d-sm-block fw-bold" id="user-display-name">Patient</span>
             </a>
-            <ul
-              class="dropdown-menu dropdown-menu-dark text-small shadow"
-              data-bs-theme="dark"
-            >
-              <li>
-                <a class="dropdown-item" href="#" id="logout-button">Log Out</a>
-              </li>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+              <li><a class="dropdown-item" href="#" id="logout-button"><i class="bi bi-box-arrow-right me-2"></i>Log Out</a></li>
             </ul>
-          </div>
         </div>
       </div>
-    </header>
+    </nav>
 
     <!-- Main Content -->
-    <main class="container py-5">
-      <!-- Profile Info -->
-      <div class="p-4 p-md-5 mb-4 rounded text-body-emphasis bg-body-secondary">
-        <div class="col-lg-8 px-0">
-          <h2 class="display-6 fst-italic">
-            Welcome back, <span id="profile-username"></span>!
-          </h2>
-          <p class="lead my-3">
-            This is your personal health dashboard. Select one of the options below to view your data.
+    <main class="container mt-5 pb-5">
+      
+      <!-- Welcome Banner -->
+      <div class="welcome-banner text-start">
+        <div style="position: relative; z-index: 1;">
+          <h1 class="display-5 fw-bold mb-3">Welcome back, <span id="profile-username" class="text-primary">User</span>!</h1>
+          <p class="text-white-50 fs-5" style="max-width: 600px;">
+            Your personal health dashboard is ready. Monitor your vitals, manage prescriptions, and stay on top of your health goals.
           </p>
         </div>
       </div>
 
+      <!-- Dashboard Grid -->
       <div class="row g-4">
-        <!-- My Prescriptions Card -->
-        <div class="col-lg-4 col-md-6">
-          <a href="my_prescriptions.html" class="text-decoration-none">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body text-center">
-                <i class="bi bi-prescription2 card-icon mb-3"></i>
-                <h3 class="card-title">My Prescriptions</h3>
-                <p class="card-text">View your current and past prescriptions, including dosage and reminders.</p>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <!-- Blood Pressure History Card -->
-        <div class="col-lg-4 col-md-6">
-          <a href="blood_pressure_history.html" class="text-decoration-none">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body text-center">
-                <i class="bi bi-heart-pulse card-icon mb-3"></i>
-                <h3 class="card-title">Blood Pressure History</h3>
-                <p class="card-text">Check your blood pressure readings and view your weekly progress chart.</p>
-              </div>
-            </div>
-          </a>
-        </div>
         
-        <!-- Edupharma Card -->
-        <div class="col-lg-4 col-md-6">
-            <a href="edupharma.html" class="text-decoration-none">
-              <div class="card h-100 shadow-sm">
-                <div class="card-body text-center">
-                  <i class="bi bi-book-half card-icon mb-3"></i>
-                  <h3 class="card-title">Edupharma</h3>
-                  <p class="card-text">Browse a library of medications to learn about their uses and dosages.</p>
-                </div>
-              </div>
-            </a>
+        <!-- 1. My Prescriptions -->
+        <div class="col-md-6 col-lg-4">
+          <a href="my_prescriptions.html" class="action-card card-prescriptions">
+            <div class="card-icon-circle">
+              <i class="bi bi-file-medical"></i>
+            </div>
+            <h3>My Prescriptions</h3>
+            <p>View your current and past prescriptions, including dosage instructions and refill reminders.</p>
+          </a>
         </div>
 
-        <!-- Healthy Dashboard Card -->
-        <div class="col-lg-4 col-md-6">
-            <a href="healthy_dashboard.html" class="text-decoration-none">
-              <div class="card h-100 shadow-sm">
-                <div class="card-body text-center">
-                  <i class="bi bi-check-all card-icon mb-3"></i>
-                  <h3 class="card-title">Healthy Dashboard</h3>
-                  <p class="card-text">Track your daily health tasks and maintain a healthy lifestyle.</p>
-                </div>
-              </div>
-            </a>
+        <!-- 2. Blood Pressure History -->
+        <div class="col-md-6 col-lg-4">
+          <a href="blood_pressure_history.html" class="action-card card-bp">
+            <div class="card-icon-circle">
+              <i class="bi bi-heart-pulse-fill"></i>
+            </div>
+            <h3>Blood Pressure History</h3>
+            <p>Check your blood pressure readings logs and view your weekly progress charts.</p>
+          </a>
         </div>
 
-        <!-- Medication Interaction Card -->
-        <div class="col-lg-4 col-md-6">
-            <a href="medication_interaction.html" class="text-decoration-none">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body text-center">
-                        <i class="bi bi-capsule-pill card-icon mb-3"></i>
-                        <h3 class="card-title">Medication Interaction</h3>
-                        <p class="card-text">Check for potential interactions between two medications.</p>
-                    </div>
-                </div>
-            </a>
+        <!-- 3. Edupharma -->
+        <div class="col-md-6 col-lg-4">
+          <a href="edupharma.html" class="action-card card-edu">
+            <div class="card-icon-circle">
+              <i class="bi bi-journal-medical"></i>
+            </div>
+            <h3>Edupharma</h3>
+            <p>Browse our comprehensive library of medications to learn about uses, dosages, and side effects.</p>
+          </a>
         </div>
+
+        <!-- 4. Healthy Dashboard -->
+        <div class="col-md-6 col-lg-4">
+          <a href="healthy_dashboard.html" class="action-card card-healthy">
+            <div class="card-icon-circle">
+              <i class="bi bi-activity"></i>
+            </div>
+            <h3>Healthy Dashboard</h3>
+            <p>Track your daily health tasks, exercise routines, and maintain a healthy lifestyle.</p>
+          </a>
+        </div>
+
+        <!-- 5. Medication Interaction -->
+        <div class="col-md-6 col-lg-4">
+          <a href="medication_interaction.html" class="action-card card-interaction">
+            <div class="card-icon-circle">
+              <i class="bi bi-capsule"></i>
+            </div>
+            <h3>Medication Interaction</h3>
+            <p>Check for potential interactions between two medications to ensure your safety.</p>
+          </a>
+        </div>
+
       </div>
     </main>
 
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-dark p-4 text-center">
+          <div class="modal-body p-0">
+            
+            <!-- Confirmation State -->
+            <div id="logoutConfirmContent">
+              <div class="mb-4">
+                <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background-color: rgba(74, 67, 209, 0.1);">
+                  <i class="bi bi-box-arrow-right" style="font-size: 2.5rem; color: #4a43d1;"></i>
+                </div>
+              </div>
+              <h3 class="fw-bold mb-2">Log Out</h3>
+              <p class="text-white-50 mb-4">Are you sure you want to log out?</p>
+              <div class="row g-3">
+                <div class="col-6">
+                  <button type="button" class="btn btn-outline-light w-100 py-2 rounded-pill fw-bold" data-bs-dismiss="modal" style="border: 1px solid rgba(255,255,255,0.2);">Cancel</button>
+                </div>
+                <div class="col-6">
+                  <button type="button" class="btn w-100 py-2 rounded-pill fw-bold" id="confirmLogoutBtn" style="background-color: #4a43d1; color: white;">Log Out</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="logoutLoadingContent" class="d-none py-3">
+               <div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;" role="status">
+                  <span class="visually-hidden">Loading...</span>
+               </div>
+               <h4 class="fw-bold">Logging you out...</h4>
+               <p class="text-white-50 m-0">Please be patient</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Config (Ensure this file exists) -->
     <script src="firebase-config.js"></script>
-    <script src="app.js"></script>
+
+    <script>
+      const auth = firebase.auth();
+      
+      // Update Name on Load
+      auth.onAuthStateChanged(user => {
+        if(user) {
+            const name = user.displayName || user.email.split('@')[0];
+            document.getElementById('user-display-name').textContent = name;
+            document.getElementById('profile-username').textContent = name;
+        }
+      });
+
+      // 1. Trigger Logout Modal
+      const logoutBtn = document.getElementById('logout-button');
+      if(logoutBtn) {
+          logoutBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              
+              // Reset to Confirmation State
+              document.getElementById('logoutConfirmContent').classList.remove('d-none');
+              document.getElementById('logoutLoadingContent').classList.add('d-none');
+              
+              // Show Modal
+              const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+              modal.show();
+          });
+      }
+
+      // 2. Handle Confirm Action
+      const confirmBtn = document.getElementById('confirmLogoutBtn');
+      if(confirmBtn) {
+          confirmBtn.addEventListener('click', () => {
+              // Switch to Loading State
+              document.getElementById('logoutConfirmContent').classList.add('d-none');
+              document.getElementById('logoutLoadingContent').classList.remove('d-none');
+              
+              // Wait 1.5s for animation then Sign Out
+              setTimeout(() => {
+                  auth.signOut().then(() => {
+                      window.location.href = 'index.html';
+                  });
+              }, 1500);
+          });
+      }
+    </script>
   </body>
 </html>
