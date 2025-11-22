@@ -4,44 +4,509 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Edupharma - Hypercare</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <!-- Google Font: Poppins -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
+      /* --- BASE THEME --- */
       body {
         font-family: "Poppins", sans-serif;
-        background-color: #f4f6ff;
+        background-color: #1c1c3a; /* Deep Dark Blue */
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
-      .bg-dark-custom {
-        background-color: #1c1c3a;
+
+      /* --- HEADER --- */
+      .navbar-custom {
+        background-color: #15152e;
+        padding: 1rem 0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      }
+      .brand-logo {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* --- CONTENT --- */
+      .page-header {
+        margin-bottom: 2rem;
+      }
+      .page-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+      .page-subtitle {
+        color: #a0a0c0;
+        font-size: 0.95rem;
+      }
+
+      /* Back Button */
+      .btn-back {
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: color 0.2s;
+      }
+      .btn-back:hover {
+        color: #ccc;
+      }
+
+      /* --- SEARCH BAR --- */
+      .search-container {
+        position: relative;
+        margin-bottom: 2rem;
+      }
+      .search-input {
+        background-color: #ffffff;
+        border: none;
+        border-radius: 2rem;
+        padding: 1rem 1.5rem 1rem 3rem;
+        width: 100%;
+        font-size: 1.1rem;
+        color: #333;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      }
+      .search-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(74, 67, 209, 0.3);
+      }
+      .search-icon {
+        position: absolute;
+        left: 1.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #4a43d1;
+        font-size: 1.2rem;
+      }
+
+      /* --- DRUG LIST ITEMS --- */
+      .drug-list-item {
+        background-color: #ffffff;
+        border-radius: 1rem;
+        padding: 1.2rem;
+        margin-bottom: 1rem;
+        color: #1c1c3a;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-left: 5px solid #4a43d1;
+      }
+      .drug-list-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      }
+      .drug-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .drug-badge {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 50rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #6a60e9 0%, #a855f7 100%);
+        color: white;
+      }
+
+      /* --- DRUG FACTS (NUTRITION LABEL STYLE) --- */
+      .nutrition-card {
+        background-color: white;
+        color: black;
+        border: 2px solid black;
+        padding: 15px;
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        max-width: 100%;
+        margin: 0 auto;
+      }
+      .nutrition-header {
+        border-bottom: 10px solid black;
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+      }
+      .nutrition-title {
+        font-weight: 900;
+        font-size: 2.2rem;
+        margin: 0;
+        line-height: 1;
+      }
+      .nutrition-subtitle {
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin: 0;
+      }
+      .nutrition-row {
+        border-bottom: 1px solid black;
+        padding: 8px 0;
+        font-size: 0.95rem;
+      }
+      .nutrition-thick-row {
+        border-bottom: 5px solid black;
+      }
+      .nutrition-label {
+        font-weight: 900;
+        font-size: 1rem;
+        display: block;
+        margin-bottom: 4px;
+      }
+      .nutrition-text {
+        line-height: 1.4;
+      }
+      .nutrition-disclaimer {
+        font-size: 0.75rem;
+        margin-top: 15px;
+        color: #555;
+        font-style: italic;
+      }
+
+      /* Modal Dark Overlay Override */
+      .modal-content-drug-facts {
+        background-color: white;
+        color: black;
+        border-radius: 0;
+      }
+
+      /* --- INITIAL STATE --- */
+      .initial-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        opacity: 0.7;
+      }
+      .initial-icon {
+        font-size: 4rem;
+        color: #6a60e9;
+        margin-bottom: 1rem;
       }
     </style>
   </head>
   <body>
-    <!-- Header -->
-    <header class="bg-dark-custom p-3 shadow-sm text-light">
-      <div class="container d-flex justify-content-between align-items-center">
-        <span class="fs-4 fw-bold">Edupharma - Medication Library</span>
-        <a href="main.html" class="btn btn-light">Back to Dashboard</a>
-      </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="container py-5">
-      <div id="medication-list-container">
-        <div class="d-flex justify-content-center">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading medications...</span>
-            </div>
+    <!-- Header -->
+    <nav class="navbar-custom">
+      <div class="container d-flex justify-content-between align-items-center">
+        <a href="main.html" class="brand-logo">
+            <i class="bi bi-heart-pulse-fill text-primary"></i>
+            Hypercare
+        </a>
+        
+        <!-- User Profile Dropdown -->
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+              <div class="rounded-circle bg-secondary me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                <i class="bi bi-person-fill"></i>
+              </div>
+              <span class="d-none d-sm-block fw-bold" id="nav-user-name">Patient</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+              <li><a class="dropdown-item" href="main.html">Dashboard</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="logout-button">Log Out</a></li>
+            </ul>
         </div>
       </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mt-4 pb-5">
+      
+      <a href="main.html" class="btn-back">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+      </a>
+
+      <div class="page-header">
+        <h1 class="page-title">Edupharma AI Library</h1>
+        <p class="page-subtitle">Powered by Gemini AI. Search for any medication to learn about it.</p>
+      </div>
+
+      <!-- Search Section -->
+      <div class="search-container">
+        <i class="bi bi-search search-icon"></i>
+        <input 
+          type="text" 
+          id="drugSearch" 
+          class="search-input" 
+          placeholder="Type a drug name (e.g., Ibuprofen, Lipitor)..."
+        >
+      </div>
+
+      <!-- Loading Spinner -->
+      <div id="loadingSpinner" class="text-center py-5 d-none">
+         <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+         </div>
+         <p class="text-white-50 mt-3" id="loadingText">Consulting AI...</p>
+      </div>
+
+      <!-- Drug List Container -->
+      <div id="drugListContainer">
+         <!-- Initial State -->
+         <div class="initial-state">
+            <i class="bi bi-stars initial-icon"></i>
+            <h3>Ask Edupharma</h3>
+            <p class="text-white-50">Type any medication name above to get instant facts powered by AI.</p>
+         </div>
+      </div>
+
     </main>
 
+    <!-- Drug Facts Modal -->
+    <div class="modal fade" id="drugFactsModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-drug-facts p-0">
+          <div class="modal-body p-0">
+             <div id="drugFactsContent">
+                <div class="p-5 text-center">
+                    <div class="spinner-border text-dark" role="status"></div>
+                    <p class="mt-3 fw-bold">Generating Drug Facts...</p>
+                </div>
+             </div>
+          </div>
+          <div class="modal-footer border-0 justify-content-center">
+             <button type="button" class="btn btn-dark rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
-    <script src="app.js"></script>
+
+    <script>
+      const auth = firebase.auth();
+      const drugListContainer = document.getElementById('drugListContainer');
+      const spinner = document.getElementById('loadingSpinner');
+      const loadingText = document.getElementById('loadingText');
+      const searchInput = document.getElementById('drugSearch');
+      
+      // YOUR GEMINI API KEY
+      const apiKey = "AIzaSyCnpoAZpe1iRJp-28C7ukHu5EGyn9k-cNM"; 
+
+      let searchTimeout = null;
+
+      // 1. Auth Check
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          document.getElementById('nav-user-name').textContent = user.displayName || "Patient";
+        } else {
+          window.location.href = 'index.html';
+        }
+      });
+
+      // 2. Logout
+      document.getElementById('logout-button').addEventListener('click', (e) => {
+        e.preventDefault();
+        auth.signOut().then(() => window.location.href = 'index.html');
+      });
+
+      // 3. Search Logic (AI Only)
+      searchInput.addEventListener('input', (e) => {
+          const term = e.target.value.toLowerCase().trim();
+          clearTimeout(searchTimeout);
+
+          if (term.length === 0) {
+              resetView();
+              return;
+          }
+
+          // Show Spinner
+          spinner.classList.remove('d-none');
+          loadingText.textContent = `Asking AI about "${term}"...`;
+          drugListContainer.innerHTML = ''; 
+
+          // Debounce API call
+          searchTimeout = setTimeout(() => {
+              fetchDrugsFromGemini(term);
+          }, 800); 
+      });
+
+      function resetView() {
+          spinner.classList.add('d-none');
+          drugListContainer.innerHTML = `
+             <div class="initial-state">
+                <i class="bi bi-stars initial-icon"></i>
+                <h3>Ask Edupharma</h3>
+                <p class="text-white-50">Type any medication name above to get instant facts powered by AI.</p>
+             </div>
+          `;
+      }
+
+      // 4. Gemini Search (List)
+      async function fetchDrugsFromGemini(term) {
+          if(!apiKey) return;
+
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+          
+          // Prompt to find matching real drugs
+          const prompt = `The user is searching for medication: "${term}". Identify the most likely intended drug(s) (up to 3). Return a raw JSON array of strings (e.g. ["Paracetamol", "Panadol"]). Do NOT explain. If it's not a drug, return [].`;
+
+          try {
+              const response = await fetch(url, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+              });
+
+              const data = await response.json();
+              const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+              
+              // Parse JSON from AI response
+              let drugs = [];
+              try {
+                  drugs = JSON.parse(text.replace(/```json|```/g, '').trim());
+              } catch (e) {
+                  console.warn("AI JSON Parse Error", e);
+              }
+
+              spinner.classList.add('d-none');
+
+              if (drugs.length > 0) {
+                  renderList(drugs);
+              } else {
+                  drugListContainer.innerHTML = `
+                    <div class="initial-state">
+                        <h3>No matching drugs found.</h3>
+                        <p class="text-white-50">Please try a different spelling.</p>
+                    </div>
+                  `;
+              }
+
+          } catch (error) {
+              console.error("Gemini Error:", error);
+              spinner.classList.add('d-none');
+              drugListContainer.innerHTML = `<p class="text-center text-danger">AI Service Unavailable.</p>`;
+          }
+      }
+
+      // 5. Render List
+      function renderList(drugs) {
+          drugListContainer.innerHTML = '';
+          drugs.forEach(drugName => {
+              const item = document.createElement('div');
+              item.className = 'drug-list-item';
+              item.innerHTML = `
+                  <span class="drug-name">${drugName}</span>
+                  <span class="drug-badge"><i class="bi bi-stars"></i> AI Result</span>
+              `;
+              item.onclick = () => openDrugFacts(drugName);
+              drugListContainer.appendChild(item);
+          });
+      }
+
+      // 6. Open Modal & Fetch Details (AI Only)
+      async function openDrugFacts(drugName) {
+          const modal = new bootstrap.Modal(document.getElementById('drugFactsModal'));
+          const contentDiv = document.getElementById('drugFactsContent');
+          
+          contentDiv.innerHTML = `
+             <div class="p-5 text-center">
+                <div class="spinner-border text-dark" role="status"></div>
+                <p class="mt-3 fw-bold">Analyzing ${drugName}...</p>
+             </div>
+          `;
+          modal.show();
+
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+          
+          // Strict JSON prompt for details
+          const prompt = `Provide detailed clinical information for "${drugName}". Return ONLY a raw JSON object with these exact keys: "description", "uses", "doses_usage", "side_effects", "warnings". Keep it concise and accurate. Do not use markdown.`;
+
+          try {
+              const response = await fetch(url, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+              });
+
+              const data = await response.json();
+              const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+              const details = JSON.parse(text.replace(/```json|```/g, '').trim());
+
+              renderNutritionLabel(drugName, details);
+
+          } catch (error) {
+              contentDiv.innerHTML = `<p class="p-4 text-danger text-center">Failed to generate drug facts.</p>`;
+          }
+      }
+
+      // 7. Render Nutrition Label Style
+      function renderNutritionLabel(name, details) {
+          const html = `
+            <div class="nutrition-card">
+                <div class="nutrition-header">
+                    <h1 class="nutrition-title">Drug Facts</h1>
+                    <p class="nutrition-subtitle">Active Ingredient: ${name}</p>
+                </div>
+                
+                <div class="nutrition-thick-row"></div>
+                
+                <div class="nutrition-row">
+                    <span class="nutrition-label">Description</span>
+                    <span class="nutrition-text">${details.description}</span>
+                </div>
+
+                <div class="nutrition-row">
+                    <span class="nutrition-label">Uses</span>
+                    <span class="nutrition-text">${details.uses}</span>
+                </div>
+
+                <div class="nutrition-thick-row"></div>
+
+                <div class="nutrition-row">
+                    <span class="nutrition-label">Doses & Usage</span>
+                    <span class="nutrition-text">${details.doses_usage}</span>
+                </div>
+
+                <div class="nutrition-row">
+                    <span class="nutrition-label">Side Effects</span>
+                    <span class="nutrition-text">${details.side_effects}</span>
+                </div>
+
+                <div class="nutrition-thick-row"></div>
+
+                <div class="nutrition-row" style="border-bottom: none;">
+                    <span class="nutrition-label">Warnings</span>
+                    <span class="nutrition-text">${details.warnings}</span>
+                </div>
+
+                <div class="nutrition-disclaimer">
+                    * AI-generated content. For informational purposes only. Consult a doctor.
+                </div>
+            </div>
+          `;
+          document.getElementById('drugFactsContent').innerHTML = html;
+      }
+    </script>
   </body>
 </html>
