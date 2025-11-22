@@ -87,6 +87,7 @@
         border: none;
         position: relative;
         overflow: hidden;
+        cursor: pointer;
       }
       .action-card:hover {
         transform: translateY(-10px);
@@ -111,6 +112,9 @@
       .card-edu .card-icon-circle { background-color: #e0f8ff; color: #0dcaf0; }
       .card-healthy .card-icon-circle { background-color: #d1e7dd; color: #198754; }
       .card-interaction .card-icon-circle { background-color: #fff3cd; color: #ffc107; }
+      
+      /* Support Card Style (Unified) */
+      .card-support .card-icon-circle { background-color: #f3f4f6; color: #4b5563; }
 
       .action-card h3 {
         font-weight: 700;
@@ -227,6 +231,21 @@
             <h3>Medication Interaction</h3>
             <p>Check for potential interactions between two medications to ensure your safety.</p>
           </a>
+        </div>
+
+        <!-- 6. Help & Support (Unified Style) -->
+        <div class="col-md-6 col-lg-4">
+          <div class="action-card card-support">
+            <div class="card-icon-circle">
+              <i class="bi bi-headset"></i>
+            </div>
+            <h3>Help & Support</h3>
+            <p>New features are in development. We appreciate your patience.</p>
+            <div class="mt-3 pt-3 w-100 border-top">
+                <p class="m-0 text-muted fw-bold small">For complaints & inquiries:</p>
+                <p class="m-0 text-primary fw-bold"><i class="bi bi-whatsapp me-1"></i> 0895410964614 (Vito)</p>
+            </div>
+          </div>
         </div>
 
       </div>
