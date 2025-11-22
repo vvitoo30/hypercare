@@ -4,54 +4,492 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Healthy Dashboard - Hypercare</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <!-- Google Font: Poppins -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
+      /* --- BASE THEME --- */
       body {
         font-family: "Poppins", sans-serif;
-        background-color: #f4f6ff;
+        background-color: #1c1c3a; /* Deep Dark Blue */
+        color: white;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
-      .bg-dark-custom {
-        background-color: #1c1c3a;
+
+      /* --- HEADER --- */
+      .navbar-custom {
+        background-color: #15152e;
+        padding: 1rem 0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
       }
+      .brand-logo {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* --- CONTENT --- */
+      .page-header {
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+      .page-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+      .page-subtitle {
+        color: #a0a0c0;
+        font-size: 0.95rem;
+      }
+
+      /* Back Button */
+      .btn-back {
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        transition: color 0.2s;
+      }
+      .btn-back:hover {
+        color: #ccc;
+      }
+
+      /* --- PROGRESS SECTION --- */
+      .progress-card {
+        background: linear-gradient(145deg, #2a2a55, #212145);
+        border-radius: 2rem;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255,255,255,0.05);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      /* Circular Progress */
+      .progress-ring {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(#4a43d1 var(--progress), rgba(255,255,255,0.1) 0deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        position: relative;
+        transition: background 0.5s ease;
+      }
+      .progress-ring::before {
+        content: "";
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: #212145; /* Matches card bg */
+      }
+      .progress-text {
+        position: relative;
+        z-index: 2;
+        font-weight: 700;
+        font-size: 1.5rem;
+      }
+
+      /* --- TASK LIST --- */
+      .task-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
       .task-item {
+        background-color: #ffffff;
+        border-radius: 1rem;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #1c1c3a;
+        font-weight: 600;
         cursor: pointer;
-        user-select: none;
+        transition: all 0.2s;
+        border-left: 6px solid transparent;
       }
+      
+      .task-item:hover {
+        transform: translateX(5px);
+      }
+
+      /* Done State */
       .task-item.done {
+        background-color: #e0f8e9; /* Light Green */
+        color: #198754;
+        border-left: 6px solid #198754;
         text-decoration: line-through;
-        color: #6c757d;
+        opacity: 0.8;
+      }
+      
+      .check-icon {
+        font-size: 1.5rem;
+        color: #ccc;
+      }
+      .task-item.done .check-icon {
+        color: #198754;
+      }
+
+      /* Modal */
+      .modal-content-dark {
+        background-color: #252547;
+        color: white;
+        border-radius: 1.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
     </style>
   </head>
   <body>
-    <!-- Header -->
-    <header class="bg-dark-custom p-3 shadow-sm text-light">
-      <div class="container d-flex justify-content-between align-items-center">
-        <span class="fs-4 fw-bold">Healthy Dashboard</span>
-        <a href="main.html" class="btn btn-light">Back to Dashboard</a>
-      </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="container py-5">
-      <h2 class="fw-bold mb-4">Your Daily Health Tasks</h2>
-      <p class="text-muted">These tasks reset every day. Click to toggle 'Done' or 'Not Done'.</p>
-      <div id="health-tasks-container" class="list-group">
-        <div class="d-flex justify-content-center">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading tasks...</span>
-            </div>
+    <!-- Header -->
+    <nav class="navbar-custom">
+      <div class="container d-flex justify-content-between align-items-center">
+        <a href="main.html" class="brand-logo">
+            <i class="bi bi-heart-pulse-fill text-primary"></i>
+            Hypercare
+        </a>
+        
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+              <div class="rounded-circle bg-secondary me-2 d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                <i class="bi bi-person-fill"></i>
+              </div>
+              <span class="d-none d-sm-block fw-bold" id="nav-user-name">Patient</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow">
+              <li><a class="dropdown-item" href="main.html">Dashboard</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="logout-button">Log Out</a></li>
+            </ul>
         </div>
       </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mt-4 pb-5">
+      
+      <a href="main.html" class="btn-back">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+      </a>
+
+      <div class="page-header">
+        <h1 class="page-title">Your Daily Health Tasks</h1>
+        <p class="page-subtitle">Personalized tasks powered by AI based on your medical record.</p>
+      </div>
+
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            <!-- Progress Ring -->
+            <div class="progress-card">
+                <div class="progress-ring" id="progressRing" style="--progress: 0deg;">
+                    <span class="progress-text" id="progressText">0%</span>
+                </div>
+                <h4 id="progressMessage" class="fw-bold">Loading Plan...</h4>
+            </div>
+
+            <!-- Loading -->
+            <div id="loadingSpinner" class="text-center py-4">
+               <div class="spinner-border text-primary" role="status"></div>
+               <p class="text-white-50 mt-2 small" id="aiStatusText">Analyzing health records...</p>
+            </div>
+
+            <!-- Tasks List -->
+            <div id="taskListContainer" class="task-list d-none">
+                <!-- Injected via JS -->
+            </div>
+
+        </div>
+      </div>
+
     </main>
 
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-dark p-4 text-center">
+          <div class="modal-body p-0">
+            <div id="logoutConfirmContent">
+              <div class="mb-4">
+                <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background-color: rgba(74, 67, 209, 0.1);">
+                  <i class="bi bi-box-arrow-right" style="font-size: 2.5rem; color: #4a43d1;"></i>
+                </div>
+              </div>
+              <h3 class="fw-bold mb-2">Log Out</h3>
+              <p class="text-white-50 mb-4">Are you sure you want to log out?</p>
+              <div class="row g-3">
+                <div class="col-6">
+                  <button type="button" class="btn btn-outline-light w-100 py-2 rounded-pill fw-bold" data-bs-dismiss="modal" style="border: 1px solid rgba(255,255,255,0.2);">Cancel</button>
+                </div>
+                <div class="col-6">
+                  <button type="button" class="btn w-100 py-2 rounded-pill fw-bold" id="confirmLogoutBtn" style="background-color: #4a43d1; color: white;">Log Out</button>
+                </div>
+              </div>
+            </div>
+            <div id="logoutLoadingContent" class="d-none py-3">
+               <div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+               <h4 class="fw-bold">Logging you out...</h4>
+               <p class="text-white-50 m-0">Please be patient</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
-    <script src="app.js"></script>
+
+    <script>
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+      const taskContainer = document.getElementById('taskListContainer');
+      const spinner = document.getElementById('loadingSpinner');
+      const aiStatusText = document.getElementById('aiStatusText');
+      
+      // GEMINI API KEY
+      const apiKey = "AIzaSyCnpoAZpe1iRJp-28C7ukHu5EGyn9k-cNM";
+
+      // Fallback Tasks if AI Fails or No Data
+      const FALLBACK_TASKS = [
+          { id: 't1', label: 'Drink 8 glasses of water' },
+          { id: 't2', label: 'Get 7-8 hours sleep' },
+          { id: 't3', label: 'Eat a healthy breakfast' },
+          { id: 't4', label: 'Light exercise (20 mins)' },
+          { id: 't5', label: 'Take daily vitamins' }
+      ];
+
+      // We will store tasks in an array of objects: { id, label, isDone }
+      let taskList = [];
+
+      // 1. Auth Check
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          document.getElementById('nav-user-name').textContent = user.displayName || "Patient";
+          loadDailyTasks(user.uid);
+        } else {
+          window.location.href = 'index.html';
+        }
+      });
+
+      // 2. Logout Logic
+      document.getElementById('logout-button').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('logoutConfirmContent').classList.remove('d-none');
+        document.getElementById('logoutLoadingContent').classList.add('d-none');
+        new bootstrap.Modal(document.getElementById('logoutModal')).show();
+      });
+
+      document.getElementById('confirmLogoutBtn').addEventListener('click', () => {
+        document.getElementById('logoutConfirmContent').classList.add('d-none');
+        document.getElementById('logoutLoadingContent').classList.remove('d-none');
+        setTimeout(() => {
+            auth.signOut().then(() => window.location.href = 'index.html');
+        }, 1500);
+      });
+
+      // 3. Load Tasks (Daily Reset + AI Gen)
+      async function loadDailyTasks(userId) {
+          const today = new Date().toISOString().split('T')[0]; 
+          const docRef = db.collection("users").doc(userId).collection("health_tracking").doc("daily_tasks");
+
+          try {
+              const doc = await docRef.get();
+              
+              // CASE A: Tasks exist for TODAY
+              if (doc.exists && doc.data().date === today) {
+                  taskList = doc.data().tasks || [];
+                  renderTasks();
+                  spinner.style.display = 'none';
+                  taskContainer.classList.remove('d-none');
+              } 
+              // CASE B: New Day -> Generate New Tasks
+              else {
+                  aiStatusText.textContent = "Consulting AI Doctor...";
+                  
+                  // 1. Get User Medical Profile
+                  const userProfile = await db.collection("users").doc(userId).get();
+                  const data = userProfile.data() || {};
+                  
+                  let newTasks = [];
+
+                  // 2. Decide: AI or Fallback?
+                  if (data.medical_report || data.medication) {
+                      newTasks = await generateTasksFromAI(data.medical_report, data.medication);
+                  } 
+                  
+                  if (newTasks.length === 0) {
+                      // Fallback if AI failed or profile empty
+                      newTasks = FALLBACK_TASKS.map(t => ({ ...t, isDone: false }));
+                  }
+
+                  taskList = newTasks;
+
+                  // 3. Save to Firestore
+                  await docRef.set({
+                      date: today,
+                      tasks: taskList
+                  });
+
+                  renderTasks();
+                  spinner.style.display = 'none';
+                  taskContainer.classList.remove('d-none');
+              }
+
+          } catch (error) {
+              console.error("Error loading tasks:", error);
+              if(error.code === 'permission-denied') {
+                  alert("Permission Denied! Please check Firestore Rules.");
+              }
+              spinner.innerHTML = '<p class="text-danger">Failed to load data.</p>';
+          }
+      }
+
+      // 4. AI Generation Logic
+      async function generateTasksFromAI(condition, medication) {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+          
+          const condStr = condition || "General Health";
+          const medStr = medication || "None";
+
+          // Strict JSON Prompt with Low Temperature for consistency
+          const prompt = `
+            You are a medical assistant. Create a list of exactly 5 daily health tasks for a patient with:
+            Condition: ${condStr}
+            Medication: ${medStr}
+            
+            Tasks must be short, actionable (max 6 words), and specific to their condition.
+            Return ONLY a raw JSON array of objects with keys "id" (string) and "label" (string). 
+            Example: [{"id":"t1", "label":"Drink water"}, {"id":"t2", "label":"Walk 30 mins"}]
+            Do not include markdown formatting.
+          `;
+
+          try {
+              const response = await fetch(url, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ 
+                      contents: [{ parts: [{ text: prompt }] }],
+                      generationConfig: { temperature: 0.1 } // Low temp for consistent results across same inputs
+                  })
+              });
+
+              const data = await response.json();
+              const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+              const cleanText = text.replace(/```json|```/g, '').trim();
+              
+              const parsedTasks = JSON.parse(cleanText);
+              
+              // Add isDone property
+              return parsedTasks.map((t, index) => ({
+                  id: `ai_task_${index}`,
+                  label: t.label,
+                  isDone: false
+              }));
+
+          } catch (e) {
+              console.error("AI Generation Failed:", e);
+              return []; // Return empty triggers fallback
+          }
+      }
+
+      // 5. Render UI
+      function renderTasks() {
+          taskContainer.innerHTML = '';
+          let completedCount = 0;
+
+          taskList.forEach((task, index) => {
+              if(task.isDone) completedCount++;
+
+              const item = document.createElement('div');
+              item.className = `task-item ${task.isDone ? 'done' : ''}`;
+              item.innerHTML = `
+                  <span>${task.label}</span>
+                  <i class="bi ${task.isDone ? 'bi-check-circle-fill' : 'bi-circle'} check-icon"></i>
+              `;
+              
+              // Toggle Click
+              item.addEventListener('click', () => toggleTask(index));
+              
+              taskContainer.appendChild(item);
+          });
+
+          updateProgress(completedCount, taskList.length);
+      }
+
+      // 6. Toggle Logic
+      async function toggleTask(index) {
+          const userId = auth.currentUser.uid;
+          
+          // Optimistic Update
+          taskList[index].isDone = !taskList[index].isDone;
+          renderTasks();
+
+          // Save to Firebase
+          try {
+              await db.collection("users").doc(userId).collection("health_tracking").doc("daily_tasks").update({
+                  tasks: taskList
+              });
+          } catch (e) {
+              console.error("Save failed", e);
+              // Revert
+              taskList[index].isDone = !taskList[index].isDone;
+              renderTasks();
+          }
+      }
+
+      // 7. Update Progress UI
+      function updateProgress(done, total) {
+          const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+          const degrees = percent * 3.6; 
+          
+          const ring = document.getElementById('progressRing');
+          const text = document.getElementById('progressText');
+          const msg = document.getElementById('progressMessage');
+
+          ring.style.setProperty('--progress', `${degrees}deg`);
+          text.textContent = `${percent}%`;
+
+          if(percent === 0) msg.textContent = "Let's get started!";
+          else if(percent < 50) msg.textContent = "Good start!";
+          else if(percent < 100) msg.textContent = "Keep going!";
+          else msg.textContent = "All done! Great job!";
+      }
+
+    </script>
   </body>
 </html>
