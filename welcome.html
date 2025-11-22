@@ -9,121 +9,170 @@
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous"
     />
-
     <!-- Google Font: Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap"
       rel="stylesheet"
     />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
 
-    <!-- Custom CSS for colors and layout -->
     <style>
-      /* Make sure HTML and Body are full height */
-      html,
+      /* --- IMMERSIVE DARK THEME --- */
       body {
-        height: 100%;
-        margin: 0;
-      }
-
-      /* Create the 2-part flex container AND apply Poppins font */
-      body {
-        display: flex;
-        flex-direction: column;
         font-family: "Poppins", sans-serif;
-      }
-
-      /* These are the specific colors from your design */
-      .bg-dark-custom {
-        /* The dark purple background */
         background-color: #1c1c3a;
+        background: radial-gradient(circle at top center, #2a2a55 0%, #1c1c3a 70%, #0f0f1a 100%);
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        overflow: hidden;
+        position: relative;
       }
 
-      .text-primary-custom {
-        /* The main purple text color */
-        color: #4a43d1;
+      /* --- BACKGROUND DECORATION --- */
+      .glow-blob {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(106, 96, 233, 0.15) 0%, rgba(0,0,0,0) 70%);
+        border-radius: 50%;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .blob-1 { top: -200px; left: 50%; transform: translateX(-50%); }
+      .blob-2 { bottom: -300px; right: -100px; }
+
+      /* --- CONTENT WRAPPER --- */
+      .welcome-container {
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+        padding: 2rem;
+        position: relative;
+        z-index: 1;
       }
 
-      /* --- BUTTON STYLES --- */
-
-      .btn-primary-custom {
-        /* The solid purple login button */
-        background-color: #6a60e9;
-        border-color: #6a60e9;
+      /* --- LOGO ANIMATION --- */
+      .logo-box {
+        margin-bottom: 1.5rem;
+        animation: float 6s ease-in-out infinite;
+      }
+      .logo-img {
+        max-width: 240px;
+        filter: drop-shadow(0 0 25px rgba(106, 96, 233, 0.4));
+      }
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-15px); }
       }
 
-      .btn-primary-custom:hover {
-        /* A slightly darker hover state */
-        background-color: #584fc9;
-        border-color: #584fc9;
+      /* --- TYPOGRAPHY --- */
+      .app-title {
+        font-weight: 800;
+        font-size: 3rem;
+        letter-spacing: -1px;
+        margin: 0;
+        background: linear-gradient(to right, #ffffff, #a0a0ff);
+        -webkit-background-clip: text;
+        background-clip: text; /* Standard property added here */
+        -webkit-text-fill-color: transparent;
+      }
+      .app-tagline {
+        color: #a0a0c0;
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+        margin-bottom: 3rem;
       }
 
-      /* NEW: Custom outline button as requested */
-      .btn-outline-primary-custom {
-        border-color: #6a60e9; /* Same purple as login fill */
-        color: #6a60e9; /* Same purple as login fill */
+      /* --- BUTTONS --- */
+      .btn-custom {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        border-radius: 50rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
       }
 
-      .btn-outline-primary-custom:hover {
-        background-color: #6a60e9; /* Fill on hover */
-        border-color: #6a60e9;
-        color: #ffffff; /* White text on hover */
+      .btn-login {
+        background: linear-gradient(135deg, #6a60e9 0%, #4a43d1 100%);
+        color: white;
+        border: none;
+        box-shadow: 0 8px 20px rgba(74, 67, 209, 0.3);
+      }
+      .btn-login:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(74, 67, 209, 0.5);
+        color: white;
       }
 
-      .btn-custom-width {
-        /* Make buttons wide, like in the design */
-        width: 75%;
-        /* Add taller padding */
-        padding-top: 1.5rem;
-        padding-bottom: 1.5rem;
+      .btn-signup {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+      .btn-signup:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .footer-text {
+        margin-top: 3rem;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 0.8rem;
       }
     </style>
   </head>
   <body>
-    <!-- ===== TOP HALF (White) ===== -->
-    <div
-      class="flex-grow-1 d-flex flex-column justify-content-center align-items-center bg-light"
-    >
-      <!-- Logo Image -->
-      <img
-        src="Assets/logo.png"
-        alt="Hypercare Logo"
-        class="img-fluid"
-        style="max-width: 250px; padding: 1rem"
-      />
+
+    <!-- Background Decorations -->
+    <div class="glow-blob blob-1"></div>
+    <div class="glow-blob blob-2"></div>
+
+    <div class="welcome-container">
+      <!-- Logo -->
+      <div class="logo-box">
+        <!-- Using your asset, ensuring it centers correctly -->
+        <img 
+          src="Assets/logo.png" 
+          alt="Hypercare Logo" 
+          class="logo-img"
+          onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='block';"
+        >
+        <!-- Fallback Icon if image fails to load -->
+        <i id="fallback-icon" class="bi bi-heart-pulse-fill text-primary" style="font-size: 5rem; display: none;"></i>
+      </div>
+
+      <!-- Text -->
+      <h1 class="app-title">HYPERCARE</h1>
+      <p class="app-tagline">Get Better Yourself</p>
+
+      <!-- Actions -->
+      <div class="d-grid gap-2">
+        <a href="Login.html" class="btn-custom btn-login">
+          Login
+        </a>
+        <a href="Sign_Up.html" class="btn-custom btn-signup">
+          Create Account
+        </a>
+      </div>
+
+      <p class="footer-text">v1.0.0 • Healthcare Companion</p>
     </div>
 
-    <!-- ===== BOTTOM HALF (Dark) ===== -->
-    <!-- Added 'gap-3' to evenly space the buttons -->
-    <div
-      class="flex-grow-1 d-flex flex-column justify-content-center align-items-center bg-dark-custom gap-3"
-    >
-      <!-- Login Button -->
-      <a
-        href="Login.html"
-        class="btn btn-primary-custom rounded-pill fw-bold text-white btn-custom-width shadow"
-        role="button"
-        >Login</a
-      >
-
-      <!-- Sign Up Button -->
-      <a
-        href="Sign_Up.html"
-        class="btn btn-outline-primary-custom rounded-pill fw-bold btn-custom-width shadow-sm"
-        role="button"
-        >Sign Up</a
-      >
-    </div>
-
-    <!-- Bootstrap JS Bundle (for modals, etc., if we add them later) -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-      xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
