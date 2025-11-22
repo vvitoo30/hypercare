@@ -176,6 +176,24 @@
       .badge-patient { background-color: #d1e7dd; color: #198754; }
       .badge-user { background-color: #e2e3e5; color: #6c757d; }
 
+      /* Delete Button */
+      .btn-delete {
+        background-color: #ffe0e3;
+        color: #dc3545;
+        border: none;
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+      }
+      .btn-delete:hover {
+        background-color: #dc3545;
+        color: white;
+      }
+
       /* --- MODAL (Dark Theme) --- */
       .modal-content-dark {
         background-color: #252547;
@@ -214,7 +232,6 @@
       
       <!-- Stats Section (Click to Filter) -->
       <div class="row g-3 mb-5">
-        <!-- 1. Total Card -->
         <div class="col-6 col-md-3">
           <div class="stat-card stat-users active-filter" id="card-all" onclick="applyFilter('all')">
             <div class="stat-icon-box"><i class="bi bi-people-fill"></i></div>
@@ -224,7 +241,6 @@
             </div>
           </div>
         </div>
-        <!-- 2. Doctors Card -->
         <div class="col-6 col-md-3">
           <div class="stat-card stat-doctors" id="card-doctor" onclick="applyFilter('doctor')">
             <div class="stat-icon-box"><i class="bi bi-heart-pulse-fill"></i></div>
@@ -234,7 +250,6 @@
             </div>
           </div>
         </div>
-        <!-- 3. Patients Card -->
         <div class="col-6 col-md-3">
           <div class="stat-card stat-patients" id="card-patient" onclick="applyFilter('patient')">
             <div class="stat-icon-box"><i class="bi bi-person-wheelchair"></i></div>
@@ -244,7 +259,6 @@
             </div>
           </div>
         </div>
-        <!-- 4. Admins Card (NEW) -->
         <div class="col-6 col-md-3">
           <div class="stat-card stat-admins" id="card-admin" onclick="applyFilter('admin')">
             <div class="stat-icon-box"><i class="bi bi-shield-fill"></i></div>
@@ -260,7 +274,6 @@
       <div class="table-container">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h3 class="fw-bold m-0">Manage Users</h3>
-          <!-- Search Input -->
           <div style="width: 250px; position: relative;">
             <input type="text" id="searchUser" class="form-control rounded-pill ps-4" placeholder="Search users...">
             <i class="bi bi-search position-absolute text-muted" style="right: 15px; top: 10px;"></i>
@@ -287,13 +300,13 @@
       </div>
     </main>
 
-    <!-- Logout Confirmation Modal -->
+    <!-- ============ MODALS ============ -->
+
+    <!-- 1. Logout Modal -->
     <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-content-dark p-4 text-center">
           <div class="modal-body p-0">
-            
-            <!-- STATE 1: Confirmation -->
             <div id="logoutConfirmContent">
               <div class="mb-4">
                 <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background-color: rgba(74, 67, 209, 0.1);">
@@ -303,27 +316,76 @@
               <h3 class="fw-bold mb-2">Log Out</h3>
               <p class="text-white-50 mb-4">Are you sure you want to log out?</p>
               <div class="row g-3">
-                <div class="col-6">
-                  <button type="button" class="btn btn-outline-light w-100 py-2 rounded-pill fw-bold" data-bs-dismiss="modal" style="border: 1px solid rgba(255,255,255,0.2);">Cancel</button>
-                </div>
-                <div class="col-6">
-                  <button type="button" class="btn w-100 py-2 rounded-pill fw-bold" id="confirmLogoutBtn" style="background-color: #4a43d1; color: white;">Log Out</button>
-                </div>
+                <div class="col-6"><button type="button" class="btn btn-outline-light w-100 py-2 rounded-pill fw-bold" data-bs-dismiss="modal" style="border: 1px solid rgba(255,255,255,0.2);">Cancel</button></div>
+                <div class="col-6"><button type="button" class="btn w-100 py-2 rounded-pill fw-bold" id="confirmLogoutBtn" style="background-color: #4a43d1; color: white;">Log Out</button></div>
               </div>
             </div>
-
-            <!-- STATE 2: Loading Animation -->
             <div id="logoutLoadingContent" class="d-none py-3">
-               <div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;" role="status">
-                  <span class="visually-hidden">Loading...</span>
-               </div>
+               <div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
                <h4 class="fw-bold">Logging you out...</h4>
                <p class="text-white-50 m-0">Please be patient</p>
             </div>
-
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- 2. Change Role Confirmation Modal -->
+    <div class="modal fade" id="changeRoleModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content modal-content-dark p-4 text-center">
+            <div class="modal-body p-0">
+              <div id="roleConfirmContent">
+                <div class="mb-4">
+                  <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background-color: rgba(255, 193, 7, 0.1);">
+                    <i class="bi bi-exclamation-lg" style="font-size: 3rem; color: #ffc107;"></i>
+                  </div>
+                </div>
+                <h3 class="fw-bold mb-2">Change Role?</h3>
+                <p class="text-white-50 mb-4" id="roleChangeText">Are you sure?</p>
+                <div class="row g-3">
+                  <div class="col-6"><button type="button" class="btn btn-outline-light w-100 py-2 rounded-pill fw-bold" data-bs-dismiss="modal" style="border: 1px solid rgba(255,255,255,0.2);">Cancel</button></div>
+                  <div class="col-6"><button type="button" class="btn w-100 py-2 rounded-pill fw-bold" id="confirmRoleChangeBtn" style="background-color: #ffc107; color: black;">Confirm</button></div>
+                </div>
+              </div>
+              <!-- Loading State -->
+              <div id="roleLoadingContent" class="d-none py-3">
+                 <div class="spinner-border text-warning mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+                 <h4 class="fw-bold">Updating Role...</h4>
+                 <p class="text-white-50 m-0">Please wait</p>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <!-- 3. Delete User Confirmation Modal -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content modal-content-dark p-4 text-center">
+            <div class="modal-body p-0">
+              <div id="deleteConfirmContent">
+                <div class="mb-4">
+                  <div class="mx-auto d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background-color: rgba(220, 53, 69, 0.1);">
+                    <i class="bi bi-trash-fill" style="font-size: 2.5rem; color: #dc3545;"></i>
+                  </div>
+                </div>
+                <h3 class="fw-bold mb-2">Delete User?</h3>
+                <p class="text-white-50 mb-4" id="deleteUserText">This action cannot be undone.</p>
+                <div class="row g-3">
+                  <div class="col-6"><button type="button" class="btn btn-outline-light w-100 py-2 rounded-pill fw-bold" data-bs-dismiss="modal" style="border: 1px solid rgba(255,255,255,0.2);">Cancel</button></div>
+                  <div class="col-6"><button type="button" class="btn w-100 py-2 rounded-pill fw-bold" id="confirmDeleteBtn" style="background-color: #dc3545; color: white;">Delete</button></div>
+                </div>
+              </div>
+              <!-- Loading State -->
+              <div id="deleteLoadingContent" class="d-none py-3">
+                 <div class="spinner-border text-danger mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+                 <h4 class="fw-bold">Deleting User...</h4>
+                 <p class="text-white-50 m-0">Please wait</p>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
 
     <!-- Firebase Scripts -->
@@ -339,6 +401,11 @@
       let allUsers = [];
       let currentFilter = 'all';
 
+      // Global variables for modals
+      let targetUserId = null;
+      let targetUserRole = null;
+      let targetUserName = null;
+
       // 1. Auth Check
       auth.onAuthStateChanged(user => {
         if (user) {
@@ -352,25 +419,18 @@
       // 2. Logout Logic
       document.getElementById('logoutBtn').addEventListener('click', (e) => {
           e.preventDefault();
-          // Reset modal
           document.getElementById('logoutConfirmContent').classList.remove('d-none');
           document.getElementById('logoutLoadingContent').classList.add('d-none');
-          // Show modal
-          const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
-          logoutModal.show();
+          new bootstrap.Modal(document.getElementById('logoutModal')).show();
       });
 
       document.getElementById('confirmLogoutBtn').addEventListener('click', () => {
-          // Switch to Loading State
           document.getElementById('logoutConfirmContent').classList.add('d-none');
           document.getElementById('logoutLoadingContent').classList.remove('d-none');
-
-          // Wait 1.5s then logout
           setTimeout(() => {
               auth.signOut().then(() => window.location.href = 'index.html');
           }, 1500);
       });
-
 
       // 3. Load Users & Update Stats
       function loadUsers() {
@@ -407,23 +467,19 @@
           });
       }
 
-      // 4. Filter Logic (Called by Cards)
+      // 4. Filter Logic
       function applyFilter(filterRole) {
           currentFilter = filterRole;
           
-          // UI Update: Highlight active card
           document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-filter'));
           document.getElementById(`card-${filterRole}`).classList.add('active-filter');
 
-          // Filter Data
           const term = document.getElementById('searchUser').value.toLowerCase();
           
           const filtered = allUsers.filter(u => {
-              // First check role
               const uRole = (u.role || 'user').toLowerCase();
               const roleMatch = (filterRole === 'all') || (uRole === filterRole);
               
-              // Then check search term
               const nameMatch = (u.username && u.username.toLowerCase().includes(term)) || false;
               const emailMatch = (u.email && u.email.toLowerCase().includes(term)) || false;
               
@@ -449,7 +505,6 @@
               const role = user.role || 'user';
               const initial = name.charAt(0).toUpperCase();
 
-              // Badge Logic
               let badgeClass = 'badge-user';
               if(role === 'admin') badgeClass = 'badge-admin';
               if(role === 'doctor') badgeClass = 'badge-doctor';
@@ -465,13 +520,16 @@
                     </td>
                     <td class="text-secondary">${email}</td>
                     <td><span class="badge-role ${badgeClass}">${role.toUpperCase()}</span></td>
-                    <td>
-                        <select class="role-select" onchange="updateRole('${user.id}', this.value)">
+                    <td class="d-flex align-items-center gap-2">
+                        <select class="role-select" onchange="triggerRoleChange('${user.id}', this.value, '${name}')">
                             <option value="" disabled selected>Change Role</option>
                             <option value="patient">Patient</option>
                             <option value="doctor">Doctor</option>
                             <option value="admin">Admin</option>
                         </select>
+                        <button class="btn-delete" onclick="triggerDeleteUser('${user.id}', '${name}')" title="Delete User">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </td>
                 </tr>
               `;
@@ -479,28 +537,79 @@
           });
       }
 
-      // 6. Update Role Function
-      async function updateRole(userId, newRole) {
-          if(!confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
-              // If cancelled, reload list to reset dropdown
-              applyFilter(currentFilter); 
-              return;
-          }
+      // 6. Trigger Role Change Modal
+      function triggerRoleChange(userId, newRole, userName) {
+          targetUserId = userId;
+          targetUserRole = newRole;
+          targetUserName = userName;
+
+          document.getElementById('roleChangeText').innerText = `Change role for "${userName}" to ${newRole.toUpperCase()}?`;
+          
+          // Reset Modal UI
+          document.getElementById('roleConfirmContent').classList.remove('d-none');
+          document.getElementById('roleLoadingContent').classList.add('d-none');
+          
+          new bootstrap.Modal(document.getElementById('changeRoleModal')).show();
+      }
+
+      // Handle Role Confirmation
+      document.getElementById('confirmRoleChangeBtn').addEventListener('click', async () => {
+          // Show loading
+          document.getElementById('roleConfirmContent').classList.add('d-none');
+          document.getElementById('roleLoadingContent').classList.remove('d-none');
 
           try {
-              await db.collection("users").doc(userId).update({
-                  role: newRole
-              });
-              // No need to manual reload, onSnapshot handles it
+              await db.collection("users").doc(targetUserId).update({ role: targetUserRole });
+              
+              setTimeout(() => {
+                  bootstrap.Modal.getInstance(document.getElementById('changeRoleModal')).hide();
+                  // Table updates automatically via snapshot listener
+              }, 1500);
           } catch (error) {
               console.error("Error updating role:", error);
               alert("Failed to update role: " + error.message);
+              // Close modal and refresh to fix dropdown visual state
+              bootstrap.Modal.getInstance(document.getElementById('changeRoleModal')).hide();
+              applyFilter(currentFilter);
           }
+      });
+
+      // 7. Trigger Delete User Modal
+      function triggerDeleteUser(userId, userName) {
+          targetUserId = userId;
+          targetUserName = userName;
+
+          document.getElementById('deleteUserText').innerText = `Are you sure you want to delete "${userName}"? This cannot be undone.`;
+          
+          // Reset Modal UI
+          document.getElementById('deleteConfirmContent').classList.remove('d-none');
+          document.getElementById('deleteLoadingContent').classList.add('d-none');
+          
+          new bootstrap.Modal(document.getElementById('deleteUserModal')).show();
       }
 
-      // 7. Search Input Listener
+      // Handle Delete Confirmation
+      document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+          // Show loading
+          document.getElementById('deleteConfirmContent').classList.add('d-none');
+          document.getElementById('deleteLoadingContent').classList.remove('d-none');
+
+          try {
+              await db.collection("users").doc(targetUserId).delete();
+              
+              setTimeout(() => {
+                  bootstrap.Modal.getInstance(document.getElementById('deleteUserModal')).hide();
+              }, 1500);
+          } catch (error) {
+              console.error("Error deleting user:", error);
+              alert("Failed to delete user: " + error.message);
+              bootstrap.Modal.getInstance(document.getElementById('deleteUserModal')).hide();
+          }
+      });
+
+      // 8. Search Input Listener
       document.getElementById('searchUser').addEventListener('input', () => {
-          applyFilter(currentFilter); // Re-run filter with current role + new search term
+          applyFilter(currentFilter);
       });
 
     </script>
