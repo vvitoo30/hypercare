@@ -1255,20 +1255,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const medicationTab = document.getElementById('medicationTab');
     if (medicationTab) {
         medicationTab.addEventListener('shown.bs.tab', event => {
-            const activeTabId = event.target.id;
-            // Detach previous interaction snapshot listener if moving away from reaction tab
-            if (medicationInteractionsSnapshotUnsubscribe && activeTabId !== 'reaction-tab') {
-                medicationInteractionsSnapshotUnsubscribe();
-                medicationInteractionsSnapshotUnsubscribe = null; // Clear reference
-            }
-
-            if (activeTabId === 'add-tab') {
-                resetMedicationForm();
-            } else if (activeTabId === 'list-tab') {
-                displayMedicationManagement();
-            } else if (activeTabId === 'reaction-tab') {
-                displayMedicationInteractionsList();
-            }
+            displayMedicationManagement();
+            displayMedicationInteractionsList();
         });
         // Attach listener for 'hide.bs.tab' to ensure cleanup if active tab is changed via code or external means
         medicationTab.addEventListener('hide.bs.tab', event => {
@@ -1279,13 +1267,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Initial load for the default active tab (Medication List)
-        const activeTab = medicationTab.querySelector('.nav-link.active');
-        if (activeTab && activeTab.id === 'list-tab') {
-            displayMedicationManagement();
-        } else if (activeTab && activeTab.id === 'reaction-tab') {
-             displayMedicationInteractionsList();
-        }
+
     }
 
 

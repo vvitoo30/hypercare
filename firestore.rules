@@ -9,12 +9,17 @@ service cloud.firestore {
 
     // Rules for the 'users' collection
     match /users/{userId} {
-      // READ: Allow a user to read their own document. Admins can read any user document.
-      // Doctors can also list users for their dashboard.
-      allow read, list: if request.auth != null && (
+      // READ: A user can read their own document. Admins/Doctors can read any user document.
+      allow read: if request.auth != null && (
             request.auth.uid == userId || 
             isRequestingUserRole('admin') || 
             isRequestingUserRole('doctor')
+      );
+      
+      // LIST: Doctors can list all patients, Admins can list all users.
+      allow list: if request.auth != null && (
+            (isRequestingUserRole('doctor') && resource.data.role == 'patient') ||
+            isRequestingUserRole('admin')
       );
       
       // CREATE: Allow a user to create their own user document.
