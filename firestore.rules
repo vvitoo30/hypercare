@@ -51,6 +51,29 @@ service cloud.firestore {
       match /daily_health_tasks/{dateId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+
+      // Specific rules for 'medication_schedules' subcollection
+      match /medication_schedules/{scheduleId} {
+        allow read: if request.auth != null && (request.auth.uid == userId || isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
+        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
+      }
+
+      // Specific rules for 'pharmacy_notes' subcollection
+      match /pharmacy_notes/{noteId} {
+        allow read: if request.auth != null && (request.auth.uid == userId || isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
+        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
+      }
+
+      // Specific rules for 'checkup_records' subcollection
+      match /checkup_records/{recordId} {
+        allow read: if request.auth != null && (request.auth.uid == userId || isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
+        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
+      }
+
+      // Specific rules for 'health_tracking' subcollection
+      match /health_tracking/{trackingId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // Rules for the 'medications' collection
