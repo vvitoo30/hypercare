@@ -26,8 +26,8 @@ service cloud.firestore {
         isRequestingUserRole('admin') || isRequestingUserRole('doctor')
       );
 
-      // DELETE: Not allowing deletes for now.
-      allow delete: if false;
+      // DELETE: Allow admins to delete user documents.
+      allow delete: if isRequestingUserRole('admin');
 
       // Specific rule for health_tracking to allow patient writes
       match /health_tracking/{trackingId} {
