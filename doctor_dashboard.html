@@ -320,6 +320,7 @@
         border-bottom: none;
       }
     </style>
+    <script src="https://apis.google.com/js/api.js"></script>
   </head>
   <body>
     
@@ -534,6 +535,10 @@
                <button class="btn-action-grid" data-bs-toggle="modal" data-bs-target="#medicalCheckupRecordsModal">
                  Add Medical<br>Record
                </button>
+             </div>
+             <div id="google-auth-buttons" class="mt-4">
+                <button id="authorize_button" class="btn btn-primary">Authorize Google Calendar</button>
+                <button id="signout_button" class="btn btn-danger">Sign Out</button>
              </div>
           </div>
         </div>
@@ -976,7 +981,6 @@
            return;
          }
          
-         // Gather all entries
          const groups = document.querySelectorAll('.medication-group');
          const schedules = [];
          
@@ -989,6 +993,15 @@
          });
 
          if(schedules.length === 0) return alert("Add at least one medication.");
+
+         // Create Google Calendar events if authorized
+         if (gapi.client.getToken() !== null) {
+            const patient = allPatients.find(p => p.id === currentPatientId);
+            const patientName = patient ? patient.username : 'Unknown Patient';
+            schedules.forEach(schedule => {
+              createCalendarEvent(schedule, patientName);
+            });
+         }
 
          const batch = db.batch();
          const patientRef = db.collection("users").doc(currentPatientId);
@@ -1011,7 +1024,6 @@
              await batch.commit();
              showOverlayAndClose('medicationScheduleModal', 'medicationSaveOverlay');
              
-             // Reset Form
              document.getElementById('medicationContainer').innerHTML = `
               <div class="medication-group">
                 <div class="mb-3">
@@ -1025,6 +1037,44 @@
               </div>
              `;
          } catch(e) { alert("Error: " + e.message); }
+      }
+
+      async function createCalendarEvent(schedule, patientName) {
+        const [hour, minute] = schedule.time.split(':');
+        const now = new Date();
+        // Schedule for the next day
+        const eventDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, hour, minute);
+
+        const event = {
+          'summary': `Take ${schedule.medication} for ${patientName}`,
+          'description': `Medication reminder for ${patientName} to take ${schedule.medication}.`,
+          'start': {
+            'dateTime': eventDate.toISOString(),
+            'timeZone': 'Asia/Jakarta'
+          },
+          'end': {
+            'dateTime': eventDate.toISOString(),
+            'timeZone': 'Asia/Jakarta'
+          },
+          'reminders': {
+            'useDefault': false,
+            'overrides': [
+              {'method': 'email', 'minutes': 0},
+              {'method': 'popup', 'minutes': 0}
+            ]
+          }
+        };
+
+        try {
+          const request = gapi.client.calendar.events.insert({
+            'calendarId': 'primary',
+            'resource': event
+          });
+          const response = await request;
+          console.log('Event created: ' + response.result.htmlLink);
+        } catch (error) {
+          console.error('Error creating event: ', error);
+        }
       }
 
       async function savePharmacyNote() {
@@ -1246,6 +1296,106 @@
         if (filtered.length === 0) patientListContainer.innerHTML = '<p class="text-center text-white-50">No matches.</p>';
         else filtered.forEach(p => renderPatientCard(p));
       });
+
+      const CLIENT_ID = '387519648442-fv232sn74e1a6i5g88fq2r17693p43jh.apps.googleusercontent.com';
+      const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+      const SCOPES = "https://www.googleapis.com/auth/calendar.events";
+
+      let tokenClient;
+      let gapiInited = false;
+      let gisInited = false;
+
+      document.getElementById('authorize_button').style.visibility = 'hidden';
+      document.getElementById('signout_button').style.visibility = 'hidden';
+
+      function gapiLoaded() {
+        gapi.load('client', initializeGapiClient);
+      }
+
+      async function initializeGapiClient() {
+        await gapi.client.init({
+          discoveryDocs: DISCOVERY_DOCS,
+        });
+        gapiInited = true;
+        maybeEnableButtons();
+      }
+
+      function gisLoaded() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+          callback: '', // defined later
+        });
+        gisInited = true;
+        maybeEnableButtons();
+      }
+
+      function maybeEnableButtons() {
+        if (gapiInited && gisInited) {
+          document.getElementById('authorize_button').style.visibility = 'visible';
+        }
+      }
+
+      document.getElementById('authorize_button').onclick = handleAuthClick;
+      document.getElementById('signout_button').onclick = handleSignoutClick;
+
+      function handleAuthClick() {
+        tokenClient.callback = async (resp) => {
+          if (resp.error !== undefined) {
+            throw (resp);
+          }
+          document.getElementById('signout_button').style.visibility = 'visible';
+          document.getElementById('authorize_button').innerText = 'Refresh';
+          await listUpcomingEvents();
+        };
+
+        if (gapi.client.getToken() === null) {
+          tokenClient.requestAccessToken({prompt: 'consent'});
+        } else {
+          tokenClient.requestAccessToken({prompt: ''});
+        }
+      }
+
+      function handleSignoutClick() {
+        const token = gapi.client.getToken();
+        if (token !== null) {
+          google.accounts.oauth2.revoke(token.access_token);
+          gapi.client.setToken('');
+          document.getElementById('authorize_button').innerText = 'Authorize';
+          document.getElementById('signout_button').style.visibility = 'hidden';
+        }
+      }
+
+      async function listUpcomingEvents() {
+        let response;
+        try {
+          const request = {
+            'calendarId': 'primary',
+            'timeMin': (new Date()).toISOString(),
+            'showDeleted': false,
+            'singleEvents': true,
+            'maxResults': 10,
+            'orderBy': 'startTime',
+          };
+          response = await gapi.client.calendar.events.list(request);
+        } catch (err) {
+          console.error('Error getting events: ', err);
+          return;
+        }
+
+        const events = response.result.items;
+        if (!events || events.length == 0) {
+          console.log('No upcoming events found.');
+          return;
+        }
+        // Flatten to string to display
+        const output = events.reduce(
+            (str, event) => `${str}${event.summary} (${(event.start.dateTime || event.start.date)})\n`,
+            'Events:\n');
+        console.log(output);
+      }
     </script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
   </body>
 </html>
