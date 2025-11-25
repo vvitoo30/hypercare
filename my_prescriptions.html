@@ -206,6 +206,17 @@
       const container = document.getElementById('prescriptionsContainer');
       const spinner = document.getElementById('loadingSpinner');
 
+      // Request notification permission on page load
+      if ('Notification' in window) {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            console.log('Notification permission granted.');
+          } else {
+            console.warn('Notification permission denied.');
+          }
+        });
+      }
+
       // 1. Check Auth
       auth.onAuthStateChanged((user) => {
         if (user) {

@@ -9,70 +9,55 @@ service cloud.firestore {
 
     // Rules for the 'users' collection
     match /users/{userId} {
-      // READ: A user can read their own document. Admins/Doctors can read any user document.
-      allow read: if request.auth != null && (
+      // READ: Allow a user to read their own document. Admins can read any user document.
+      // Doctors can also list users for their dashboard.
+      allow read, list: if request.auth != null && (
             request.auth.uid == userId || 
             isRequestingUserRole('admin') || 
             isRequestingUserRole('doctor')
       );
       
-      // LIST: Doctors can list all patients, Admins can list all users.
-      allow list: if request.auth != null && (
-            (isRequestingUserRole('doctor') && resource.data.role == 'patient') ||
-            isRequestingUserRole('admin')
-      );
-      
-      // CREATE: Allow a user to create their own user document.
-      allow create: if request.auth.uid == userId;
+      // CREATE: Allow a user to create their own user document or a doctor to create a patient document.
+      allow create: if request.auth != null && (request.auth.uid == userId || isRequestingUserRole('doctor'));
 
-      // UPDATE: Allow user to update their own doc (but not their role), or allow an admin to update anything.
+      // UPDATE: Allow user to update their own doc (but not their role), or allow an admin or a doctor to update anything.
       allow update: if request.auth != null && (
         (request.auth.uid == userId && request.resource.data.role == resource.data.role) ||
-        isRequestingUserRole('admin')
+        isRequestingUserRole('admin') || isRequestingUserRole('doctor')
       );
 
       // DELETE: Not allowing deletes for now.
       allow delete: if false;
 
-      // Rules for patient data subcollections
-      // Specific rules for 'prescriptions' subcollection
-      match /prescriptions/{prescriptionId} {
-        allow read: if request.auth != null && (request.auth.uid == userId || isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
-        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
-      }
-
-      // Specific rules for 'blood_pressure' subcollection
-      match /blood_pressure/{bpId} {
-        allow read: if request.auth != null && (request.auth.uid == userId || isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
-        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
-      }
-
-      // Specific rules for 'daily_health_tasks' subcollection
-      match /daily_health_tasks/{dateId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-      }
-
-      // Specific rules for 'medication_schedules' subcollection
-      match /medication_schedules/{scheduleId} {
-        allow read: if request.auth != null && (request.auth.uid == userId || isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
-        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
-      }
-
-      // Specific rules for 'pharmacy_notes' subcollection
-      match /pharmacy_notes/{noteId} {
-        allow read: if request.auth != null && (request.auth.uid == userId || isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
-        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
-      }
-
-      // Specific rules for 'checkup_records' subcollection
-      match /checkup_records/{recordId} {
-        allow read: if request.auth != null && (request.auth.uid == userId || isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
-        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
-      }
-
-      // Specific rules for 'health_tracking' subcollection
+      // Specific rule for health_tracking to allow patient writes
       match /health_tracking/{trackingId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Specific rule for audit_trail
+      match /audit_trail/{logId} {
+        allow read: if request.auth != null && (
+          request.auth.uid == userId || 
+          isRequestingUserRole('admin') || 
+          isRequestingUserRole('doctor')
+        );
+        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
+      }
+
+      // Rules for patient data subcollections
+      match /{subcollection}/{docId} {
+        // READ: 
+        // 1. A user can read their OWN subcollections (e.g., a patient reading their own prescriptions).
+        // 2. Admins and Doctors can read ANY user's subcollections.
+        allow read: if request.auth != null && (
+          request.auth.uid == userId || 
+          isRequestingUserRole('admin') || 
+          isRequestingUserRole('doctor')
+        );
+
+        // WRITE:
+        // Only allow doctors and admins to write to any subcollection (prescriptions, blood_pressure).
+        allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
       }
     }
 
@@ -82,14 +67,6 @@ service cloud.firestore {
         allow read: if request.auth != null;
         // WRITE (create, update, delete): Only admins or doctors can manage medications.
         allow write: if request.auth != null && (isRequestingUserRole('admin') || isRequestingUserRole('doctor'));
-    }
-
-    // Rules for the 'medication_interactions' collection
-    match /medication_interactions/{interactionId} {
-        // READ: Any authenticated user can read interactions (for the patient-facing checker).
-        allow read: if request.auth != null;
-        // WRITE: Temporarily allow any authenticated user to write for debugging.
-        allow write: if request.auth != null;
     }
   }
 }

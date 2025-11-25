@@ -692,11 +692,17 @@ const displayMedicationInteraction = () => {
 
 // --- Medication Management Functions (for medication_management.html) ---
 const resetMedicationForm = () => {
-    // Select the specific fields of the "Tambah Obat" form
-    document.getElementById('medication-name').value = '';
-    document.getElementById('medication-description').value = '';
-    document.getElementById('medication-type').value = '';
-    document.getElementById('medication-dosage').value = '';
+    const form = document.getElementById('add-medication-form');
+    if (form) {
+        form.reset(); // Resets all form fields
+    }
+    document.getElementById('medication-id-to-edit').value = '';
+    document.getElementById('add-medication-form-title').textContent = 'Tambah Obat Baru';
+    document.getElementById('add-medication-submit-btn').textContent = 'Simpan Obat';
+    const cancelBtn = document.getElementById('cancel-edit-btn');
+    if (cancelBtn) {
+        cancelBtn.style.display = 'none';
+    }
 };
 
 const editMedication = (medicationId) => {
@@ -833,6 +839,133 @@ const displayMedicationInteractionsList = () => {
     });
 };
 
+// --- Edit Profile Functions (for edit_profile.html) ---
+const handleProfileEditPage = (user) => {
+    if (!user) return;
+
+    const profileUsernameInput = document.getElementById('profile-username');
+    const profileEmailInput = document.getElementById('profile-email');
+    const profilePhoneInput = document.getElementById('profile-phone');
+    const profileAgeInput = document.getElementById('profile-age');
+    const profileLocationInput = document.getElementById('profile-location');
+    const profileReportInput = document.getElementById('profile-report');
+    const profileAllergiesInput = document.getElementById('profile-allergies');
+    const profileMedicationInput = document.getElementById('profile-medication');
+    const editProfileForm = document.getElementById('edit-profile-form');
+
+    if (!editProfileForm) return;
+
+    // Fetch user data from Firestore and populate the form
+    db.collection('users').doc(user.uid).get()
+        .then(doc => {
+            if (doc.exists) {
+                const userData = doc.data();
+                if (profileUsernameInput) profileUsernameInput.value = userData.username || user.displayName || '';
+                if (profileEmailInput) profileEmailInput.value = user.email || '';
+                if (profilePhoneInput) profilePhoneInput.value = userData.phoneNumber || '';
+                if (profileAgeInput) profileAgeInput.value = userData.age || '';
+                if (profileLocationInput) profileLocationInput.value = userData.location_dob || '';
+                if (profileReportInput) profileReportInput.value = userData.medical_report || '';
+                if (profileAllergiesInput) profileAllergiesInput.value = userData.allergies || '';
+                if (profileMedicationInput) profileMedicationInput.value = userData.medication || '';
+
+                const userDisplayNameHeader = document.getElementById('user-display-name');
+                if (userDisplayNameHeader) {
+                    userDisplayNameHeader.textContent = userData.username || user.displayName || 'User';
+                }
+            } else {
+                if (profileEmailInput) profileEmailInput.value = user.email || '';
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching user profile:", error);
+            if (profileEmailInput) profileEmailInput.value = user.email || '';
+        });
+
+    // Handle form submission
+    editProfileForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const updatedData = {
+          username: profileUsernameInput.value,
+          phoneNumber: profilePhoneInput.value,
+          age: profileAgeInput.value,
+          location_dob: profileLocationInput.value,
+        };
+
+        try {
+            // Update Firestore document
+            await db.collection('users').doc(user.uid).update(updatedData);
+
+            // Update Firebase Auth profile display name
+            await user.updateProfile({ displayName: updatedData.username });
+
+            alert('Profile updated successfully!');
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            alert("Error updating profile: " + error.message);
+        }
+    });
+};
+
+// --- Medication Notification Functions ---
+let notificationIntervalId; // To store the interval ID for clearing
+
+const scheduleMedicationNotifications = (userId) => {
+    // Clear any existing interval to prevent duplicates
+    if (notificationIntervalId) {
+        clearInterval(notificationIntervalId);
+    }
+
+    if (Notification.permission !== 'granted') {
+        console.warn('Notification permission not granted. Cannot schedule notifications.');
+        return;
+    }
+
+    const sentNotifications = new Set(); // To prevent sending multiple notifications for the same minute
+
+    const checkAndSendNotifications = async () => {
+        const now = new Date();
+        const currentHour = String(now.getHours()).padStart(2, '0');
+        const currentMinute = String(now.getMinutes()).padStart(2, '0');
+        const currentTime = `${currentHour}:${currentMinute}`;
+        const currentTimestamp = now.getTime(); // Used to check if it's a recent trigger
+
+        try {
+            const snapshot = await db.collection("users").doc(userId).collection("medication_schedules").get();
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.items && Array.isArray(data.items)) {
+                    data.items.forEach(item => {
+                        if (item.time === currentTime) {
+                            const notificationKey = `${item.medication}-${item.time}`;
+                            // Check if notification for this medication and time has already been sent in the current minute
+                            if (!sentNotifications.has(notificationKey)) {
+                                new Notification('Medication Reminder', {
+                                    body: `It's time for your ${item.medication}!`,
+                                    icon: '/Assets/logo.png' // Make sure you have a logo.png in your Assets folder
+                                });
+                                sentNotifications.add(notificationKey); // Mark as sent
+                                console.log(`Notification sent for ${item.medication} at ${item.time}`);
+                            }
+                        }
+                    });
+                }
+            });
+            // Clear sent notifications after a minute to allow repeat notifications on next day if any
+            setTimeout(() => sentNotifications.clear(), 60 * 1000); 
+
+        } catch (error) {
+            console.error("Error checking medication schedules for notifications:", error);
+        }
+    };
+
+    // Run immediately and then every minute
+    checkAndSendNotifications();
+    notificationIntervalId = setInterval(checkAndSendNotifications, 60 * 1000); // Check every minute
+    console.log('Medication notification scheduler started.');
+};
+
 // --- Main App Logic ---
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -843,7 +976,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const googleSigninButton = document.getElementById('google-signin-button');
     const userDisplayName = document.getElementById('user-display-name');
     const userEmail = document.getElementById('user-email');
-    const editProfileForm = document.getElementById('edit-profile-form');
+    // const editProfileForm = document.getElementById('edit-profile-form'); // Removed, now handled inside handleProfileEditPage
     const addMedicationForm = document.getElementById('add-medication-form');
 
 
@@ -1069,6 +1202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isEdupharmaPage = onPage('edupharma');
         const isHealthyDashboardPage = onPage('healthy_dashboard');
         const isMedicationInteractionPage = onPage('medication_interaction');
+        const isEditProfilePage = onPage('edit_profile');
 
         if (user) {
             try {
@@ -1097,7 +1231,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (isEdupharmaPage) displayMedicationLibrary();
                 else if (isHealthyDashboardPage) displayHealthyDashboard();
                 else if (isMedicationInteractionPage) displayMedicationInteraction();
-                else if ((isMainPage || isMyPrescriptionsPage || isBPHistoryPage) && (role === 'user' || role === 'patient')) displayUserData(user);
+                else if (isEditProfilePage) handleProfileEditPage(user);
+                else if (isMyPrescriptionsPage) scheduleMedicationNotifications(user.uid);
+                else if ((isMainPage || isBPHistoryPage) && (role === 'user' || role === 'patient')) displayUserData(user);
 
             } catch (error) {
                 console.error("Error during auth state change, signing out:", error);
@@ -1162,16 +1298,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (logoutButton) logoutButton.addEventListener('click', () => auth.signOut());
     if (googleSigninButton) googleSigninButton.addEventListener('click', signInWithGoogle);
     
-    if (editProfileForm) {
-        editProfileForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            // This form is not fully implemented in the provided files, but the logic is here
-        });
-    }
+    // if (editProfileForm) {
+    //     editProfileForm.addEventListener('submit', (e) => {
+    //         e.preventDefault();
+    //         // This form is not fully implemented in the provided files, but the logic is here
+    //     });
+    // }
 
     if (addMedicationForm) {
         addMedicationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const medicationId = document.getElementById('medication-id-to-edit').value;
             const medicationData = {
                 name: document.getElementById('medication-name').value,
                 description: document.getElementById('medication-description').value,
@@ -1186,21 +1323,44 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                await db.collection('medications').add({ ...medicationData, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-                alert(`Medication '${medicationData.name}' added successfully!`);
-                // Clear the form
-                document.getElementById('medication-name').value = '';
-                document.getElementById('medication-description').value = '';
-                document.getElementById('medication-type').value = '';
-                document.getElementById('medication-dosage').value = '';
+                if (medicationId) {
+                    // Update existing medication
+                    await db.collection('medications').doc(medicationId).update(medicationData);
+                    alert(`Medication '${medicationData.name}' updated successfully!`);
+                } else {
+                    // Add new medication
+                    await db.collection('medications').add({ ...medicationData, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                    alert(`Medication '${medicationData.name}' added successfully!`);
+                }
+                resetMedicationForm(); // Reset form after both add and update
+                
+                // Switch back to the list tab
+                const listTabEl = document.getElementById('list-tab');
+                if (listTabEl) {
+                    const listTab = new bootstrap.Tab(listTabEl);
+                    listTab.show();
+                }
+
             } catch (error) {
-                console.error("Error saving new medication:", error);
-                alert("Failed to save new medication: " + error.message);
+                console.error("Error saving medication:", error);
+                alert("Failed to save medication: " + error.message);
             }
         });
     }
 
     const cancelEditBtn = document.getElementById('cancel-edit-btn');
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', () => {
+            resetMedicationForm();
+            // Switch back to the list tab
+            const listTabEl = document.getElementById('list-tab');
+            if (listTabEl) {
+                const listTab = new bootstrap.Tab(listTabEl);
+                listTab.show();
+            }
+        });
+    }
+
     const saveInteractionBtn = document.getElementById('save-interaction-btn'); // Get reference here
     let saveInteractionHandler; // Declare globally for cleanup
 

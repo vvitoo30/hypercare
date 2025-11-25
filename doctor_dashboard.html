@@ -468,20 +468,48 @@
           <div class="modal-body p-4">
              <!-- Patient Info Card (Light) -->
              <div class="patient-detail-card">
-                <div class="fw-bold fs-5 text-dark" id="modalPName">Loading...</div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="fw-bold fs-5 text-dark" id="modalPName">Loading...</div>
+                  <div>
+                    <button class="btn btn-sm btn-primary" id="editPatientBtn" onclick="toggleEditMode(true)">Edit</button>
+                    <button class="btn btn-sm btn-success d-none" id="savePatientBtn" onclick="savePatientDetails()">Save</button>
+                    <button class="btn btn-sm btn-secondary d-none" id="cancelEditBtn" onclick="toggleEditMode(false)">Cancel</button>
+                  </div>
+                </div>
                 <hr class="custom-hr">
                 
-                <div class="detail-label">Location / DOB</div>
-                <div class="detail-content" id="modalPLocDob">...</div>
-                
-                <div class="detail-label">Medical Report</div>
-                <div class="detail-content" id="modalPReport">...</div>
-                
-                <div class="detail-label">Allergies</div>
-                <div class="detail-content" id="modalPAllergies">...</div>
-                
-                <div class="detail-label">Medication</div>
-                <div class="detail-content mb-0" id="modalPMeds">...</div>
+                <div id="patient-details-view">
+                  <div class="detail-label">Location / DOB</div>
+                  <div class="detail-content" id="modalPLocDob">...</div>
+                  
+                  <div class="detail-label">Medical Report</div>
+                  <div class="detail-content" id="modalPReport">...</div>
+                  
+                  <div class="detail-label">Allergies</div>
+                  <div class="detail-content" id="modalPAllergies">...</div>
+                  
+                  <div class="detail-label">Medication</div>
+                  <div class="detail-content mb-0" id="modalPMeds">...</div>
+                </div>
+
+                <div id="patient-details-edit" class="d-none">
+                  <div class="mb-3">
+                    <label class="form-label">Location / DOB</label>
+                    <input type="text" class="form-control" id="editPLocDob">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Medical Report</label>
+                    <textarea class="form-control" id="editPReport" rows="2"></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Allergies</label>
+                    <input type="text" class="form-control" id="editPAllergies">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">Medication</label>
+                    <input type="text" class="form-control" id="editPMeds">
+                  </div>
+                </div>
              </div>
 
              <!-- History Button -->
@@ -492,7 +520,10 @@
              <!-- Grid Buttons -->
              <div class="buttons-grid">
                <button class="btn-action-grid" data-bs-toggle="modal" data-bs-target="#medicationScheduleModal">
-                 Medication<br>Schedule
+                 Add Medication<br>Schedule
+               </button>
+               <button class="btn-action-grid" onclick="openViewMedicationSchedules()">
+                 View Medication<br>Schedules
                </button>
                <button class="btn-action-grid" data-bs-toggle="modal" data-bs-target="#bloodPressureModal">
                  Blood Pressure<br>Records
@@ -509,6 +540,21 @@
       </div>
     </div>
 
+    <!-- VIEW MEDICATION SCHEDULES MODAL -->
+    <div class="modal fade" id="viewMedicationSchedulesModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content modal-content-dark">
+          <div class="modal-header border-0">
+            <h4 class="modal-title fw-bold">Medication Schedules</h4>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+             <div id="medicationScheduleList">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <!-- 4. SUB-MODAL: Medication Schedule -->
     <div class="modal fade" id="medicationScheduleModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
       <div class="modal-dialog modal-dialog-centered">
@@ -531,8 +577,8 @@
               <!-- Dynamic Rows will be added here -->
               <div class="medication-group">
                 <div class="mb-3">
-                   <label class="form-label-light">Time (e.g. 08:00)</label>
-                   <input type="text" class="form-control form-control-pill-white sched-time" placeholder="HH:MM">
+                   <label class="form-label-light">Time</label>
+                   <input type="time" class="form-control form-control-pill-white sched-time">
                 </div>
                 <div class="mb-3">
                    <label class="form-label-light">Medication Name</label>
@@ -759,14 +805,101 @@
           if(patient) {
               // Populate Modal Fields
               document.getElementById('modalPName').innerText = `${patient.username || 'Unknown'} (${patient.age || 'N/A'})`;
+              
+              // Populate view mode
               document.getElementById('modalPLocDob').innerText = patient.location_dob || 'N/A';
               document.getElementById('modalPReport').innerText = patient.medical_report || 'N/A';
               document.getElementById('modalPAllergies').innerText = patient.allergies || 'N/A';
               document.getElementById('modalPMeds').innerText = patient.medication || 'N/A';
+
+              // Ensure edit mode is off by default
+              toggleEditMode(false);
               
               // Show Modal
               new bootstrap.Modal(document.getElementById('patientDetailModal')).show();
           }
+      }
+
+      function toggleEditMode(editing) {
+        const viewDiv = document.getElementById('patient-details-view');
+        const editDiv = document.getElementById('patient-details-edit');
+        const editBtn = document.getElementById('editPatientBtn');
+        const saveBtn = document.getElementById('savePatientBtn');
+        const cancelBtn = document.getElementById('cancelEditBtn');
+
+        if (editing) {
+          // Populate edit fields
+          const patient = allPatients.find(p => p.id === currentPatientId);
+          if (patient) {
+            document.getElementById('editPLocDob').value = patient.location_dob || '';
+            document.getElementById('editPReport').value = patient.medical_report || '';
+            document.getElementById('editPAllergies').value = patient.allergies || '';
+            document.getElementById('editPMeds').value = patient.medication || '';
+          }
+
+          viewDiv.classList.add('d-none');
+          editDiv.classList.remove('d-none');
+          editBtn.classList.add('d-none');
+          saveBtn.classList.remove('d-none');
+          cancelBtn.classList.remove('d-none');
+        } else {
+          viewDiv.classList.remove('d-none');
+          editDiv.classList.add('d-none');
+          editBtn.classList.remove('d-none');
+          saveBtn.classList.add('d-none');
+          cancelBtn.classList.add('d-none');
+        }
+      }
+
+      async function savePatientDetails() {
+        if (!currentPatientId) return;
+
+        const updatedData = {
+          location_dob: document.getElementById('editPLocDob').value,
+          medical_report: document.getElementById('editPReport').value,
+          allergies: document.getElementById('editPAllergies').value,
+          medication: document.getElementById('editPMeds').value,
+        };
+
+        const user = auth.currentUser;
+        if (!user) {
+          alert("You must be logged in to make changes.");
+          return;
+        }
+
+        const batch = db.batch();
+        const patientRef = db.collection("users").doc(currentPatientId);
+        batch.update(patientRef, updatedData);
+
+        const auditTrailRef = patientRef.collection("audit_trail").doc();
+        batch.set(auditTrailRef, {
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          changedBy: user.email,
+          changeType: "Updated Patient Details",
+          changeDetails: updatedData
+        });
+
+        try {
+          await batch.commit();
+          
+          // Update local data
+          const patientIndex = allPatients.findIndex(p => p.id === currentPatientId);
+          if (patientIndex > -1) {
+            allPatients[patientIndex] = { ...allPatients[patientIndex], ...updatedData };
+          }
+          
+          // Update view
+          document.getElementById('modalPLocDob').innerText = updatedData.location_dob;
+          document.getElementById('modalPReport').innerText = updatedData.medical_report;
+          document.getElementById('modalPAllergies').innerText = updatedData.allergies;
+          document.getElementById('modalPMeds').innerText = updatedData.medication;
+
+          toggleEditMode(false);
+          alert('Patient details updated successfully!');
+        } catch (error) {
+          console.error("Error updating patient details:", error);
+          alert("Error: " + error.message);
+        }
       }
 
       // 6. Sub-Modal Saving Logic
@@ -785,12 +918,34 @@
 
       async function saveBPRecord() {
          if(!currentPatientId) return;
+
+         const user = auth.currentUser;
+         if (!user) {
+           alert("You must be logged in to make changes.");
+           return;
+         }
+
          const sys = document.getElementById('bpSystolic').value;
          const dia = document.getElementById('bpDiastolic').value;
+
+         const batch = db.batch();
+         const patientRef = db.collection("users").doc(currentPatientId);
+
+         const bpRef = patientRef.collection("blood_pressure").doc();
+         batch.set(bpRef, {
+             systolic: sys, diastolic: dia, recordedAt: firebase.firestore.FieldValue.serverTimestamp()
+         });
+
+         const auditTrailRef = patientRef.collection("audit_trail").doc();
+         batch.set(auditTrailRef, {
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          changedBy: user.email,
+          changeType: "Added Blood Pressure Record",
+          changeDetails: { systolic: sys, diastolic: dia }
+         });
+
          try {
-             await db.collection("users").doc(currentPatientId).collection("blood_pressure").add({
-                 systolic: sys, diastolic: dia, recordedAt: firebase.firestore.FieldValue.serverTimestamp()
-             });
+             await batch.commit();
              showOverlayAndClose('bloodPressureModal', 'bpSaveOverlay');
          } catch(e) { alert("Error: " + e.message); }
       }
@@ -801,8 +956,8 @@
         div.className = 'medication-group';
         div.innerHTML = `
             <div class="mb-3">
-               <label class="form-label-light">Time (e.g. 08:00)</label>
-               <input type="text" class="form-control form-control-pill-white sched-time" placeholder="HH:MM">
+               <label class="form-label-light">Time</label>
+               <input type="time" class="form-control form-control-pill-white sched-time">
             </div>
             <div class="mb-3">
                <label class="form-label-light">Medication Name</label>
@@ -814,6 +969,12 @@
 
       async function saveMedicationSchedule() {
          if(!currentPatientId) return;
+
+         const user = auth.currentUser;
+         if (!user) {
+           alert("You must be logged in to make changes.");
+           return;
+         }
          
          // Gather all entries
          const groups = document.querySelectorAll('.medication-group');
@@ -829,20 +990,33 @@
 
          if(schedules.length === 0) return alert("Add at least one medication.");
 
+         const batch = db.batch();
+         const patientRef = db.collection("users").doc(currentPatientId);
+         
+         const scheduleRef = patientRef.collection("medication_schedules").doc();
+         batch.set(scheduleRef, {
+             items: schedules,
+             createdAt: firebase.firestore.FieldValue.serverTimestamp()
+         });
+
+         const auditTrailRef = patientRef.collection("audit_trail").doc();
+         batch.set(auditTrailRef, {
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          changedBy: user.email,
+          changeType: "Added Medication Schedule",
+          changeDetails: { items: schedules }
+         });
+
          try {
-             // Save as single doc with array for this set
-             await db.collection("users").doc(currentPatientId).collection("medication_schedules").add({
-                 items: schedules,
-                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
-             });
+             await batch.commit();
              showOverlayAndClose('medicationScheduleModal', 'medicationSaveOverlay');
              
              // Reset Form
              document.getElementById('medicationContainer').innerHTML = `
               <div class="medication-group">
                 <div class="mb-3">
-                   <label class="form-label-light">Time (e.g. 08:00)</label>
-                   <input type="text" class="form-control form-control-pill-white sched-time" placeholder="HH:MM">
+                   <label class="form-label-light">Time</label>
+                   <input type="time" class="form-control form-control-pill-white sched-time">
                 </div>
                 <div class="mb-3">
                    <label class="form-label-light">Medication Name</label>
@@ -855,27 +1029,156 @@
 
       async function savePharmacyNote() {
          if(!currentPatientId) return;
+
+         const user = auth.currentUser;
+         if (!user) {
+           alert("You must be logged in to make changes.");
+           return;
+         }
+
          const note = document.getElementById('pharmacyNoteInput').value;
+
+         const batch = db.batch();
+         const patientRef = db.collection("users").doc(currentPatientId);
+
+         const noteRef = patientRef.collection("pharmacy_notes").doc();
+         batch.set(noteRef, {
+             note: note, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+         });
+
+         const auditTrailRef = patientRef.collection("audit_trail").doc();
+         batch.set(auditTrailRef, {
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          changedBy: user.email,
+          changeType: "Added Pharmacy Note",
+          changeDetails: { note: note }
+         });
+
          try {
-             await db.collection("users").doc(currentPatientId).collection("pharmacy_notes").add({
-                 note: note, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-             });
+             await batch.commit();
              showOverlayAndClose('pharmacyNotesModal', 'pharmacySaveOverlay');
          } catch(e) { alert("Error: " + e.message); }
       }
 
       async function saveNewCheckup() {
          if(!currentPatientId) return;
+
+         const user = auth.currentUser;
+         if (!user) {
+           alert("You must be logged in to make changes.");
+           return;
+         }
+
          const sys = document.getElementById('chkSys').value;
          const dia = document.getElementById('chkDia').value;
          const meds = document.getElementById('chkMeds').value;
          const notes = document.getElementById('chkNotes').value;
+         
+         const checkupData = {
+             bp: `${sys}/${dia}`, medication: meds, notes: notes, date: firebase.firestore.FieldValue.serverTimestamp()
+         };
+
+         const batch = db.batch();
+         const patientRef = db.collection("users").doc(currentPatientId);
+
+         const checkupRef = patientRef.collection("checkup_records").doc();
+         batch.set(checkupRef, checkupData);
+
+         const auditTrailRef = patientRef.collection("audit_trail").doc();
+         batch.set(auditTrailRef, {
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          changedBy: user.email,
+          changeType: "Added Medical Checkup Record",
+          changeDetails: checkupData
+         });
+
          try {
-             await db.collection("users").doc(currentPatientId).collection("checkup_records").add({
-                 bp: `${sys}/${dia}`, medication: meds, notes: notes, date: firebase.firestore.FieldValue.serverTimestamp()
-             });
+             await batch.commit();
              showOverlayAndClose('medicalCheckupRecordsModal', 'checkupSaveOverlay');
          } catch(e) { alert("Error: " + e.message); }
+      }
+
+      function formatChangeDetails(changeType, changeDetails) {
+        let formatted = '';
+        switch (changeType) {
+          case "Updated Patient Details":
+            formatted += '<ul>';
+            for (const key in changeDetails) {
+              if (Object.hasOwnProperty.call(changeDetails, key)) {
+                formatted += `<li><strong>${key.replace(/_/g, ' ')}:</strong> ${changeDetails[key]}</li>`;
+              }
+            }
+            formatted += '</ul>';
+            break;
+          case "Added Medication Schedule":
+            formatted += '<ul>';
+            changeDetails.items.forEach(item => {
+              formatted += `<li>${item.time} - ${item.medication}</li>`;
+            });
+            formatted += '</ul>';
+            break;
+          case "Added Blood Pressure Record":
+            formatted += `<p><strong>Systolic:</strong> ${changeDetails.systolic}, <strong>Diastolic:</strong> ${changeDetails.diastolic}</p>`;
+            break;
+          case "Added Pharmacy Note":
+            formatted += `<p><strong>Note:</strong> ${changeDetails.note}</p>`;
+            break;
+          case "Added Medical Checkup Record":
+            formatted += `<p><strong>BP:</strong> ${changeDetails.bp}, <strong>Medication:</strong> ${changeDetails.medication}, <strong>Notes:</strong> ${changeDetails.notes}</p>`;
+            break;
+          default:
+            formatted = `<pre><small>${JSON.stringify(changeDetails, null, 2)}</small></pre>`;
+            break;
+        }
+        return formatted;
+      }
+
+      function openViewMedicationSchedules() {
+          if(!currentPatientId) return;
+          const list = document.getElementById('medicationScheduleList');
+          list.innerHTML = 'Loading...';
+          
+          db.collection("users").doc(currentPatientId).collection("medication_schedules").orderBy('createdAt','desc').get()
+          .then(snap => {
+              if(snap.empty) { list.innerHTML = "No medication schedules found."; return; }
+              let html = '<ul class="list-group">';
+              snap.forEach(doc => {
+                  const d = doc.data();
+                  const dateStr = d.createdAt ? d.createdAt.toDate().toLocaleString() : '?';
+                  let itemsHtml = '<ul class="list-unstyled mt-2">';
+                  if(d.items && Array.isArray(d.items)) {
+                    d.items.forEach(item => {
+                      itemsHtml += `<li>${item.time} - ${item.medication}</li>`;
+                    });
+                  }
+                  itemsHtml += '</ul>';
+
+                  html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+                              <div>
+                                <small>Scheduled on: ${dateStr}</small>
+                                ${itemsHtml}
+                              </div>
+                              <button class="btn btn-danger btn-sm" onclick="deleteMedicationSchedule('${doc.id}')">Delete</button>
+                           </li>`;
+              });
+              html += '</ul>';
+              list.innerHTML = html;
+              new bootstrap.Modal(document.getElementById('viewMedicationSchedulesModal')).show();
+          });
+      }
+
+      async function deleteMedicationSchedule(scheduleId) {
+        if (!currentPatientId || !scheduleId) return;
+        if (confirm("Are you sure you want to delete this medication schedule?")) {
+          try {
+            await db.collection("users").doc(currentPatientId).collection("medication_schedules").doc(scheduleId).delete();
+            alert("Schedule deleted successfully!");
+            openViewMedicationSchedules(); // Refresh the list
+          } catch (error) {
+            console.error("Error deleting schedule: ", error);
+            alert("Error: " + error.message);
+          }
+        }
       }
 
       function openCheckupHistory() {
@@ -883,14 +1186,23 @@
           const list = document.getElementById('checkupHistoryList');
           list.innerHTML = 'Loading...';
           
-          db.collection("users").doc(currentPatientId).collection("checkup_records").orderBy('date','desc').get()
+          db.collection("users").doc(currentPatientId).collection("audit_trail").orderBy('timestamp','desc').get()
           .then(snap => {
-              if(snap.empty) { list.innerHTML = "No records found."; return; }
+              if(snap.empty) { list.innerHTML = "No history records found."; return; }
               let html = '';
               snap.forEach(doc => {
                   const d = doc.data();
-                  const dateStr = d.date ? d.date.toDate().toLocaleDateString() : '?';
-                  html += `<div class="checkup-row"><span class="fw-bold">${dateStr}</span> <small>${d.bp}</small></div>`;
+                  const dateStr = d.timestamp ? d.timestamp.toDate().toLocaleString() : '?';
+                  const formattedDetails = formatChangeDetails(d.changeType, d.changeDetails);
+                  html += `<div class="checkup-row">
+                            <div>
+                              <span class="fw-bold">${d.changeType}</span>
+                              <br>
+                              <small>By: ${d.changedBy} on ${dateStr}</small>
+                              <br>
+                              ${formattedDetails}
+                            </div>
+                           </div>`;
               });
               list.innerHTML = html;
               new bootstrap.Modal(document.getElementById('medicalCheckupModal')).show();
