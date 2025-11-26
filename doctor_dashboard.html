@@ -1319,25 +1319,40 @@
           const list = document.getElementById('checkupHistoryList');
           list.innerHTML = 'Loading...';
           
-          db.collection("users").doc(currentPatientId).collection("audit_trail").orderBy('timestamp','desc').get()
+          db.collection("users").doc(currentPatientId).collection("checkup_records").orderBy('date','desc').get()
           .then(snap => {
-              if(snap.empty) { list.innerHTML = "No history records found."; return; }
-              let html = '';
-              snap.forEach(doc => {
-                  const d = doc.data();
-                  const dateStr = d.timestamp ? d.timestamp.toDate().toLocaleString() : '?';
-                  const formattedDetails = formatChangeDetails(d.changeType, d.changeDetails);
-                  html += `<div class="checkup-row">
-                            <div>
-                              <span class="fw-bold">${d.changeType}</span>
-                              <br>
-                              <small>By: ${d.changedBy} on ${dateStr}</small>
-                              <br>
-                              ${formattedDetails}
-                            </div>
-                           </div>`;
-              });
-              list.innerHTML = html;
+              const modalTitle = document.querySelector('#medicalCheckupModal .modal-title');
+              if (modalTitle) modalTitle.innerText = "Medical Checkup Records";
+
+              if(snap.empty) { 
+                list.innerHTML = '<p class="text-center text-white-50">No checkup records found.</p>'; 
+              } else {
+                let html = '<div class="list-group">';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const dateStr = d.date ? d.date.toDate().toLocaleString() : 'N/A';
+                    const bp = d.bp || 'N/A';
+                    const medication = d.medication || 'N/A';
+                    const notes = d.notes || 'N/A';
+
+                    html += `<div class="list-group-item list-group-item-action flex-column align-items-start bg-light text-dark mb-2 rounded-3 border-0">
+                                <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1 fw-bold text-primary">Checkup on ${dateStr}</h5>
+                                </div>
+                                <p class="mb-1"><strong>Blood Pressure:</strong> ${bp}</p>
+                                <p class="mb-1"><strong>Medication:</strong> ${medication}</p>
+                                <small><strong>Notes:</strong> ${notes}</small>
+                            </div>`;
+                });
+                html += '</div>';
+                list.innerHTML = html;
+              }
+
+              new bootstrap.Modal(document.getElementById('medicalCheckupModal')).show();
+          })
+          .catch(error => {
+              console.error("Error fetching checkup records: ", error);
+              list.innerHTML = '<p class="text-center text-danger">Error loading records.</p>';
               new bootstrap.Modal(document.getElementById('medicalCheckupModal')).show();
           });
       }
