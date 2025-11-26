@@ -77,7 +77,7 @@
       /* --- TEXT STYLES --- */
       .app-title {
         font-weight: 800;
-        font-size: 3.5rem;
+        font-size: clamp(2.5rem, 8vw, 3.5rem); /* Responsive font size */
         letter-spacing: -1px;
         margin: 1rem 0 0.5rem 0;
         opacity: 0;
@@ -91,7 +91,7 @@
 
       .app-tagline {
         color: #a0a0c0;
-        font-size: 1.2rem;
+        font-size: clamp(1rem, 3vw, 1.2rem); /* Responsive font size */
         font-weight: 500;
         margin: 0;
         overflow: hidden; 
