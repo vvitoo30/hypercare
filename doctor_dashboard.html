@@ -1281,7 +1281,11 @@
                   let itemsHtml = '<ul class="list-unstyled mt-2">';
                   if(d.items && Array.isArray(d.items)) {
                     d.items.forEach(item => {
-                      itemsHtml += `<li>${item.time} - ${item.medication}</li>`;
+                      let scheduleInfo = `${item.time} - ${item.medication}`;
+                      if (item.startDate && item.endDate) {
+                        scheduleInfo += ` (from ${item.startDate} to ${item.endDate})`;
+                      }
+                      itemsHtml += `<li>${scheduleInfo}</li>`;
                     });
                   }
                   itemsHtml += '</ul>';

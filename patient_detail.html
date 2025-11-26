@@ -587,6 +587,16 @@
                   <label class="form-label-light fs-4">Medication</label>
                   <textarea class="form-control form-control-pill-white med-name" rows="2" placeholder="e.g. Paracetamol 500mg"></textarea>
                 </div>
+                <div class="row">
+                  <div class="col-6 mb-3">
+                    <label class="form-label-light">Start Date</label>
+                    <input type="date" class="form-control form-control-pill-white start-date">
+                  </div>
+                  <div class="col-6 mb-3">
+                    <label class="form-label-light">End Date</label>
+                    <input type="date" class="form-control form-control-pill-white end-date">
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -854,16 +864,20 @@
             const m1 = group.querySelector('.m1').value || '0';
             const m2 = group.querySelector('.m2').value || '0';
             const medName = group.querySelector('.med-name').value;
+            const startDate = group.querySelector('.start-date').value;
+            const endDate = group.querySelector('.end-date').value;
             
-            if(medName) {
+            if(medName && startDate && endDate) {
                 schedules.push({
                     time: `${h1}${h2}:${m1}${m2}`,
-                    medication: medName
+                    medication: medName,
+                    startDate: startDate,
+                    endDate: endDate
                 });
             }
         });
 
-        if(schedules.length === 0) return alert("Please add at least one medication.");
+        if(schedules.length === 0) return alert("Please add at least one complete medication schedule (name, start date, and end date).");
 
         try {
             // We add a batch or single document depending on preference. 
@@ -898,6 +912,16 @@
             <div class="mb-3">
               <label class="form-label-light fs-4">Medication</label>
               <textarea class="form-control form-control-pill-white med-name" rows="2"></textarea>
+            </div>
+            <div class="row">
+              <div class="col-6 mb-3">
+                <label class="form-label-light">Start Date</label>
+                <input type="date" class="form-control form-control-pill-white start-date">
+              </div>
+              <div class="col-6 mb-3">
+                <label class="form-label-light">End Date</label>
+                <input type="date" class="form-control form-control-pill-white end-date">
+              </div>
             </div>
           </div>`;
         container.insertAdjacentHTML('beforeend', html);

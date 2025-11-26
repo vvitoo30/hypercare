@@ -140,6 +140,21 @@
         opacity: 0.5;
         margin-bottom: 1rem;
       }
+
+      /* Calendar Button */
+      .calendar-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        color: #4a43d1;
+        font-size: 1.3rem;
+        text-decoration: none;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+      }
+      .calendar-btn:hover {
+        opacity: 1;
+      }
     </style>
   </head>
   <body>
@@ -244,7 +259,7 @@
             if(userDoc.exists) {
                 const data = userDoc.data();
                 if(data.medication && data.medication.trim() !== "") {
-                    renderCard("Primary Medication", data.medication, "Daily / As Prescribed", "bi-capsule");
+                    renderCard("Primary Medication", data.medication, "Daily / As Prescribed", "bi-capsule", null, null, null);
                     hasData = true;
                 }
             }
@@ -254,10 +269,10 @@
             
             snapshot.forEach(doc => {
                 const data = doc.data();
-                // data.items is an array of {time, medication}
+                // data.items is an array of {time, medication, startDate, endDate}
                 if(data.items && Array.isArray(data.items)) {
                     data.items.forEach(item => {
-                        renderCard(item.medication, "Scheduled Reminder", item.time, "bi-alarm");
+                        renderCard(item.medication, "Scheduled Reminder", item.time, "bi-alarm", item.startDate, item.endDate);
                         hasData = true;
                     });
                 }
@@ -287,22 +302,37 @@
         }
       }
 
-      function renderCard(title, subtitle, badgeText, iconClass) {
+      function renderCard(title, subtitle, badgeText, iconClass, startDate, endDate) {
           const isTime = iconClass === 'bi-alarm';
           const badgeHtml = isTime 
             ? `<span class="badge-time"><i class="bi bi-clock me-1"></i> ${badgeText}</span>`
             : `<span class="badge-time" style="background-color: #6c757d;">${badgeText}</span>`;
+        
+          const safeTitle = title.replace(/'/g, "\\'");
+
+          // Show calendar button if it's a scheduled medication.
+          const calendarButtonHtml = isTime
+            ? `<a href="#" class="calendar-btn" onclick="addToCalendar('${safeTitle}', '${badgeText}', '${startDate || ''}', '${endDate || ''}')" title="Add to Google Calendar">
+                 <i class="bi bi-calendar-plus"></i>
+               </a>`
+            : '';
+          
+          let displaySubtitle = subtitle;
+          if (isTime && startDate && endDate) {
+              displaySubtitle = `Schedule: ${startDate} to ${endDate}`;
+          }
 
           const html = `
             <div class="col-md-6 col-lg-4">
                 <div class="rx-card">
+                    ${calendarButtonHtml}
                     <div class="d-flex align-items-start justify-content-between">
                         <div>
                             <div class="rx-icon">
                                 <i class="bi ${iconClass}"></i>
                             </div>
                             <div class="rx-title">${title}</div>
-                            <div class="rx-meta">${subtitle}</div>
+                            <div class="rx-meta">${displaySubtitle}</div>
                             ${badgeHtml}
                         </div>
                     </div>
@@ -310,6 +340,69 @@
             </div>
           `;
           container.insertAdjacentHTML('beforeend', html);
+      }
+
+      function addToCalendar(medicationName, time, startDate, endDate) {
+        // Case 1: New format with start and end date -> Create Recurring Event
+        if (startDate && endDate) {
+            if (!confirm(`Add a recurring reminder for "${medicationName}" to your Google Calendar? This will create a daily event from ${startDate} to ${endDate}.`)) {
+              return;
+            }
+
+            const [hours, minutes] = time.split(':');
+            const startDateTime = new Date(`${startDate}T${time}:00`);
+            const endDateTime = new Date(startDateTime.getTime() + 5 * 60000); // 5 minute duration for each event
+
+            const toGoogleLocal = (date) => {
+                return date.getFullYear() +
+                       ('0' + (date.getMonth() + 1)).slice(-2) +
+                       ('0' + date.getDate()).slice(-2) + 'T' +
+                       ('0' + date.getHours()).slice(-2) +
+                       ('0' + date.getMinutes()).slice(-2) + '00';
+            }
+
+            const untilDate = new Date(`${endDate}T23:59:59`);
+            const untilDateUTC = untilDate.toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
+            const rrule = `RRULE:FREQ=DAILY;UNTIL=${untilDateUTC}`;
+
+            const eventDetails = {
+                title: `Take Medication: ${medicationName}`,
+                dates: `${toGoogleLocal(startDateTime)}/${toGoogleLocal(endDateTime)}`,
+                details: `Daily reminder to take your prescribed medication: ${medicationName}.`,
+                recur: rrule,
+                ctz: Intl.DateTimeFormat().resolvedOptions().timeZone
+            };
+            
+            const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.title)}&dates=${encodeURIComponent(eventDetails.dates)}&details=${encodeURIComponent(eventDetails.details)}&recur=${encodeURIComponent(eventDetails.recur)}&ctz=${encodeURIComponent(eventDetails.ctz)}`;
+            window.open(calendarUrl, '_blank');
+
+        // Case 2: Old format without dates -> Create Single Event
+        } else {
+            if (!confirm(`Add a one-time reminder for "${medicationName}" at ${time} to your Google Calendar?`)) {
+              return;
+            }
+
+            const [hours, minutes] = time.split(':');
+            const now = new Date();
+            const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+
+            if (startTime < now) {
+              startTime.setDate(startTime.getDate() + 1);
+            }
+
+            const endTime = new Date(startTime.getTime() + 5 * 60000);
+            const toGoogleUTC = (date) => date.toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
+
+            const event = {
+              title: `Take Medication: ${medicationName}`,
+              start: toGoogleUTC(startTime),
+              end: toGoogleUTC(endTime),
+              details: `Reminder to take your prescribed medication: ${medicationName}.`
+            };
+
+            const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${event.start}/${event.end}&details=${encodeURIComponent(event.details)}`;
+            window.open(calendarUrl, '_blank');
+        }
       }
     </script>
   </body>
