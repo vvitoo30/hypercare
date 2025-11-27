@@ -190,8 +190,21 @@
         <i class="bi bi-arrow-left"></i> Back to Dashboard
       </a>
 
-      <h1 class="page-title">My Prescriptions</h1>
-      <p class="page-subtitle">View your current medications and dosage schedules.</p>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+            <h1 class="page-title mb-0">My Prescriptions</h1>
+            <p class="page-subtitle">View your current medications and dosage schedules.</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMedicationModal">
+            <i class="bi bi-plus-circle me-1"></i> Add Medication
+        </button>
+        <button class="btn btn-secondary" onclick="openEditPrimaryMedicationModal()">
+            <i class="bi bi-pencil-square me-1"></i> Edit Primary
+        </button>
+        <button class="btn btn-info" onclick="openManageSchedulesModal()">
+            <i class="bi bi-card-list me-1"></i> Manage Schedules
+        </button>
+      </div>
 
       <div id="loadingSpinner" class="text-center py-5">
          <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
@@ -205,6 +218,74 @@
       </div>
 
     </main>
+    
+    <!-- Add Medication Modal -->
+    <div class="modal fade" id="addMedicationModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #252547; color: white; border-radius: 1.5rem;">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold">Add New Medication Schedule</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="medicationContainerModal">
+                <div class="medication-group">
+                    <div class="mb-3">
+                       <label class="form-label-light">Time</label>
+                       <input type="time" class="form-control form-control-pill-white sched-time">
+                    </div>
+                    <div class="mb-3">
+                       <label class="form-label-light">Medication Name</label>
+                       <input type="text" class="form-control form-control-pill-white sched-name" placeholder="e.g., Amlodipine 5mg">
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-outline-light mb-4" onclick="addMedicationGroup()">
+                <i class="bi bi-plus-circle me-1"></i> Add Another
+            </button>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="saveMedicationSchedule()">Save Schedule</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Edit Primary Medication Modal -->
+    <div class="modal fade" id="editPrimaryMedicationModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #252547; color: white; border-radius: 1.5rem;">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold">Edit Primary Medication</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <p class="text-white-50 small">This is for general, non-scheduled medication. For scheduled doses, add them as separate medication schedules.</p>
+              <textarea id="primaryMedicationInput" class="form-control" rows="4" style="background-color: #1c1c3a; color: white; border: 1px solid #3f3f6b;"></textarea>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="savePrimaryMedication()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manage Schedules Modal -->
+    <div class="modal fade" id="manageSchedulesModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="background-color: #252547; color: white; border-radius: 1.5rem;">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold">Manage Medication Schedules</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+             <div id="scheduleListInModal">Loading schedules...</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -221,18 +302,7 @@
       const container = document.getElementById('prescriptionsContainer');
       const spinner = document.getElementById('loadingSpinner');
 
-      // Request notification permission on page load
-      if ('Notification' in window) {
-        Notification.requestPermission().then(permission => {
-          if (permission === 'granted') {
-            console.log('Notification permission granted.');
-          } else {
-            console.warn('Notification permission denied.');
-          }
-        });
-      }
-
-      // 1. Check Auth
+      // --- Main Auth Check ---
       auth.onAuthStateChanged((user) => {
         if (user) {
           document.getElementById('nav-user-name').textContent = user.displayName || "Patient";
@@ -242,167 +312,209 @@
         }
       });
 
-      // 2. Logout
+      // --- Logout ---
       document.getElementById('logout-button').addEventListener('click', (e) => {
         e.preventDefault();
         auth.signOut().then(() => window.location.href = 'index.html');
       });
 
-      // 3. Load Data
+      // --- Data Loading and Rendering ---
       async function loadPrescriptions(userId) {
+        spinner.style.display = 'block';
+        container.style.display = 'none';
         container.innerHTML = '';
         let hasData = false;
 
         try {
-            // A. Fetch Main Profile Medication
+            // Load primary medication
             const userDoc = await db.collection("users").doc(userId).get();
-            if(userDoc.exists) {
-                const data = userDoc.data();
-                if(data.medication && data.medication.trim() !== "") {
-                    renderCard("Primary Medication", data.medication, "Daily / As Prescribed", "bi-capsule", null, null, null);
-                    hasData = true;
-                }
+            if(userDoc.exists && userDoc.data().medication) {
+                renderCard("Primary Medication", userDoc.data().medication, "Daily / As Prescribed", "bi-capsule", null, false);
+                hasData = true;
             }
 
-            // B. Fetch Scheduled Medications
+            // Load scheduled medications
             const snapshot = await db.collection("users").doc(userId).collection("medication_schedules").orderBy("createdAt", "desc").get();
-            
             snapshot.forEach(doc => {
                 const data = doc.data();
-                // data.items is an array of {time, medication, startDate, endDate}
                 if(data.items && Array.isArray(data.items)) {
                     data.items.forEach(item => {
-                        renderCard(item.medication, "Scheduled Reminder", item.time, "bi-alarm", item.startDate, item.endDate);
+                        renderCard(item.medication, "Scheduled Reminder", item.time, "bi-alarm", doc.id, true);
                         hasData = true;
                     });
                 }
             });
 
-            // Handle Empty State
             if(!hasData) {
-                container.innerHTML = `
-                    <div class="col-12">
-                        <div class="empty-state">
-                            <i class="bi bi-prescription2 empty-icon"></i>
-                            <h3>No prescriptions found</h3>
-                            <p class="text-white-50">Your doctor hasn't assigned any medications yet.</p>
-                        </div>
-                    </div>
-                `;
+                container.innerHTML = `<div class="col-12"><div class="empty-state"><i class="bi bi-prescription2 empty-icon"></i><h3>No prescriptions found</h3><p class="text-white-50">You can add your own medication schedules.</p></div></div>`;
             }
-
             spinner.style.display = 'none';
             container.style.display = 'flex';
-
         } catch (error) {
-            console.error("Error:", error);
-            container.innerHTML = `<p class="text-danger text-center">Error loading data: ${error.message}</p>`;
+            console.error("Error loading prescriptions:", error);
             spinner.style.display = 'none';
-            container.style.display = 'block';
+            container.innerHTML = `<div class="col-12"><p class="text-danger text-center">Error: ${error.message}</p></div>`;
+            container.style.display = 'flex';
         }
       }
 
-      function renderCard(title, subtitle, badgeText, iconClass, startDate, endDate) {
+      function renderCard(title, subtitle, badgeText, iconClass, scheduleId, isSchedulable) {
           const isTime = iconClass === 'bi-alarm';
-          const badgeHtml = isTime 
-            ? `<span class="badge-time"><i class="bi bi-clock me-1"></i> ${badgeText}</span>`
-            : `<span class="badge-time" style="background-color: #6c757d;">${badgeText}</span>`;
-        
+          const badgeHtml = isTime ? `<span class="badge-time"><i class="bi bi-clock me-1"></i> ${badgeText}</span>` : `<span class="badge-time" style="background-color: #6c757d;">${badgeText}</span>`;
           const safeTitle = title.replace(/'/g, "\\'");
-
-          // Show calendar button if it's a scheduled medication.
-          const calendarButtonHtml = isTime
-            ? `<a href="#" class="calendar-btn" onclick="addToCalendar('${safeTitle}', '${badgeText}', '${startDate || ''}', '${endDate || ''}')" title="Add to Google Calendar">
-                 <i class="bi bi-calendar-plus"></i>
-               </a>`
-            : '';
+          const calendarButtonHtml = isSchedulable ? `<a href="#" class="calendar-btn" onclick="addToCalendar('${safeTitle}', '${badgeText}')" title="Add to Google Calendar"><i class="bi bi-calendar-plus"></i></a>` : '';
           
-          let displaySubtitle = subtitle;
-          if (isTime && startDate && endDate) {
-              displaySubtitle = `Schedule: ${startDate} to ${endDate}`;
-          }
-
           const html = `
             <div class="col-md-6 col-lg-4">
                 <div class="rx-card">
                     ${calendarButtonHtml}
                     <div class="d-flex align-items-start justify-content-between">
                         <div>
-                            <div class="rx-icon">
-                                <i class="bi ${iconClass}"></i>
-                            </div>
+                            <div class="rx-icon"><i class="bi ${iconClass}"></i></div>
                             <div class="rx-title">${title}</div>
-                            <div class="rx-meta">${displaySubtitle}</div>
+                            <div class="rx-meta">${subtitle}</div>
                             ${badgeHtml}
                         </div>
                     </div>
                 </div>
-            </div>
-          `;
+            </div>`;
           container.insertAdjacentHTML('beforeend', html);
       }
 
-      function addToCalendar(medicationName, time, startDate, endDate) {
-        // Case 1: New format with start and end date -> Create Recurring Event
-        if (startDate && endDate) {
-            if (!confirm(`Add a recurring reminder for "${medicationName}" to your Google Calendar? This will create a daily event from ${startDate} to ${endDate}.`)) {
-              return;
+      // --- Medication Schedule Management ---
+      function addMedicationGroup() {
+        const container = document.getElementById('medicationContainerModal');
+        const div = document.createElement('div');
+        div.className = 'medication-group';
+        div.innerHTML = `<hr style="border-top: 1px solid rgba(255,255,255,0.2);"><div class="mb-3"><label class="form-label-light">Time</label><input type="time" class="form-control form-control-pill-white sched-time"></div><div class="mb-3"><label class="form-label-light">Medication Name</label><input type="text" class="form-control form-control-pill-white sched-name"></div>`;
+        container.appendChild(div);
+      }
+
+      async function saveMedicationSchedule() {
+         const user = auth.currentUser;
+         if (!user) return alert("You must be logged in.");
+         
+         const groups = document.querySelectorAll('#addMedicationModal .medication-group');
+         const schedules = [];
+         groups.forEach(g => {
+             const time = g.querySelector('.sched-time').value;
+             const name = g.querySelector('.sched-name').value;
+             if(time && name) schedules.push({ time, medication: name });
+         });
+
+         if(schedules.length === 0) return alert("Add at least one medication.");
+
+         try {
+             const patientRef = db.collection("users").doc(user.uid);
+             await patientRef.collection("medication_schedules").add({
+                 items: schedules,
+                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
+             });
+             
+             bootstrap.Modal.getInstance(document.getElementById('addMedicationModal'))?.hide();
+             loadPrescriptions(user.uid);
+             alert("Medication schedule added!");
+         } catch(e) { 
+            alert("Error saving schedule: " + e.message); 
+            console.error("Error saving schedule: ", e);
+         }
+      }
+      
+      async function deletePrescription(scheduleId) {
+        const user = auth.currentUser;
+        if (!user || !scheduleId) return;
+
+        if (confirm("Are you sure you want to delete this medication schedule?")) {
+          try {
+            await db.collection("users").doc(user.uid).collection("medication_schedules").doc(scheduleId).delete();
+            alert("Schedule deleted successfully!");
+            loadPrescriptions(user.uid);
+            const manageModalEl = document.getElementById('manageSchedulesModal');
+            const manageModal = bootstrap.Modal.getInstance(manageModalEl);
+            if(manageModal && manageModalEl.classList.contains('show')) {
+              openManageSchedulesModal();
             }
-
-            const [hours, minutes] = time.split(':');
-            const startDateTime = new Date(`${startDate}T${time}:00`);
-            const endDateTime = new Date(startDateTime.getTime() + 5 * 60000); // 5 minute duration for each event
-
-            const toGoogleLocal = (date) => {
-                return date.getFullYear() +
-                       ('0' + (date.getMonth() + 1)).slice(-2) +
-                       ('0' + date.getDate()).slice(-2) + 'T' +
-                       ('0' + date.getHours()).slice(-2) +
-                       ('0' + date.getMinutes()).slice(-2) + '00';
-            }
-
-            const untilDate = new Date(`${endDate}T23:59:59`);
-            const untilDateUTC = untilDate.toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
-            const rrule = `RRULE:FREQ=DAILY;UNTIL=${untilDateUTC}`;
-
-            const eventDetails = {
-                title: `Take Medication: ${medicationName}`,
-                dates: `${toGoogleLocal(startDateTime)}/${toGoogleLocal(endDateTime)}`,
-                details: `Daily reminder to take your prescribed medication: ${medicationName}.`,
-                recur: rrule,
-                ctz: Intl.DateTimeFormat().resolvedOptions().timeZone
-            };
-            
-            const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.title)}&dates=${encodeURIComponent(eventDetails.dates)}&details=${encodeURIComponent(eventDetails.details)}&recur=${encodeURIComponent(eventDetails.recur)}&ctz=${encodeURIComponent(eventDetails.ctz)}`;
-            window.open(calendarUrl, '_blank');
-
-        // Case 2: Old format without dates -> Create Single Event
-        } else {
-            if (!confirm(`Add a one-time reminder for "${medicationName}" at ${time} to your Google Calendar?`)) {
-              return;
-            }
-
-            const [hours, minutes] = time.split(':');
-            const now = new Date();
-            const startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
-
-            if (startTime < now) {
-              startTime.setDate(startTime.getDate() + 1);
-            }
-
-            const endTime = new Date(startTime.getTime() + 5 * 60000);
-            const toGoogleUTC = (date) => date.toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
-
-            const event = {
-              title: `Take Medication: ${medicationName}`,
-              start: toGoogleUTC(startTime),
-              end: toGoogleUTC(endTime),
-              details: `Reminder to take your prescribed medication: ${medicationName}.`
-            };
-
-            const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${event.start}/${event.end}&details=${encodeURIComponent(event.details)}`;
-            window.open(calendarUrl, '_blank');
+          } catch (error) {
+            console.error("Error deleting schedule: ", error);
+            alert("Error deleting medication: " + error.message);
+          }
         }
+      }
+
+      // --- Primary Medication Management ---
+      async function openEditPrimaryMedicationModal() {
+        const user = auth.currentUser;
+        if (!user) return;
+        try {
+            const userDoc = await db.collection("users").doc(user.uid).get();
+            document.getElementById('primaryMedicationInput').value = userDoc.data()?.medication || '';
+            new bootstrap.Modal(document.getElementById('editPrimaryMedicationModal')).show();
+        } catch (error) {
+            alert("Could not load your medication data. " + error.message);
+        }
+      }
+
+      async function savePrimaryMedication() {
+        const user = auth.currentUser;
+        if (!user) return;
+        try {
+            await db.collection("users").doc(user.uid).update({
+                medication: document.getElementById('primaryMedicationInput').value
+            });
+            bootstrap.Modal.getInstance(document.getElementById('editPrimaryMedicationModal'))?.hide();
+            loadPrescriptions(user.uid);
+            alert("Primary medication updated successfully!");
+        } catch (error) {
+            alert("Failed to update medication. " + error.message);
+        }
+      }
+
+      // --- Manage Schedules Modal ---
+      async function openManageSchedulesModal() {
+        const user = auth.currentUser;
+        if (!user) return;
+        const listContainer = document.getElementById('scheduleListInModal');
+        listContainer.innerHTML = 'Loading...';
+        
+        try {
+            const snapshot = await db.collection("users").doc(user.uid).collection("medication_schedules").orderBy('createdAt','desc').get();
+            if(snapshot.empty) { 
+                listContainer.innerHTML = "<p class='text-white-50'>No medication schedules found.</p>"; 
+            } else {
+                let html = '<ul class="list-group list-group-flush">';
+                snapshot.forEach(doc => {
+                    let itemsHtml = doc.data().items.map(item => `<li>${item.time} - ${item.medication}</li>`).join('');
+                    html += `<li class="list-group-item d-flex justify-content-between align-items-center" style="background: transparent; color: white;">
+                                <ul class="list-unstyled">${itemsHtml}</ul>
+                                <button class="btn btn-sm" style="background-color: red; color: black;" onclick="deletePrescription('${doc.id}')">Delete</button>
+                             </li>`;
+                });
+                html += '</ul>';
+                listContainer.innerHTML = html;
+            }
+            new bootstrap.Modal(document.getElementById('manageSchedulesModal')).show();
+        } catch (error) {
+            listContainer.innerHTML = '<p class="text-danger">Error loading schedules.</p>';
+        }
+      }
+
+      // --- Google Calendar ---
+      function addToCalendar(medicationName, time) {
+          if (!confirm(`Add a one-time reminder for "${medicationName}" at ${time} to your Google Calendar?`)) return;
+          const [hours, minutes] = time.split(':');
+          const now = new Date();
+          let startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+          if (startTime < now) startTime.setDate(startTime.getDate() + 1);
+          const endTime = new Date(startTime.getTime() + 5 * 60000);
+          const toGoogleUTC = (date) => date.toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
+          const event = {
+            title: `Take Medication: ${medicationName}`,
+            start: toGoogleUTC(startTime),
+            end: toGoogleUTC(endTime),
+            details: `Reminder to take your prescribed medication: ${medicationName}.`
+          };
+          const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${event.start}/${event.end}&details=${encodeURIComponent(event.details)}`;
+          window.open(calendarUrl, '_blank');
       }
     </script>
   </body>
