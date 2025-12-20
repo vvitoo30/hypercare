@@ -144,9 +144,21 @@
                             <input type="text" class="form-control" id="modal-prescription-dosage" required>
                         </div>
                         <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="modal-prescription-frequency" class="form-label">Frequency (times per day)</label>
+                            <div class="col-md-4">
+                                <label for="modal-prescription-frequency" class="form-label">Frequency (times/day)</label>
                                 <input type="number" class="form-control" id="modal-prescription-frequency" min="1" max="10" placeholder="e.g., 3">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="modal-prescription-recurrence" class="form-label">Recurrence</label>
+                                <select class="form-select" id="modal-prescription-recurrence">
+                                    <option value="DAILY" selected>Daily</option>
+                                    <option value="WEEKLY">Weekly</option>
+                                    <option value="MONTHLY">Monthly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="modal-prescription-end-date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="modal-prescription-end-date">
                             </div>
                         </div>
                         <div id="modal-time-inputs-container" class="mb-3"><!-- Time inputs generated here --></div>

@@ -86,6 +86,63 @@
           </div>
         </div>
       </div>
+
+      <hr class="my-4" />
+
+      <!-- Prescription Section -->
+      <div id="prescriptions-section">
+        <h3 class="fw-bold mb-3">Manage Prescriptions</h3>
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h4 class="card-title mb-3">Add New Prescription</h4>
+            <form id="add-prescription-form" class="mb-4">
+              <div class="mb-3">
+                <label for="prescription-name" class="form-label">Medication Name</label>
+                <input class="form-control" list="medication-options" id="prescription-name" placeholder="Type to search..." required>
+                <datalist id="medication-options">
+                    <!-- Options will be populated by app.js from Firestore -->
+                </datalist>
+              </div>
+              <div class="mb-3">
+                <label for="prescription-dosage" class="form-label">Dosage</label>
+                <input type="text" class="form-control" id="prescription-dosage" placeholder="e.g., 500mg" required>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label for="prescription-frequency" class="form-label">Frequency (times/day)</label>
+                  <input type="number" class="form-control" id="prescription-frequency" min="1" max="10" placeholder="e.g., 3">
+                </div>
+                <div class="col-md-4">
+                  <label for="prescription-recurrence" class="form-label">Recurrence</label>
+                  <select class="form-select" id="prescription-recurrence">
+                      <option value="DAILY" selected>Daily</option>
+                      <option value="WEEKLY">Weekly</option>
+                      <option value="MONTHLY">Monthly</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="prescription-end-date" class="form-label">End Date</label>
+                  <input type="date" class="form-control" id="prescription-end-date">
+                </div>
+              </div>
+              <div id="time-inputs-container" class="mb-3">
+                <!-- Time inputs will be generated here -->
+              </div>
+              <div class="mb-3">
+                <label for="prescription-notes" class="form-label">Notes</label>
+                <textarea class="form-control" id="prescription-notes" rows="2"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Add Prescription</button>
+            </form>
+
+            <h4 class="fw-bold mb-3">Prescription History</h4>
+            <div id="prescriptions-history">
+              <!-- Prescriptions history will be loaded here -->
+              <p>Loading prescriptions...</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

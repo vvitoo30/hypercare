@@ -2,6 +2,66 @@
 const db = firebase.firestore();
 const auth = firebase.auth();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
+googleProvider.addScope('https://www.googleapis.com/auth/calendar.events');
+
+// --- Helper: Create Google Calendar Event ---
+const createCalendarEvent = async (title, time, recurrenceType = 'DAILY', endDate = null) => {
+    const accessToken = sessionStorage.getItem('googleAccessToken');
+    if (!accessToken) {
+        console.warn("No Google Access Token found. Please sign in again to enable Calendar integration.");
+        return;
+    }
+
+    const [hours, minutes] = time.split(':');
+    const startDate = new Date();
+    startDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    
+    const endDateObj = new Date(startDate);
+    endDateObj.setMinutes(startDate.getMinutes() + 30); // 30 min duration
+
+    let rrule = `RRULE:FREQ=${recurrenceType}`;
+    if (endDate) {
+        // Format date as YYYYMMDDTHHMMSSZ
+        const untilDate = new Date(endDate);
+        untilDate.setHours(23, 59, 59, 0);
+        const untilStr = untilDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        rrule += `;UNTIL=${untilStr}`;
+    }
+
+    const event = {
+        'summary': title,
+        'start': {
+            'dateTime': startDate.toISOString(),
+            'timeZone': Intl.DateTimeFormat().resolvedOptions().timeZone
+        },
+        'end': {
+            'dateTime': endDateObj.toISOString(),
+            'timeZone': Intl.DateTimeFormat().resolvedOptions().timeZone
+        },
+        'recurrence': [
+            rrule
+        ]
+    };
+
+    try {
+        const response = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(event)
+        });
+
+        if (response.ok) {
+            console.log(`Event created: ${title} (${recurrenceType})`);
+        } else {
+            console.error("Failed to create Calendar event:", await response.text());
+        }
+    } catch (e) {
+        console.error("Error calling Google Calendar API:", e);
+    }
+};
 
 // --- All functions are defined globally so they can be called from anywhere ---
 
@@ -269,6 +329,9 @@ const updateUserRole = (uid, newRole) => {
 const signInWithGoogle = () => {
     auth.signInWithPopup(googleProvider)
         .then(result => {
+            if (result.credential) {
+                sessionStorage.setItem('googleAccessToken', result.credential.accessToken);
+            }
             const user = result.user;
             const userDocRef = db.collection('users').doc(user.uid);
 
@@ -472,14 +535,26 @@ const handlePatientEditPage = () => {
                 }
             }
 
+            const recurrence = document.getElementById('prescription-recurrence').value;
+            const endDate = document.getElementById('prescription-end-date').value;
+
             patientRef.collection('prescriptions').add({
                 name: document.getElementById('prescription-name').value,
                 dosage: document.getElementById('prescription-dosage').value,
                 frequency: frequency,
-                times: times, // Save array of times
+                times: times, 
+                recurrence: recurrence,
+                endDate: endDate,
                 notes: document.getElementById('prescription-notes').value,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
+                const medName = document.getElementById('prescription-name').value;
+                if (times && times.length > 0) {
+                    times.forEach(t => createCalendarEvent(`Take ${medName}`, t, recurrence, endDate));
+                    alert(`Prescription saved and added to your Google Calendar (${recurrence})!`);
+                } else {
+                    alert('Prescription saved!');
+                }
                 prescriptionForm.reset();
                 if(timeInputsContainer) timeInputsContainer.innerHTML = '';
             });
@@ -495,7 +570,8 @@ const handlePatientEditPage = () => {
         snapshot.forEach(doc => {
             const data = doc.data();
             const reminderTimes = data.times && data.times.length > 0 ? data.times.join(', ') : 'No specific times set';
-            const reminderInfo = `<p class="card-text">Reminder: ${data.frequency || 'N/A'} times a day at ${reminderTimes}</p>`;
+            const recurrenceInfo = data.recurrence ? ` | ${data.recurrence} until ${data.endDate || 'forever'}` : '';
+            const reminderInfo = `<p class="card-text">Reminder: ${data.frequency || 'N/A'} times a day at ${reminderTimes}${recurrenceInfo}</p>`;
             html += `<div class="card mb-2"><div class="card-body"><h5 class="card-title">${data.name} (${data.dosage})</h5>${reminderInfo}<p class="card-text">${data.notes}</p><small class="text-muted">Prescribed on ${data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'N/A'}</small></div></div>`;
         });
         prescriptionsHistory.innerHTML = html;
@@ -1070,9 +1146,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         const reminderTimes = data.times && data.times.length > 0 ? data.times.join(', ') : 'No specific times';
+                        const recurrenceInfo = data.recurrence ? ` | ${data.recurrence} until ${data.endDate || 'forever'}` : '';
                         html += `<div class="card mb-2"><div class="card-body">
                                     <h5 class="card-title">${data.name} (${data.dosage})</h5>
-                                    <p class="card-text">Reminder: ${data.frequency || 'N/A'} times a day. ${data.times && data.times.length > 0 ? `At ${reminderTimes}`: ''}</p>
+                                    <p class="card-text">Reminder: ${data.frequency || 'N/A'} times a day. ${data.times && data.times.length > 0 ? `At ${reminderTimes}`: ''}${recurrenceInfo}</p>
                                     <p class="card-text"><small>${data.notes || ''}</small></p>
                                     <small class="text-muted">Prescribed on ${data.timestamp ? data.timestamp.toDate().toLocaleDateString() : 'N/A'}</small>
                                  </div></div>`;
@@ -1108,6 +1185,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     dosage: document.getElementById('modal-prescription-dosage').value,
                     frequency: parseInt(frequencyInput.value, 10) || 0,
                     times: Array.from(timeInputsContainer.querySelectorAll('input')).map(input => input.value).filter(Boolean),
+                    recurrence: document.getElementById('modal-prescription-recurrence').value,
+                    endDate: document.getElementById('modal-prescription-end-date').value,
                     notes: document.getElementById('modal-prescription-notes').value,
                 };
                 if (!newPrescription.name || !newPrescription.dosage) return alert('Please fill out Medication Name and Dosage.');
@@ -1134,7 +1213,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     batch.set(newPrescriptionRef, { ...prescription, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
                 });
                 batch.commit().then(() => {
-                    alert('All prescriptions saved successfully!');
+                    let calendarCount = 0;
+                    tempPrescriptions.forEach(p => {
+                        if (p.times && p.times.length > 0) {
+                            p.times.forEach(t => {
+                                createCalendarEvent(`Take ${p.name}`, t, p.recurrence, p.endDate);
+                                calendarCount++;
+                            });
+                        }
+                    });
+
+                    if (calendarCount > 0) {
+                        alert(`All prescriptions saved and ${calendarCount} recurring reminders added to Google Calendar!`);
+                    } else {
+                        alert('All prescriptions saved successfully!');
+                    }
                     tempPrescriptions = [];
                     renderTempPrescriptions();
                 }).catch(error => { console.error('Error saving prescriptions in batch:', error); alert('Failed to save prescriptions.'); });
